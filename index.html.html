@@ -587,6 +587,43 @@ tr:hover td { background:var(--gold-ultra); }
 ::-webkit-scrollbar-track { background:transparent; }
 ::-webkit-scrollbar-thumb { background:var(--border); border-radius:4px; }
 ::-webkit-scrollbar-thumb:hover { background:var(--gold); }
+
+/* ─── MODAL SELECIONAR PACIENTE ─── */
+.select-patient-list { max-height:55vh; overflow-y:auto; margin:0 -4px; padding:0 4px; }
+.select-patient-item {
+  display:flex; align-items:center; gap:13px;
+  padding:13px 14px; border-radius:14px; cursor:pointer;
+  border:1.5px solid transparent; transition:.2s; margin-bottom:8px;
+  background:var(--cream);
+}
+.select-patient-item:hover { border-color:var(--gold); background:var(--gold-ultra); }
+.select-patient-item:active { transform:scale(.98); }
+.sp-avatar {
+  width:42px; height:42px; border-radius:12px; flex-shrink:0;
+  background:linear-gradient(135deg,var(--green-pale),#d0ece9);
+  display:flex; align-items:center; justify-content:center;
+  font-family:'Cormorant Garamond',serif; font-size:1.2rem; color:var(--green-mid);
+  border:1.5px solid rgba(212,184,150,.3);
+}
+.sp-info { flex:1; min-width:0; }
+.sp-name { font-weight:700; font-size:.9rem; color:var(--charcoal); }
+.sp-diag { font-size:.74rem; color:var(--soft); margin-top:2px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.sp-sessions { font-size:.68rem; color:var(--gold-deep); font-weight:700; margin-top:3px; }
+.sp-arrow { color:var(--gold); font-size:1.2rem; flex-shrink:0; }
+.select-search {
+  display:flex; align-items:center; gap:9px;
+  background:var(--cream); border:1.5px solid var(--border);
+  border-radius:11px; padding:10px 13px; margin-bottom:14px;
+  transition:.2s;
+}
+.select-search:focus-within { border-color:var(--gold); }
+.select-search input {
+  flex:1; border:none; outline:none;
+  font-family:'Nunito',sans-serif; font-size:.88rem;
+  color:var(--charcoal); background:transparent;
+}
+.select-search input::placeholder { color:var(--soft); }
+.sp-empty { text-align:center; padding:28px; color:var(--soft); font-size:.85rem; }
 </style>
 </head>
 <body>
@@ -666,7 +703,7 @@ tr:hover td { background:var(--gold-ultra); }
         <div class="dash-name" id="dash-name">—</div>
         <div class="dash-crp" id="dash-crp"></div>
       </div>
-      <div class="dash-badge" onclick="showScreen('setup')">
+      <div class="dash-badge" onclick="navToSetup()">
         <span>⚙️</span><span>Perfil</span>
       </div>
     </div>
@@ -690,8 +727,8 @@ tr:hover td { background:var(--gold-ultra); }
     <button class="bnav-btn active" id="bnav-dash" onclick="navTo('dash')">
       <span class="bnav-icon">🏠</span>Início<div class="bnav-dot"></div>
     </button>
-    <button class="bnav-btn" id="bnav-table" onclick="navTo('patients-table')">
-      <span class="bnav-icon">📋</span>Cadastros
+    <button class="bnav-btn" onclick="openSelectPatient()">
+      <span class="bnav-icon">🩺</span>Novo Atend.
     </button>
     <button class="bnav-btn" id="bnav-new" onclick="openNewPatient()">
       <span class="bnav-icon" style="font-size:22px;color:var(--gold-deep)">＋</span>Paciente
@@ -720,7 +757,7 @@ tr:hover td { background:var(--gold-ultra); }
   </div>
   <div class="bottom-nav">
     <button class="bnav-btn" id="bnav-dash2" onclick="navTo('dash')"><span class="bnav-icon">🏠</span>Início</button>
-    <button class="bnav-btn active" id="bnav-table2" onclick="navTo('patients-table')"><span class="bnav-icon">📋</span>Cadastros<div class="bnav-dot"></div></button>
+    <button class="bnav-btn" onclick="openSelectPatient()"><span class="bnav-icon">🩺</span>Novo Atend.</button>
     <button class="bnav-btn" onclick="openNewPatient()"><span class="bnav-icon" style="font-size:22px;color:var(--gold-deep)">＋</span>Paciente</button>
   </div>
 </div>
@@ -771,9 +808,10 @@ tr:hover td { background:var(--gold-ultra); }
   <div class="form-body">
     <div class="form-section">
       <div class="form-section-title">Sessão</div>
-      <div class="grid2">
-        <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="f-date"></div>
-        <div class="form-group"><label class="form-label">Nº sessão</label><input type="number" class="form-input" id="f-num" min="1"></div>
+      <div class="form-group"><label class="form-label">Data</label><input type="date" class="form-input" id="f-date"></div>
+      <div style="background:var(--gold-ultra);border:1px solid var(--border-gold);border-radius:10px;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;margin-top:4px">
+        <span style="font-size:.72rem;font-weight:700;color:var(--mid);letter-spacing:.06em;text-transform:uppercase">Sessão nº</span>
+        <span id="f-num-display" style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--gold-deep)"></span>
       </div>
     </div>
     <div class="form-section">
@@ -840,6 +878,7 @@ tr:hover td { background:var(--gold-ultra); }
     <div class="sign-ok-icon">✅</div>
     <h2>Atendimento confirmado!</h2>
     <p>Assinado e registrado com sucesso.</p>
+    <button onclick="bootDash()" style="margin-top:28px;padding:14px 36px;background:linear-gradient(135deg,var(--green-light),var(--green-deep));color:#fff;border:none;border-radius:50px;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(10,92,82,.3);transition:.2s" onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">🏠 Voltar ao início</button>
   </div>
 </div>
 
@@ -887,6 +926,22 @@ tr:hover td { background:var(--gold-ultra); }
   </div>
 </div>
 
+<!-- ══ MODAL SELECIONAR PACIENTE ══ -->
+<div class="modal-overlay" id="modal-select" onclick="closeMO(event,'modal-select')">
+  <div class="modal">
+    <div class="modal-title">Novo Atendimento</div>
+    <div class="modal-sub">Selecione o paciente que será atendido</div>
+    <div class="select-search">
+      <span style="color:var(--soft)">🔍</span>
+      <input type="text" id="sp-search" placeholder="Buscar paciente..." oninput="filterSelectList()">
+    </div>
+    <div class="select-patient-list" id="sp-list"></div>
+    <div style="margin-top:14px">
+      <button class="btn-cancel" style="width:100%" onclick="closeModal('modal-select')">Cancelar</button>
+    </div>
+  </div>
+</div>
+
 <script>
 // ── STATE ──
 let db = JSON.parse(localStorage.getItem('fh_db') || '{"users":{},"patients":[],"sessions":[]}');
@@ -923,7 +978,7 @@ function doLogin(){
   const user=db.users[email];
   if(!user||user.pass!==btoa(pass)){showErr('E-mail ou senha incorretos.');return;}
   saveUser({email,...user});
-  if(!user.name||!user.crp){showScreen('setup');fillSetup();}
+  if(!user.name||!user.crp){navToSetup();}
   else{bootDash();}
 }
 function doRegister(){
@@ -936,18 +991,26 @@ function doRegister(){
   db.users[email]={name,pass:btoa(pass),crp:'',spec:'',tel:'',addr:''};
   saveDB(); saveUser({email,...db.users[email]});
   showScreen('setup');
-  document.getElementById('s-name').value=name;
-  updateStampPreview();
+  setTimeout(()=>{
+    document.getElementById('s-name').value=name;
+    updateStampPreview();
+  },50);
 }
 
 // ── SETUP ──
+function navToSetup(){
+  showScreen('setup');
+  setTimeout(fillSetup, 50);
+}
+
 function fillSetup(){
-  const u=currentUser;
-  ['s-name','s-crp','s-spec','s-tel','s-addr'].forEach(id=>{
-    const key=id.replace('s-','');
-    const map={name:'name',crp:'crp',spec:'spec',tel:'tel',addr:'addr'};
-    document.getElementById(id).value=u[map[key]]||'';
-  });
+  const u = currentUser;
+  if(!u) return;
+  document.getElementById('s-name').value  = u.name  || '';
+  document.getElementById('s-crp').value   = u.crp   || '';
+  document.getElementById('s-spec').value  = u.spec  || '';
+  document.getElementById('s-tel').value   = u.tel   || '';
+  document.getElementById('s-addr').value  = u.addr  || '';
   updateStampPreview();
 }
 ['s-name','s-crp','s-spec','s-tel','s-addr'].forEach(id=>
@@ -1087,7 +1150,10 @@ function renderSessions(filter){
   el.innerHTML=list.map(s=>{
     const d=new Date(s.date+'T12:00:00');
     const pc=s.pain<=3?'chip-done':s.pain<=6?'chip-gold':'chip-pain';
-    return `<div class="session-item">
+    const unsigned=!s.signed;
+    const clickAttr=unsigned?`onclick="resendSignature(${s.id})" title="Toque para reenviar assinatura"`:'';
+    const cursor=unsigned?'cursor:pointer':'';
+    return `<div class="session-item" style="${cursor}" ${clickAttr}>
       <div class="session-date-col"><div class="session-day">${d.getDate()}</div><div class="session-month">${MO[d.getMonth()]}</div></div>
       <div class="session-content">
         <div class="session-title">Sessão ${s.num}</div>
@@ -1098,7 +1164,9 @@ function renderSessions(filter){
           <span class="chip ${pc}">Dor ${s.pain}/10</span>
           ${s.procs.slice(0,2).map(p=>`<span class="chip chip-gold">${p}</span>`).join('')}
         </div>
-        ${s.signed?'<div class="session-signed">✅ Assinado pelo paciente</div>':'<div style="font-size:.66rem;color:var(--amber);font-weight:700;margin-top:5px">⏳ Aguardando assinatura</div>'}
+        ${s.signed
+          ?'<div class="session-signed">✅ Assinado pelo paciente</div>'
+          :'<div style="font-size:.66rem;color:var(--amber);font-weight:700;margin-top:5px;display:flex;align-items:center;gap:5px">⏳ Aguardando assinatura &nbsp;·&nbsp; <span style="color:var(--green-mid);text-decoration:underline">Reenviar link 📲</span></div>'}
       </div>
     </div>`;
   }).join('');
@@ -1107,9 +1175,11 @@ function renderSessions(filter){
 // ── FORM ──
 function openFormAtend(){
   const p=db.patients.find(x=>x.id===currentPatientId);
+  const nextNum=sessionsOf(p.id).length+1;
   document.getElementById('form-patient-name').textContent=p.name;
   document.getElementById('f-date').value=new Date().toISOString().split('T')[0];
-  document.getElementById('f-num').value=sessionsOf(p.id).length+1;
+  document.getElementById('f-num-display').textContent=nextNum;
+  document.getElementById('f-num-display').dataset.num=nextNum;
   ['f-evolucao','f-pa','f-spo2','f-fc','f-obs'].forEach(id=>document.getElementById(id).value='');
   document.querySelectorAll('.proc-tag').forEach(t=>t.classList.remove('sel'));
   document.getElementById('btn-whats').style.display='none';
@@ -1136,7 +1206,7 @@ function saveSession(){
   const s={
     id:Date.now(), patientId:p.id,
     date:document.getElementById('f-date').value,
-    num:parseInt(document.getElementById('f-num').value)||sessionsOf(p.id).length+1,
+    num:parseInt(document.getElementById('f-num-display').dataset.num)||sessionsOf(p.id).length+1,
     evolucao:document.getElementById('f-evolucao').value||'(sem registro)',
     pa:document.getElementById('f-pa').value||'—',
     spo2:document.getElementById('f-spo2').value||'—',
@@ -1159,6 +1229,20 @@ function sendWhatsApp(){
   const{session:s,patient:p}=savedSession;
   const link=`${location.href.split('?')[0]}?sign=${s.id}`;
   const msg=encodeURIComponent(`Olá ${p.name.split(' ')[0]}! 👋\n\nSeu atendimento foi registrado. Confirme com apenas 1 toque:\n\n${link}`);
+  const phone=p.phone.replace(/\D/g,'');
+  window.open(`https://wa.me/55${phone}?text=${msg}`,'_blank');
+  setTimeout(()=>openSignScreen(s,p),600);
+}
+
+function resendSignature(sid){
+  const s=db.sessions.find(x=>x.id===sid);
+  if(!s) return;
+  const p=db.patients.find(x=>x.id===s.patientId);
+  if(!p) return;
+  if(!p.phone){ alert('Este paciente não tem WhatsApp cadastrado.'); return; }
+  savedSession={session:s,patient:p};
+  const link=`${location.href.split('?')[0]}?sign=${s.id}`;
+  const msg=encodeURIComponent(`Olá ${p.name.split(' ')[0]}! 👋\n\nSeu atendimento ainda não foi confirmado. Assine com 1 toque:\n\n${link}`);
   const phone=p.phone.replace(/\D/g,'');
   window.open(`https://wa.me/55${phone}?text=${msg}`,'_blank');
   setTimeout(()=>openSignScreen(s,p),600);
@@ -1206,6 +1290,39 @@ function confirmSign(){
 
 // ── MODALS ──
 function openNewPatient(){document.getElementById('modal-new').classList.add('open');}
+
+// ── SELECIONAR PACIENTE PARA ATENDIMENTO ──
+function openSelectPatient(){
+  document.getElementById('sp-search').value='';
+  renderSelectList(db.patients);
+  document.getElementById('modal-select').classList.add('open');
+}
+function filterSelectList(){
+  const q=document.getElementById('sp-search').value.toLowerCase();
+  renderSelectList(db.patients.filter(p=>p.name.toLowerCase().includes(q)||p.diag.toLowerCase().includes(q)));
+}
+function renderSelectList(list){
+  const el=document.getElementById('sp-list');
+  if(!list.length){
+    el.innerHTML='<div class="sp-empty">Nenhum paciente encontrado.<br>Cadastre um paciente primeiro.</div>';
+    return;
+  }
+  el.innerHTML=list.map(p=>`
+    <div class="select-patient-item" onclick="selectPatientForAtend(${p.id})">
+      <div class="sp-avatar">${p.name[0]}</div>
+      <div class="sp-info">
+        <div class="sp-name">${p.name}</div>
+        <div class="sp-diag">${p.diag}</div>
+        <div class="sp-sessions">🩺 ${sessionsOf(p.id).length} sessões realizadas</div>
+      </div>
+      <span class="sp-arrow">›</span>
+    </div>`).join('');
+}
+function selectPatientForAtend(id){
+  closeModal('modal-select');
+  currentPatientId=id;
+  openFormAtend();
+}
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function closeMO(e,id){if(e.target===document.getElementById(id))closeModal(id);}
 function saveNewPatient(){
