@@ -5,22 +5,21 @@ import { useParams, useRouter } from 'next/navigation';
 import '../../../globals.css';
 
 export default function ProntuarioPaciente() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params?.id;
   const router = useRouter();
-  const [user, setUser] = useState(null);
-  const [paciente, setPaciente] = useState(null);
   
-  // CORREÇÃO TS: Informando que o estado aceita um array de objetos dinâmicos
+  const [user, setUser] = useState<any>(null);
+  const [paciente, setPaciente] = useState<any>(null);
   const [atendimentos, setAtendimentos] = useState<any[]>([]);
-  
   const [loading, setLoading] = useState(false);
 
-  // Estados do Formulário (Evolução + Financeiro básico)
   const [novoAtendimento, setNovoAtendimento] = useState('');
   const [valorSessao, setValorSessao] = useState('');
   const [formaPagamento, setFormaPagamento] = useState('Pix');
 
   const carregarDados = async () => {
+    if (!id) return;
     const { data: pData } = await supabase.from('v_tn003_pacientes').select('*').eq('id', id).single();
     setPaciente(pData);
 
@@ -35,18 +34,18 @@ export default function ProntuarioPaciente() {
   };
 
   useEffect(() => {
-    const verificarUser = async () => {
+    const verificarUsuario = async () => {
       const { data: { user } } = await supabase.auth.getUser();
       if (!user) { router.push('/'); return; }
       setUser(user);
     };
-    verificarUser();
+    verificarUsuario();
     if (id) carregarDados();
   }, [id, router]);
 
-  const handleSalvarTudo = async (e) => {
+  const handleSalvarTudo = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!novoAtendimento.trim()) return;
+    if (!novoAtendimento.trim() || !user) return;
     setLoading(true);
 
     const { data: atendimento, error: errorAtend } = await supabase
@@ -142,7 +141,7 @@ export default function ProntuarioPaciente() {
 
             <h3 style={{ color: '#2D5A53', fontFamily: 'Cormorant Garamond', fontSize: '1.8rem', marginBottom: '20px' }}>Histórico Clínico e Financeiro</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
-              {atendimentos.length > 0 ? atendimentos.map((atend) => {
+              {atendimentos.length > 0 ? atendimentos.map((atend: any) => {
                 const fin = Array.isArray(atend.tn007_financeiro) ? atend.tn007_financeiro[0] : atend.tn007_financeiro;
                 return (
                   <div key={atend.id} style={{ background: 'white', padding: '25px', borderRadius: '20px', borderLeft: '5px solid #D4B896', border: '1px solid #E5E2DA' }}>
