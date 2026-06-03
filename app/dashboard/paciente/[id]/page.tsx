@@ -3,7 +3,7 @@
 import { useEffect, useState, ChangeEvent, FormEvent } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import '../globals.css';
+import '@/app/globals.css';
 
 // Definição estrita das estruturas de dados do banco
 interface Paciente {
