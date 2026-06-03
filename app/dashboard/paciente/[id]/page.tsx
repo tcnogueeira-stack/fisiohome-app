@@ -9,7 +9,10 @@ export default function ProntuarioPaciente() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [paciente, setPaciente] = useState(null);
-  const [atendimentos, setAtendimentos] = useState([]);
+  
+  // CORREÇÃO TS: Informando que o estado aceita um array de objetos dinâmicos
+  const [atendimentos, setAtendimentos] = useState<any[]>([]);
+  
   const [loading, setLoading] = useState(false);
 
   // Estados do Formulário (Evolução + Financeiro básico)
@@ -22,7 +25,6 @@ export default function ProntuarioPaciente() {
     setPaciente(pData);
 
     if (pData) {
-      // Busca os atendimentos trazendo junto os dados da tabela tn007_financeiro via Left Join
       const { data: aData } = await supabase
         .from('tn005_atendimentos')
         .select('*, tn007_financeiro(valor, forma_pagamento)')
@@ -47,7 +49,6 @@ export default function ProntuarioPaciente() {
     if (!novoAtendimento.trim()) return;
     setLoading(true);
 
-    // 1. Salva o Atendimento (TN005)
     const { data: atendimento, error: errorAtend } = await supabase
       .from('tn005_atendimentos')
       .insert([{ paciente_id: id, fisio_id: user.id, descricao: novoAtendimento }])
@@ -60,7 +61,6 @@ export default function ProntuarioPaciente() {
       return;
     }
 
-    // 2. Se houver valor informado, salva o Financeiro (TN007) vinculado ao atendimento criado
     if (valorSessao && parseFloat(valorSessao) > 0) {
       const { error: errorFin } = await supabase
         .from('tn007_financeiro')
@@ -77,7 +77,6 @@ export default function ProntuarioPaciente() {
       if (errorFin) alert('Atendimento salvo, mas houve erro no financeiro: ' + errorFin.message);
     }
 
-    // Limpa campos e recarrega a tela
     setNovoAtendimento('');
     setValorSessao('');
     setFormaPagamento('Pix');
@@ -89,7 +88,6 @@ export default function ProntuarioPaciente() {
 
   return (
     <div style={{ display: 'flex', minHeight: '100vh', backgroundColor: '#F9F8F6' }}>
-      {/* Sidebar */}
       <aside style={{ width: '260px', backgroundColor: '#2D5A53', color: '#D4B896', padding: '40px 20px' }}>
         <h2 style={{ fontFamily: 'Cormorant Garamond', fontSize: '2rem', marginBottom: '50px', cursor: 'pointer' }} onClick={() => router.push('/dashboard')}>FisioHome</h2>
         <nav style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
@@ -98,7 +96,6 @@ export default function ProntuarioPaciente() {
         </nav>
       </aside>
 
-      {/* Conteúdo Principal */}
       <main style={{ flex: 1, padding: '50px' }}>
         <header style={{ marginBottom: '40px', borderBottom: '1px solid #E5E2DA', paddingBottom: '20px' }}>
           <h1 style={{ color: '#2D5A53', fontFamily: 'Cormorant Garamond', fontSize: '2.8rem', marginBottom: '10px' }}>{paciente.nome_completo}</h1>
@@ -108,9 +105,7 @@ export default function ProntuarioPaciente() {
         </header>
 
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 320px', gap: '40px' }}>
-          {/* Lado Esquerdo */}
           <div>
-            {/* Formulário Unificado: Evolução + Financeiro */}
             <div style={{ background: 'white', padding: '30px', borderRadius: '25px', border: '1px solid #E5E2DA', marginBottom: '40px' }}>
               <h3 style={{ color: '#2D5A53', fontFamily: 'Cormorant Garamond', fontSize: '1.6rem', marginBottom: '15px' }}>Registrar Sessão e Faturamento</h3>
               <form onSubmit={handleSalvarTudo}>
@@ -122,7 +117,6 @@ export default function ProntuarioPaciente() {
                   onChange={(e) => setNovoAtendimento(e.target.value)}
                 />
                 
-                {/* Campos Financeiros Básicos */}
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px', marginBottom: '20px' }}>
                   <div className="input-group">
                     <label>VALOR DA SESSÃO (R$)</label>
@@ -146,11 +140,9 @@ export default function ProntuarioPaciente() {
               </form>
             </div>
 
-            {/* Histórico com Exibição Financeira */}
             <h3 style={{ color: '#2D5A53', fontFamily: 'Cormorant Garamond', fontSize: '1.8rem', marginBottom: '20px' }}>Histórico Clínico e Financeiro</h3>
             <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {atendimentos.length > 0 ? atendimentos.map((atend) => {
-                // Captura os dados da tabela tn007 inserida via join (no supabase retorna como array ou objeto único)
                 const fin = Array.isArray(atend.tn007_financeiro) ? atend.tn007_financeiro[0] : atend.tn007_financeiro;
                 return (
                   <div key={atend.id} style={{ background: 'white', padding: '25px', borderRadius: '20px', borderLeft: '5px solid #D4B896', border: '1px solid #E5E2DA' }}>
@@ -175,7 +167,6 @@ export default function ProntuarioPaciente() {
             </div>
           </div>
 
-          {/* Lado Direito */}
           <aside style={{ background: 'white', padding: '25px', borderRadius: '25px', border: '1px solid #E5E2DA', height: 'fit-content' }}>
             <h4 style={{ color: '#2D5A53', fontFamily: 'Cormorant Garamond', fontSize: '1.4rem', marginBottom: '15px' }}>Observações do Paciente</h4>
             <p style={{ fontSize: '0.95rem', color: '#666', lineHeight: '1.5' }}>{paciente.observacao || 'Nenhuma observação cadastrada.'}</p>
