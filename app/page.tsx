@@ -25,8 +25,12 @@ export default function Home() {
 
   const handleResetPassword = async () => {
     if (!email) return alert('Digite seu e-mail primeiro.');
+    
+    // Verificação de segurança para o Next.js buildar com sucesso:
+    const origin = typeof window !== 'undefined' ? window.location.origin : 'https://app.pajocomany.com.br';
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+      redirectTo: `${origin}/reset-password`,
     });
     if (error) alert('Erro: ' + error.message);
     else alert('Link de recuperação enviado!');
