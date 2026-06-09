@@ -290,7 +290,7 @@ export default function Dashboard() {
         <section style={{ background: C.warmWhite, borderRadius: 20, border: `1px solid ${C.border}`, boxShadow: '0 2px 12px rgba(10,92,82,0.07)', overflow: 'hidden' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '20px 24px', borderBottom: `1px solid ${C.border}`, flexWrap: 'wrap', gap: 12 }}>
             <h3 style={{ fontFamily: 'Cormorant Garamond, Georgia, serif', fontSize: '1.2rem', fontWeight: 700, color: C.charcoal, margin: 0 }}>
-              Lista de Clientes
+              Pacientes
             </h3>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, background: C.cream, border: `1.5px solid ${C.border}`, borderRadius: 50, padding: '8px 16px', minWidth: 260 }}>
               <span style={{ color: C.soft }}>🔍</span>
