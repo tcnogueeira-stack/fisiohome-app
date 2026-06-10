@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>FisioHome — Prontuário Digital</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;0,700;1,400&family=Nunito:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+:root {
+  /* Verde principal */
+  --green-deep:   #0a5c52;
+  --green-mid:    #0d7a6d;
+  --green-light:  #13a090;
+  --green-pale:   #e5f4f2;
+  --green-ultra:  #f0faf8;
+
+  /* Champagne / Dourado */
+  --gold:         #D4B896;
+  --gold-deep:    #B89870;
+  --gold-light:   #EDD9C0;
+  --gold-ultra:   #FBF5EE;
+  --gold-glow:    rgba(212,184,150,0.25);
+
+  /* Neutros quentes */
+  --cream:        #F8F4EE;
+  --warm-white:   #FEFCF9;
+  --slate-dark:   #2C3E3B;
+  --slate-gray:   #607270;
+  --slate-light:  #DFE5E4;
+  --shadow-sm:    0 2px 8px rgba(10,92,82,0.04);
+  --shadow-md:    0 8px 24px rgba(10,92,82,0.08);
+  --shadow-lg:    0 16px 40px rgba(10,92,82,0.12);
+  --radius-sm:    6px;
+  --radius-md:    12px;
+  --radius-lg:    20px;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Nunito', sans-serif;
+  background-color: var(--cream);
+  color: var(--slate-dark);
+  -webkit-font-smoothing: antialiased;
+  min-height: 100vh;
+}
+
+/* --- TELA DE LOGIN PREMIUM --- */
+#auth-screen {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background: radial-gradient(circle at top right, var(--green-pale), transparent), var(--cream);
+  padding: 20px;
+}
+.login-card {
+  background: var(--warm-white);
+  padding: 40px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  width: 100%;
+  max-width: 420px;
+  border: 1px solid rgba(212,184,150,0.3);
+  text-align: center;
+}
+.login-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  color: var(--green-deep);
+  font-weight: 700;
+  margin-bottom: 8px;
+  letter-spacing: -0.5px;
+}
+.login-subtitle {
+  font-size: 0.9rem;
+  color: var(--slate-gray);
+  margin-bottom: 32px;
+}
+.form-group {
+  text-align: left;
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  font-size: 0.85rem;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--slate-dark);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.form-control {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid var(--slate-light);
+  border-radius: var(--radius-sm);
+  font-family: inherit;
+  font-size: 0.95rem;
+  color: var(--slate-dark);
+  background: var(--warm-white);
+  transition: all 0.2s;
+}
+.form-control:focus {
+  outline: none;
+  border-color: var(--green-mid);
+  box-shadow: 0 0 0 3px rgba(13,122,109,0.1);
+}
+.btn-login {
+  width: 100%;
+  padding: 14px;
+  background: var(--green-deep);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-top: 10px;
+  box-shadow: 0 4px 12px rgba(10,92,82,0.15);
+}
+.btn-login:hover {
+  background: var(--green-mid);
+  transform: translateY(-1px);
+}
+.login-error {
+  color: #c94c4c;
+  background: #fbf2f2;
+  padding: 10px;
+  border-radius: var(--radius-sm);
+  font-size: 0.85rem;
+  margin-bottom: 20px;
+  display: none;
+  border: 1px solid rgba(199,76,76,0.2);
+}
+
+/* --- TELA PRINCIPAL (APP) - ESCONDIDA POR PADRÃO --- */
+#app-screen {
+  display: none; /* Só exibe após o login */
+}
+
+/* Estrutura do App original */
+.app-container { display: flex; min-height: 100vh; }
+aside.sidebar {
+  width: 280px; background-color: var(--green-deep); color: white;
+  display: flex; flex-direction: column; border-right: 1px solid rgba(0,0,0,0.05);
+}
+.brand {
+  padding: 32px 24px; font-family: 'Cormorant Garamond', serif;
+  font-size: 1.65rem; font-weight: 700; border-bottom: 1px solid rgba(255,255,255,0.06);
+  letter-spacing: -0.5px;
+}
+.brand span { font-family: 'Nunito', sans-serif; font-weight: 300; font-size: 0.75rem; display: block; color: var(--gold); letter-spacing: 2px; margin-top: 2px; text-transform: uppercase; }
+.search-box { padding: 20px 24px 10px; }
+.search-wrapper { position: relative; }
+.search-wrapper input {
+  width: 100%; padding: 11px 16px 11px 36px; background-color: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.12); border-radius: var(--radius-sm); color: white;
+  font-family: inherit; font-size: 0.9rem; transition: all 0.2s;
+}
+.search-wrapper input:focus { outline: none; background-color: rgba(255,255,255,0.12); border-color: var(--gold); }
+.search-wrapper svg { position: absolute; left: 12px; top: 12px; width: 14px; height: 14px; fill: rgba(255,255,255,0.4); }
+.patient-list-header { padding: 12px 24px 4px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-light); opacity: 0.8; }
+.patient-list { flex: 1; overflow-y: auto; padding: 0 12px 20px; }
+.patient-item {
+  display: flex; flex-direction: column; padding: 14px 16px; border-radius: var(--radius-sm);
+  cursor: pointer; transition: all 0.15s; margin-bottom: 4px; border-left: 3px solid transparent;
+}
+.patient-item:hover { background-color: rgba(255,255,255,0.04); }
+.patient-item.active { background-color: rgba(255,255,255,0.08); border-left-color: var(--gold); }
+.p-name { font-weight: 600; font-size: 0.95rem; margin-bottom: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.p-meta { font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+.sidebar-footer { padding: 20px 24px; border-top: 1px solid rgba(255,255,255,0.06); }
+.btn-add {
+  width: 100%; padding: 11px; background-color: var(--gold); color: var(--green-deep);
+  border: none; border-radius: var(--radius-sm); font-family: inherit; font-weight: 600;
+  font-size: 0.9rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+.btn-add:hover { background-color: var(--gold-light); transform: translateY(-1px); }
+.btn-add svg { width: 14px; height: 14px; fill: currentcolor; }
+
+/* Adicionado botão de logout no rodapé da sidebar */
+.btn-logout {
+  width: 100%; padding: 8px; background-color: transparent; color: rgba(255,255,255,0.4);
+  border: 1px solid rgba(255,255,255,0.1); border-radius: var(--radius-sm); font-family: inherit;
+  font-size: 0.8rem; cursor: pointer; transition: all 0.2s; margin-top: 10px;
+}
+.btn-logout:hover { color: #ff8a8a; border-color: rgba(255,138,138,0.3); }
+
+main.content { flex: 1; display: flex; flex-direction: column; background-color: var(--warm-white); }
+.empty-state {
+  flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 40px; text-align: center; color: var(--slate-gray);
+}
+.empty-state svg { width: 48px; height: 48px; fill: var(--gold); margin-bottom: 16px; opacity: 0.7; }
+.empty-state h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.8rem; color: var(--green-deep); margin-bottom: 8px; font-weight: 600; }
+.empty-state p { font-size: 0.95rem; max-width: 320px; line-height: 1.5; }
+.detail-view { flex: 1; display: flex; flex-direction: column; animation: fadeIn 0.2s ease-out; }
+@keyframes fadeIn { from { opacity:0; transform: translateY(4px); } to { opacity:1; transform: translateY(0); } }
+.detail-header {
+  padding: 32px 40px; border-bottom: 1px solid var(--slate-light);
+  display: flex; justify-content: space-between; align-items: flex-start; background: white;
+}
+.dh-title h2 { font-family: 'Cormorant Garamond', serif; font-size: 2.2rem; color: var(--green-deep); font-weight: 600; line-height: 1.1; margin-bottom: 6px; }
+.dh-meta { font-size: 0.9rem; color: var(--slate-gray); display: flex; gap: 16px; }
+.dh-actions { display: flex; gap: 8px; }
+.btn-action {
+  padding: 9px 16px; border: 1px solid var(--slate-light); background-color: white;
+  border-radius: var(--radius-sm); font-family: inherit; font-size: 0.85rem; font-weight: 600;
+  color: var(--slate-dark); cursor: pointer; transition: all 0.15s; display: flex; align-items: center; gap: 6px;
+}
+.btn-action:hover { border-color: var(--green-mid); color: var(--green-deep); background-color: var(--green-ultra); }
+.btn-action.danger:hover { border-color: #e0b3b3; color: #a94444; background-color: #fff55; }
+.btn-action svg { width: 13px; height: 13px; fill: currentcolor; }
+.detail-body { flex: 1; overflow-y: auto; padding: 40px; display: grid; grid-template-columns: 2fr 1fr; gap: 32px; max-width: 1400px; width: 100%; margin: 0 auto; }
+.card { background: white; border-radius: var(--radius-md); padding: 28px; box-shadow: var(--shadow-sm); border: 1px solid rgba(10,92,82,0.03); }
+.card-title { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: var(--gold-deep); margin-bottom: 16px; border-bottom: 1px dashed var(--slate-light); padding-bottom: 8px; }
+.diag-text { font-size: 1.1rem; line-height: 1.6; color: var(--slate-dark); font-weight: 500; white-space: pre-wrap; }
+.obs-text { font-size: 0.95rem; line-height: 1.6; color: var(--slate-gray); white-space: pre-wrap; }
+.info-grid { display: grid; grid-template-columns: 1fr; gap: 16px; }
+.info-item { display: flex; flex-direction: column; }
+.info-lbl { font-size: 0.75rem; font-weight: 600; text-transform: uppercase; color: var(--slate-gray); letter-spacing: 0.5px; margin-bottom: 2px; }
+.info-val { font-size: 0.95rem; font-weight: 600; color: var(--slate-dark); }
+
+/* Modais Estruturais */
+.modal-overlay {
+  position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(10,50,45,0.4);
+  backdrop-filter: blur(4px); display:flex; align-items:center; justify-content:center;
+  opacity:0; pointer-events:none; transition: all 0.2s ease; z-index: 999; padding: 20px;
+}
+.modal-overlay.active { opacity:1; pointer-events:auto; }
+.modal-box {
+  background: white; border-radius: var(--radius-lg); width: 100%; max-width: 560px;
+  box-shadow: var(--shadow-lg); border: 1px solid var(--gold-light);
+  transform: translateY(12px); transition: all 0.2s ease; overflow: hidden;
+}
+.modal-overlay.active .modal-box { transform: translateY(0); }
+.modal-head { padding: 24px 32px; border-bottom: 1px solid var(--slate-light); display: flex; justify-content: space-between; align-items: center; background-color: var(--green-ultra); }
+.modal-head h3 { font-family: 'Cormorant Garamond', serif; font-size: 1.5rem; color: var(--green-deep); font-weight: 600; }
+.modal-close { background: none; border: none; font-size: 1.5rem; cursor: pointer; color: var(--slate-gray); }
+.modal-close:hover { color: var(--green-deep); }
+.modal-form { padding: 32px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.f-full { grid-column: span 2; }
+.modal-form label { display: block; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; color: var(--slate-dark); }
+.modal-form input, .modal-form textarea, .modal-form select {
+  width: 100%; padding: 10px 14px; border: 1px solid var(--slate-light); border-radius: var(--radius-sm);
+  font-family: inherit; font-size: 0.9rem; color: var(--slate-dark); background: var(--warm-white);
+}
+.modal-form input:focus, .modal-form textarea:focus, .modal-form select:focus { outline: none; border-color: var(--green-mid); box-shadow: 0 0 0 3px rgba(13,122,109,0.08); }
+.modal-foot { padding: 20px 32px; border-top: 1px solid var(--slate-light); display: flex; justify-content: flex-end; gap: 12px; background: var(--warm-white); }
+.btn-flat { padding: 10px 20px; border: none; background: none; font-family: inherit; font-size: 0.9rem; font-weight: 600; color: var(--slate-gray); cursor: pointer; border-radius: var(--radius-sm); }
+.btn-flat:hover { color: var(--slate-dark); background-color: var(--slate-light); }
+.btn-prime { padding: 10px 24px; border: none; background-color: var(--green-deep); color: white; font-family: inherit; font-size: 0.9rem; font-weight: 600; cursor: pointer; border-radius: var(--radius-sm); box-shadow: var(--shadow-sm); }
+.btn-prime:hover { background-color: var(--green-mid); }
+
+/* Responsividade Fina */
+@media(max-width: 900px) {
+  .app-container { flex-direction: column; }
+  aside.sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid rgba(0,0,0,0.05); }
+  .brand { padding: 20px; }
+  .search-box { padding: 0 20px 10px; }
+  .patient-list-header { padding: 8px 20px 4px; }
+  .patient-list { max-height: 180px; padding: 0 12px 10px; }
+  .sidebar-footer { padding: 12px 20px; }
+  .detail-body { grid-template-columns: 1fr; padding: 20px; gap: 20px; }
+  .detail-header { padding: 24px 20px; flex-direction: column; gap: 16px; }
+  .dh-actions { width: 100%; }
+  .btn-action { flex: 1; justify-content: center; }
+  .modal-form { grid-template-columns: 1fr; }
+  .f-full { grid-column: span 1; }
+}
+</style>
+</head>
+<body>
+
+<div id="auth-screen">
+  <div class="login-card">
+    <div class="login-logo">FisioHome</div>
+    <div class="login-subtitle">Prontuário Digital Inteligente</div>
+    
+    <div id="login-error-msg" class="login-error">E-mail ou senha incorretos.</div>
+    
+    <form id="login-form" onsubmit="handleLogin(e)">
+      <div class="form-group">
+        <label for="login-email">E-mail Profissional</label>
+        <input type="email" id="login-email" class="form-control" placeholder="nome@exemplo.com" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="login-password">Senha de Acesso</label>
+        <input type="password" id="login-password" class="form-control" placeholder="••••••••" required>
+      </div>
+      
+      <button type="submit" class="btn-login">Entrar no Sistema</button>
+    </form>
+  </div>
+</div>
+
+
+<div id="app-screen">
+  <div class="app-container">
+    
+    <aside class="sidebar">
+      <div class="brand">
+        FisioHome
+        <span>Prontuários</span>
+      </div>
+      
+      <div class="search-box">
+        <div class="search-wrapper">
+          <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+          <input type="text" id="search-input" placeholder="Buscar paciente..." oninput="filterPatients()">
+        </div>
+      </div>
+      
+      <div class="patient-list-header">Pacientes Ativos</div>
+      <div class="patient-list" id="patients-container">
+        </div>
+      
+      <div class="sidebar-footer">
+        <button class="btn-add" onclick="openModal('modal-add')">
+          <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
+          Novo Paciente
+        </button>
+        <button class="btn-logout" onclick="handleLogout()">Sair do Sistema</button>
+      </div>
+    </aside>
+
+    <main class="content" id="main-content">
+      <div class="empty-state">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2zm0-4H7V7h10v2zm0 8H7v-2h10v2z"/></svg>
+        <h3>Nenhum Prontuário Selecionado</h3>
+        <p>Escolha um paciente na barra lateral ou crie um novo cadastro clínico para iniciar.</p>
+      </div>
+    </main>
+
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-add" onclick="handleOverlayClick(event, 'modal-add')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Novo Prontuário Clínico</h3>
+      <button class="modal-close" onclick="closeModal('modal-add')">&times;</button>
+    </div>
+    <form class="modal-form" id="form-add" onsubmit="createPatient(event)">
+      <div class="f-full">
+        <label>Nome Completo do Paciente *</label>
+        <input type="text" id="p-name" required placeholder="Ex: Clara de Oliveira Silva">
+      </div>
+      <div>
+        <label>Idade</label>
+        <input type="number" id="p-age" placeholder="Ex: 34">
+      </div>
+      <div>
+        <label>Sexo Biológico</label>
+        <select id="p-sex">
+          <option value="">Selecione...</option>
+          <option value="Feminino">Feminino</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Outro">Outro</option>
+        </select>
+      </div>
+      <div>
+        <label>CPF</label>
+        <input type="text" id="p-cpf" placeholder="000.000.000-00" oninput="maskCPF(this)">
+      </div>
+      <div>
+        <label>Telefone / WhatsApp</label>
+        <input type="text" id="p-phone" placeholder="(00) 00000-0000" oninput="maskPhone(this)">
+      </div>
+      <div class="f-full">
+        <label>Endereço Residencial</label>
+        <input type="text" id="p-addr" placeholder="Rua, número, bairro e cidade">
+      </div>
+      <div class="f-full">
+        <label>Diagnóstico Clínico / Queixa Principal *</label>
+        <textarea id="p-diag" rows="3" required placeholder="Descreva o quadro patológico, disfunções e objetivos da intervenção fisioterapêutica..."></textarea>
+      </div>
+      <div class="f-full">
+        <label>Observações</label>
+        <textarea id="p-obs" rows="3" placeholder="Histórico médico relevante, restrições, medicamentos ou anotações livres..."></textarea>
+      </div>
+      <div class="f-full modal-foot">
+        <button type="button" class="btn-flat" onclick="closeModal('modal-add')">Cancelar</button>
+        <button type="submit" class="btn-prime">Salvar Registro</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<div class="modal-overlay" id="modal-edit" onclick="handleOverlayClick(event, 'modal-edit')">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3>Atualizar Registro Clínico</h3>
+      <button class="modal-close" onclick="closeModal('modal-edit')">&times;</button>
+    </div>
+    <form class="modal-form" id="form-edit" onsubmit="updatePatient(event)">
+      <div class="f-full">
+        <label>Nome Completo *</label>
+        <input type="text" id="ep-name" required>
+      </div>
+      <div>
+        <label>Idade</label>
+        <input type="number" id="ep-age">
+      </div>
+      <div>
+        <label>Sexo Biológico</label>
+        <select id="ep-sex">
+          <option value="">Selecione...</option>
+          <option value="Feminino">Feminino</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Outro">Outro</option>
+        </select>
+      </div>
+      <div>
+        <label>CPF</label>
+        <input type="text" id="ep-cpf" oninput="maskCPF(this)">
+      </div>
+      <div>
+        <label>Telefone</label>
+        <input type="text" id="ep-phone" oninput="maskPhone(this)">
+      </div>
+      <div class="f-full">
+        <label>Endereço Residencial</label>
+        <input type="text" id="ep-addr">
+      </div>
+      <div class="f-full">
+        <label>Diagnóstico Clínico *</label>
+        <textarea id="ep-diag" rows="3" required></textarea>
+      </div>
+      <div class="f-full">
+        <label>Evolução / Observações Adicionais</label>
+        <textarea id="ep-obs" rows="3"></textarea>
+      </div>
+      <div class="f-full modal-foot">
+        <button type="button" class="btn-flat" onclick="closeModal('modal-edit')">Cancelar</button>
+        <button type="submit" class="btn-prime">Atualizar Registro</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// =======================================================
+// CONEXÃO COM O SUPABASE
+// =======================================================
+const SUPABASE_URL = "https://alwwhsckljdmwcodnnti.supabase.co"; 
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsd3doc2NrbGpkbXdjb2RubnRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODY1MTksImV4cCI6MjA5MDY2MjUxOX0.N-GL1B3ZyVDKwi1bAif40mszwmV8XBUC-yJ44Bxmhnk";
+
+const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Variáveis de Estado Interno
+let rawPatients = []; 
+let currentPatientId = null;
+let editingPatientId = null;
+
+// Intercepta o envio do formulário padrão de login
+document.getElementById('login-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  handleLogin();
+});
+
+// =======================================================
+// FLUXO DE AUTENTICAÇÃO (LOGIN / LOGOUT)
+// =======================================================
+
+// Executa automaticamente ao abrir a página para verificar se já existe uma sessão ativa
+async function checkActiveSession() {
+  const { data: { session }, error } = await supabaseClient.auth.getSession();
+  if (session && !error) {
+    showAppScreen();
+  } else {
+    showAuthScreen();
+  }
+}
+
+async function handleLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  const errorMsg = document.getElementById('login-error-msg');
+  
+  errorMsg.style.display = 'none';
+
+  try {
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: email,
+      password: password
+    });
+
+    if (error) throw error;
+
+    // Login com sucesso
+    showAppScreen();
+  } catch (err) {
+    console.error('Erro de autenticação:', err.message);
+    errorMsg.innerText = "Falha ao entrar: E-mail/Senha inválidos ou usuário não confirmado.";
+    errorMsg.style.display = 'block';
+  }
+}
+
+async function handleLogout() {
+  await supabaseClient.auth.signOut();
+  showAuthScreen();
+}
+
+function showAuthScreen() {
+  document.getElementById('auth-screen').style.display = 'flex';
+  document.getElementById('app-screen').style.display = 'none';
+  // Limpa campos de login
+  document.getElementById('login-password').value = '';
+}
+
+function showAppScreen() {
+  document.getElementById('auth-screen').style.display = 'none';
+  document.getElementById('app-screen').style.display = 'block';
+  // Inicializa a busca dos prontuários do banco
+  fetchPatients();
+}
+
+
+// =======================================================
+// FLUXO DE OPERAÇÕES DO BANCO DE DADOS (CRUD)
+// =======================================================
+async function fetchPatients() {
+  try {
+    const { data, error } = await supabaseClient
+      .from('tn003_pacientes')
+      .select('*')
+      .order('nome', { ascending: true });
+
+    if (error) throw error;
+
+    rawPatients = data || [];
+  } catch (err) {
+    console.warn("Supabase fora ou Tabela ausente. Rodando no Modo Local Seguro (Fallback).");
+    const local = localStorage.getItem('fisiohome_fallback_db');
+    rawPatients = local ? JSON.parse(local) : [];
+  }
+  
+  renderPatientsList(rawPatients);
+}
+
+function syncLocalFallback() {
+  localStorage.setItem('fisiohome_fallback_db', JSON.stringify(rawPatients));
+}
+
+// Renderização Dinâmica da Lista Lateral
+function renderPatientsList(list) {
+  const container = document.getElementById('patients-container');
+  container.innerHTML = '';
+
+  if(list.length === 0) {
+    container.innerHTML = '<div style="color:rgba(255,255,255,0.4); text-align:center; padding:20px; font-size:0.85rem;">Nenhum registro encontrado</div>';
+    return;
+  }
+
+  list.forEach(p => {
+    const item = document.createElement('div');
+    item.className = `patient-item ${p.id === currentPatientId ? 'active' : ''}`;
+    item.onclick = () => openPatient(p.id);
+
+    const idadeText = p.idade ? `${p.idade} anos` : 'Idade não informada';
+    item.innerHTML = `
+      <div class="p-name">${escapeHTML(p.nome)}</div>
+      <div class="p-meta">${idadeText} • ${escapeHTML(p.sexo || 'Não definido')}</div>
+    `;
+    container.appendChild(item);
+  });
+}
+
+// Filtro de Busca em Tempo Real
+function filterPatients() {
+  const query = document.getElementById('search-input').value.toLowerCase().trim();
+  const filtered = rawPatients.filter(p => p.nome.toLowerCase().includes(query) || (p.diagnostico && p.diagnostico.toLowerCase().includes(query)));
+  renderPatientsList(filtered);
+}
+
+// Abertura do Prontuário Selecionado
+function openPatient(id) {
+  currentPatientId = id;
+  renderPatientsList(rawPatients);
+
+  const p = rawPatients.find(x => x.id === id);
+  const mainContent = document.getElementById('main-content');
+
+  if (!p) {
+    closeAside();
+    return;
+  }
+
+  const formatCPF = p.cpf ? maskValue(p.cpf, '###.###.###-##') : 'Não cadastrado';
+  const formatPhone = p.telefone ? maskValue(p.telefone, '(##) #####-####') : 'Não cadastrado';
+
+  mainContent.innerHTML = `
+    <div class="detail-view">
+      <div class="detail-header">
+        <div class="dh-title">
+          <h2>${escapeHTML(p.nome)}</h2>
+          <div class="dh-meta">
+            <span><strong>ID único:</strong> ${p.id.slice(0,8)}...</span>
+            <span><strong>Registrado em:</strong> ${new Date(p.created_at || new Date()).toLocaleDateString('pt-BR')}</span>
+          </div>
+        </div>
+        <div class="dh-actions">
+          <button class="btn-action" onclick="openEditModal('${p.id}')">
+            <svg viewBox="0 0 24 24"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg>
+            Editar Ficha
+          </button>
+          <button class="btn-action danger" onclick="deletePatient('${p.id}')">
+            <svg viewBox="0 0 24 24"><path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z"/></svg>
+            Arquivar Registro
+          </button>
+        </div>
+      </div>
+      
+      <div class="detail-body">
+        <div style="display:flex; flex-direction:column; gap:24px;">
+          <div class="card">
+            <div class="card-title">Diagnóstico Clínico & Quadro Admissional</div>
+            <div class="diag-text">${escapeHTML(p.diagnostico)}</div>
+          </div>
+          <div class="card">
+            <div class="card-title">Evolução Fisioterapêutica / Observações de Conduta</div>
+            <div class="obs-text">${p.observacoes ? escapeHTML(p.observacoes) : '<i>Nenhuma observação complementar registrada até o momento.</i>'}</div>
+          </div>
+        </div>
+        
+        <div>
+          <div class="card">
+            <div class="card-title">Informações Pessoais</div>
+            <div class="info-grid">
+              <div class="info-item"><div class="info-lbl">Idade</div><div class="info-val">${p.idade ? p.idade + ' anos' : 'Não informada'}</div></div>
+              <div class="info-item"><div class="info-lbl">Sexo Biológico</div><div class="info-val">${escapeHTML(p.sexo || 'Não informado')}</div></div>
+              <div class="info-item"><div class="info-lbl">CPF</div><div class="info-val">${escapeHTML(formatCPF)}</div></div>
+              <div class="info-item"><div class="info-lbl">Telefone / Contato</div><div class="info-val">${escapeHTML(formatPhone)}</div></div>
+              <div class="info-item"><div class="info-lbl">Endereço Residencial</div><div class="info-val">${p.endereco ? escapeHTML(p.endereco) : 'Não cadastrado'}</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function closeAside() {
+  currentPatientId = null;
+  document.getElementById('main-content').innerHTML = `
+    <div class="empty-state">
+      <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-2 10H7v-2h10v2zm0-4H7V7h10v2zm0 8H7v-2h10v2z"/></svg>
+      <h3>Nenhum Prontuário Selecionado</h3>
+      <p>Escolha um paciente na barra lateral ou crie um novo cadastro clínico para iniciar.</p>
+    </div>
+  `;
+  renderPatientsList(rawPatients);
+}
+
+// Inserir Paciente
+async function createPatient(e) {
+  e.preventDefault();
+  const nome = document.getElementById('p-name').value.trim();
+  const diagnostico = document.getElementById('p-diag').value.trim();
+  
+  if(!nome || !diagnostico) return;
+
+  const novoObj = {
+    nome,
+    idade: parseInt(document.getElementById('p-age').value) || null,
+    sexo: document.getElementById('p-sex').value || null,
+    cpf: document.getElementById('p-cpf').value.replace(/\D/g, ''),
+    telefone: document.getElementById('p-phone').value.replace(/\D/g, ''),
+    endereco: document.getElementById('p-addr').value.trim(),
+    diagnostico,
+    observacoes: document.getElementById('p-obs').value.trim()
+  };
+
+  try {
+    const { data, error } = await supabaseClient
+      .from('tn003_pacientes')
+      .insert([novoObj])
+      .select();
+
+    if (error) throw error;
+    await fetchPatients();
+    if(data && data[0]) openPatient(data[0].id);
+  } catch (err) {
+    // Escapa para gravação local estável em caso de falha de conexão
+    const localId = 'loc-' + Date.now();
+    const localObj = { id: localId, ...novoObj, created_at: new Date().toISOString() };
+    rawPatients.push(localObj);
+    syncLocalFallback();
+    renderPatientsList(rawPatients);
+    openPatient(localId);
+  }
+
+  document.getElementById('form-add').reset();
+  closeModal('modal-add');
+}
+
+// Preparar e Abrir Modal de Edição
+function openEditModal(id) {
+  editingPatientId = id;
+  const p = rawPatients.find(x => x.id === id);
+  if(!p) return;
+
+  document.getElementById('ep-name').value = p.nome || '';
+  document.getElementById('ep-age').value = p.idade || '';
+  document.getElementById('ep-sex').value = p.sexo || '';
+  document.getElementById('ep-cpf').value = p.cpf || '';
+  document.getElementById('ep-phone').value = p.telefone || '';
+  document.getElementById('ep-addr').value = p.endereco || '';
+  document.getElementById('ep-diag').value = p.diagnostico || '';
+  document.getElementById('ep-obs').value = p.observacoes || '';
+
+  // Força aplicação de máscaras nos dados preenchidos
+  maskCPF(document.getElementById('ep-cpf'));
+  maskPhone(document.getElementById('ep-phone'));
+
+  openModal('modal-edit');
+}
+
+// Atualizar Dados do Paciente
+async function updatePatient(e) {
+  e.preventDefault();
+  const nome = document.getElementById('ep-name').value.trim();
+  const diagnostico = document.getElementById('ep-diag').value.trim();
+  
+  if(!nome || !diagnostico) return;
+
+  const alteracoes = {
+    nome,
+    idade: parseInt(document.getElementById('ep-age').value) || null,
+    sexo: document.getElementById('ep-sex').value || null,
+    cpf: document.getElementById('ep-cpf').value.replace(/\D/g, ''),
+    telefone: document.getElementById('ep-phone').value.replace(/\D/g, ''),
+    endereco: document.getElementById('ep-addr').value.trim(),
+    diagnostico,
+    observacoes: document.getElementById('ep-obs').value.trim()
+  };
+
+  try {
+    const { error } = await supabaseClient
+      .from('tn003_pacientes')
+      .update(alteracoes)
+      .eq('id', editingPatientId);
+
+    if (error) throw error;
+    await fetchPatients();
+  } catch (err) {
+    const idx = rawPatients.findIndex(x => x.id === editingPatientId);
+    if(idx !== -1) {
+      rawPatients[idx] = { ...rawPatients[idx], ...alteracoes };
+      syncLocalFallback();
+      renderPatientsList(rawPatients);
+    }
+  }
+
+  closeModal('modal-edit');
+  openPatient(editingPatientId);
+}
+
+// Deletar Permanentemente
+async function deletePatient(id) {
+  const p = rawPatients.find(x => x.id === id);
+  if (!p) return;
+
+  if (confirm(`Deseja realmente arquivar permanentemente o prontuário de ${p.nome}?`)) {
+    try {
+      const { error } = await supabaseClient
+        .from('tn003_pacientes')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+      if (currentPatientId === id) closeAside();
+      await fetchPatients();
+    } catch (err) {
+      rawPatients = rawPatients.filter(x => x.id !== id);
+      syncLocalFallback();
+      if (currentPatientId === id) closeAside();
+      else renderPatientsList(rawPatients);
+    }
+  }
+}
+
+// Controladores de Interface Visual (Modais)
+function openModal(id) { document.getElementById(id).classList.add('active'); }
+function closeModal(id) { document.getElementById(id).classList.remove('remove'); document.getElementById(id).classList.remove('active'); }
+function handleOverlayClick(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+// Máscaras de Input (Campos Visuais Limpos)
+function maskCPF(el) {
+  let v = el.value.replace(/\D/g, '').slice(0, 11);
+  if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+  else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+  else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+  el.value = v;
+}
+
+function maskPhone(el) {
+  let v = el.value.replace(/\D/g, '').slice(0, 11);
+  if (v.length > 10) v = v.replace(/^(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+  else if (v.length > 5) v = v.replace(/^(\d{2})(\d{4})(\d{0,4})/, '($1) $2-$3');
+  else if (v.length > 2) v = v.replace(/^(\d{2})(\d{0,5})/, '($1) $2');
+  el.value = v;
+}
+
+function maskValue(value, pattern) {
+  let i = 0;
+  const v = value.toString();
+  return pattern.replace(/#/g, () => v[i++] || '');
+}
+
+function escapeHTML(str) {
+  if(!str) return '';
+  return str.replace(/[&<>'"]/g, tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag));
+}
+
+// Inicia checando o estado de login ao carregar a página
+checkActiveSession();
+</script>
+
+</body>
+</html>
