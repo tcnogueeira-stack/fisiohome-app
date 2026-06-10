@@ -319,8 +319,8 @@ main { flex-grow: 1; padding: 2.5rem; overflow-y: auto; display: flex; flex-dire
 
 <script>
 // Chaves Supabase configuradas para apontar para as Tabelas Físicas
-const SUPABASE_URL = "https://your-supabase-url.supabase.co";
-const SUPABASE_KEY = "your-anon-key";
+const SUPABASE_URL = "https://alwwhsckljdmwcodnnti.supabase.co";
+const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsd3doc2NrbGpkbXdjb2RubnRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODY1MTksImV4cCI6MjA5MDY2MjUxOX0.N-GL1B3ZyVDKwi1bAif40mszwmV8XBUC-yJ44Bxmhnk";
 let supabaseClient = null;
 try { supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch(e){}
 
@@ -502,8 +502,15 @@ async function fetchPatients() {
         .from('tn003_pacientes')
         .select('*')
         .eq('usuario_id', currentUser.id);
-      if (!error && data) list = data;
-      else list = db.tn003_pacientes.filter(p => p.usuario_id === currentUser.id);
+      if (!error && data) {
+        list = data;
+        // Sincroniza o banco local com os dados vindos do Supabase para evitar bugs de busca/edição
+        db.tn003_pacientes = db.tn003_pacientes.filter(p => p.usuario_id !== currentUser.id);
+        db.tn003_pacientes.push(...data);
+        saveDB();
+      } else {
+        list = db.tn003_pacientes.filter(p => p.usuario_id === currentUser.id);
+      }
     } catch (err) {
       list = db.tn003_pacientes.filter(p => p.usuario_id === currentUser.id);
     }
