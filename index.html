@@ -679,12 +679,15 @@ tr:hover td { background:var(--gold-ultra); }
   <div class="setup-body">
     <div class="section-card">
       <div class="section-title-sm">Dados Profissionais</div>
-      <div class="form-group"><label class="form-label">Nome completo</label><input type="text" class="form-input" id="s-name" placeholder="Dr(a). Nome Sobrenome"></div>
+      <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input" id="s-name" placeholder="Dr(a). Nome Sobrenome"></div>
       <div class="grid2">
-        <div class="form-group"><label class="form-label">CREFITO</label><input type="text" class="form-input" id="s-crp" placeholder="CREFITO-00/000000-F"></div>
-        <div class="form-group"><label class="form-label">Especialidade</label><input type="text" class="form-input" id="s-spec" placeholder="Neurológica"></div>
+        <div class="form-group"><label class="form-label">CREFITO *</label><input type="text" class="form-input" id="s-crp" placeholder="CREFITO-00/000000-F"></div>
+        <div class="form-group"><label class="form-label">CPF *</label><input type="text" class="form-input" id="s-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
       </div>
-      <div class="form-group"><label class="form-label">Telefone / WhatsApp</label><input type="tel" class="form-input" id="s-tel" placeholder="(62) 99999-9999"></div>
+      <div class="grid2">
+        <div class="form-group"><label class="form-label">Especialidade</label><input type="text" class="form-input" id="s-spec" placeholder="Neurológica"></div>
+        <div class="form-group"><label class="form-label">Telefone / WhatsApp</label><input type="tel" class="form-input" id="s-tel" placeholder="(62) 99999-9999"></div>
+      </div>
       <div class="form-group"><label class="form-label">Cidade / Estado</label><input type="text" class="form-input" id="s-addr" placeholder="Goiânia – GO"></div>
     </div>
     <div class="section-card">
@@ -901,8 +904,8 @@ tr:hover td { background:var(--gold-ultra); }
       <div class="form-group"><label class="form-label">Sexo</label><select class="form-select" id="np-sex"><option value="">—</option><option>Feminino</option><option>Masculino</option></select></div>
     </div>
     <div class="form-group"><label class="form-label">Diagnóstico / CID *</label><input type="text" class="form-input" id="np-diag" placeholder="AVC isquêmico / I63"></div>
-    <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="np-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
-    <div class="form-group"><label class="form-label">WhatsApp</label><input type="tel" class="form-input" id="np-phone" placeholder="(62) 99999-9999"></div>
+    <div class="form-group"><label class="form-label">CPF *</label><input type="text" class="form-input" id="np-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
+    <div class="form-group"><label class="form-label">WhatsApp *</label><input type="tel" class="form-input" id="np-phone" placeholder="(62) 99999-9999"></div>
     <div class="form-group"><label class="form-label">Endereço</label><input type="text" class="form-input" id="np-addr" placeholder="Rua, número, bairro"></div>
     <div class="form-group"><label class="form-label">Observação inicial</label><input type="text" class="form-input" id="np-obs" placeholder="Ex: frágil, usa andador..."></div>
     <div class="modal-footer">
@@ -923,8 +926,8 @@ tr:hover td { background:var(--gold-ultra); }
       <div class="form-group"><label class="form-label">Sexo</label><select class="form-select" id="ep-sex"><option value="">—</option><option>Feminino</option><option>Masculino</option></select></div>
     </div>
     <div class="form-group"><label class="form-label">Diagnóstico / CID *</label><input type="text" class="form-input" id="ep-diag"></div>
-    <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="ep-cpf" maxlength="14" oninput="maskCPF(this)"></div>
-    <div class="form-group"><label class="form-label">WhatsApp</label><input type="tel" class="form-input" id="ep-phone"></div>
+    <div class="form-group"><label class="form-label">CPF *</label><input type="text" class="form-input" id="ep-cpf" maxlength="14" oninput="maskCPF(this)"></div>
+    <div class="form-group"><label class="form-label">WhatsApp *</label><input type="tel" class="form-input" id="ep-phone"></div>
     <div class="form-group"><label class="form-label">Endereço</label><input type="text" class="form-input" id="ep-addr"></div>
     <div class="form-group"><label class="form-label">Observação</label><input type="text" class="form-input" id="ep-obs"></div>
     <div class="modal-footer">
@@ -1034,12 +1037,12 @@ async function doLogin(){
           db.users[email] = {
             name: data.user.user_metadata.nome || "Fisioterapeuta",
             pass: btoa(pass),
-            crp: '', spec: '', tel: '', addr: ''
+            crp: '', spec: '', tel: '', addr: '', cpf: ''
           };
           saveDB();
           localUser = db.users[email];
         }
-        userFound = { email, ...localUser };
+        userFound = { id: data.user.id, email, ...localUser };
         console.log("Logado com sucesso via Supabase Auth!");
       }
     } catch (err) {
@@ -1051,13 +1054,13 @@ async function doLogin(){
   if (!userFound) {
     const user=db.users[email];
     if(user && user.pass===btoa(pass)){
-      userFound = {email,...user};
+      userFound = {id: email, email,...user};
     }
   }
 
   if (userFound) {
     saveUser(userFound);
-    if(!userFound.name||!userFound.crp){navToSetup();}
+    if(!userFound.name||!userFound.crp||!userFound.cpf){navToSetup();}
     else{bootDash();}
   } else {
     showErr('E-mail ou senha incorretos.');
@@ -1070,8 +1073,8 @@ function doRegister(){
   if(!name||!email||!pass){showErr('Preencha todos os campos.');return;}
   if(pass.length<6){showErr('Senha deve ter ao menos 6 caracteres.');return;}
   if(db.users[email]){showErr('Este e-mail já está cadastrado.');return;}
-  db.users[email]={name,pass:btoa(pass),crp:'',spec:'',tel:'',addr:''};
-  saveDB(); saveUser({email,...db.users[email]});
+  db.users[email]={name,pass:btoa(pass),crp:'',spec:'',tel:'',addr:'',cpf:''};
+  saveDB(); saveUser({id: email, email,...db.users[email]});
   showScreen('setup');
   setTimeout(()=>{
     document.getElementById('s-name').value=name;
@@ -1093,30 +1096,101 @@ function fillSetup(){
   document.getElementById('s-spec').value  = u.spec  || '';
   document.getElementById('s-tel').value   = u.tel   || '';
   document.getElementById('s-addr').value  = u.addr  || '';
+  if (document.getElementById('s-cpf')) {
+    document.getElementById('s-cpf').value = u.cpf || '';
+  }
   updateStampPreview();
 }
-['s-name','s-crp','s-spec','s-tel','s-addr'].forEach(id=>
-  document.getElementById(id).addEventListener('input',updateStampPreview)
-);
+['s-name','s-crp','s-spec','s-tel','s-addr','s-cpf'].forEach(id=>{
+  const el = document.getElementById(id);
+  if (el) el.addEventListener('input',updateStampPreview);
+});
 function updateStampPreview(){
   const n=v('s-name')||'Dr(a). Nome';const c=v('s-crp')||'CREFITO-00/000000-F';
   const sp=v('s-spec')||'Fisioterapia';const t=v('s-tel')||'(00) 00000-0000';
-  const a=v('s-addr')||'Cidade – UF';
-  document.getElementById('stamp-preview').innerHTML=`<strong>${n}</strong><br>Fisioterapeuta – ${sp}<br>${c}<br>${t}<br>${a}`;
+  const a=v('s-addr')||'Cidade – UF';const cpf=document.getElementById('s-cpf')?.value.trim()||'000.000.000-00';
+  document.getElementById('stamp-preview').innerHTML=`<strong>${n}</strong><br>Fisioterapeuta – ${sp}<br>${c}<br>CPF: ${cpf}<br>${t}<br>${a}`;
 }
 function v(id){return document.getElementById(id).value.trim();}
-function saveSetup(){
-  const u={name:v('s-name'),crp:v('s-crp'),spec:v('s-spec'),tel:v('s-tel'),addr:v('s-addr'),pass:currentUser.pass};
-  if(!u.name||!u.crp){alert('Preencha nome e CREFITO.');return;}
+async function saveSetup(){
+  const cpfVal = v('s-cpf');
+  const cpfClean = cpfVal.replace(/\D/g, '');
+  if (cpfClean.length !== 11) {
+    alert('Por favor, informe um CPF válido com 11 dígitos.');
+    return;
+  }
+  const crpVal = v('s-crp');
+  if (!crpVal) {
+    alert('O preenchimento do CREFITO é obrigatório.');
+    return;
+  }
+
+  const u={name:v('s-name'),crp:crpVal,spec:v('s-spec'),tel:v('s-tel'),addr:v('s-addr'),cpf:cpfVal,pass:currentUser.pass};
+  if(!u.name){alert('Preencha seu nome.');return;}
+  
   db.users[currentUser.email]={...db.users[currentUser.email],...u};
-  saveDB(); saveUser({email:currentUser.email,...db.users[currentUser.email]});
-  bootDash();
+  saveDB(); saveUser({id: currentUser.id, email:currentUser.email,...db.users[currentUser.email]});
+  
+  // Salva no Supabase (tn001_usuarios)
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient
+        .from('tn001_usuarios')
+        .upsert({
+          id: currentUser.id || undefined,
+          e_mail: currentUser.email,
+          nome: u.name,
+          crp: u.crp,
+          spec: u.spec,
+          tel: u.tel,
+          addr: u.addr,
+          cpf: u.cpf
+        }, { onConflict: 'e_mail' });
+      if (error) {
+        console.error("Erro ao salvar dados profissionais no Supabase:", error.message);
+      }
+    } catch(err) {
+      console.warn("Falha ao salvar dados no Supabase:", err);
+    }
+  }
+
+  await bootDash();
 }
 
 // ── DASHBOARD ──
-function bootDash(){
+async function fetchPatientsFromSupabase() {
+  if (supabaseClient) {
+    try {
+      const { data, error } = await supabaseClient
+        .from('tn003_pacientes')
+        .select('*')
+        .eq('usuario_id', currentUser.id || currentUser.email);
+      if (!error && data) {
+        const mappedPatients = data.map(dbP => ({
+          id: isNaN(parseInt(dbP.id)) ? dbP.id : parseInt(dbP.id),
+          name: dbP.nome,
+          age: dbP.idade,
+          sex: dbP.sexo,
+          diag: dbP.diagnostico,
+          cpf: dbP.cpf,
+          phone: dbP.telefone,
+          addr: dbP.endereco,
+          obs: dbP.observacoes,
+          usuario_id: dbP.usuario_id
+        }));
+        db.patients = db.patients.filter(p => p.usuario_id !== (currentUser.id || currentUser.email));
+        db.patients.push(...mappedPatients);
+        saveDB();
+      }
+    } catch(err) {
+      console.warn("Falha ao buscar pacientes do Supabase:", err);
+    }
+  }
+}
+async function bootDash(){
   document.getElementById('dash-name').textContent=currentUser.name||'—';
   document.getElementById('dash-crp').textContent=currentUser.crp||'';
+  await fetchPatientsFromSupabase();
   updateStats(); renderPatients(db.patients); renderTable();
   showScreen('dash');
 }
@@ -1177,8 +1251,18 @@ function renderTable(){
     </tr>`).join('');
   document.getElementById('table-count').textContent=db.patients.length+' pacientes';
 }
-function deletePatient(id){
+async function deletePatient(id){
   if(!confirm('Remover este paciente e todos os atendimentos?'))return;
+
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient.from('tn003_pacientes').delete().eq('id', id.toString());
+      if (error) console.error("Erro ao deletar paciente no Supabase:", error.message);
+    } catch(err) {
+      console.warn("Falha ao deletar paciente no Supabase:", err);
+    }
+  }
+
   db.patients=db.patients.filter(p=>p.id!==id);
   db.sessions=db.sessions.filter(s=>s.patientId!==id);
   saveDB(); renderTable(); renderPatients(db.patients); updateStats();
@@ -1407,11 +1491,62 @@ function selectPatientForAtend(id){
 }
 function closeModal(id){document.getElementById(id).classList.remove('open');}
 function closeMO(e,id){if(e.target===document.getElementById(id))closeModal(id);}
-function saveNewPatient(){
+async function saveNewPatient(){
   const name=document.getElementById('np-name').value.trim();
   const diag=document.getElementById('np-diag').value.trim();
+  const cpfVal=document.getElementById('np-cpf').value.trim();
+  const phoneVal=document.getElementById('np-phone').value.trim();
+
   if(!name||!diag){alert('Preencha nome e diagnóstico.');return;}
-  const p={id:Date.now(),name,age:parseInt(document.getElementById('np-age').value)||null,sex:document.getElementById('np-sex').value||null,diag,cpf:document.getElementById('np-cpf').value||null,phone:document.getElementById('np-phone').value.replace(/\D/g,''),addr:document.getElementById('np-addr').value,obs:document.getElementById('np-obs').value,createdAt:new Date().toISOString()};
+
+  const cpfClean = cpfVal.replace(/\D/g, '');
+  if (cpfClean.length !== 11) {
+    alert('Por favor, informe um CPF válido com 11 dígitos para o paciente.');
+    return;
+  }
+
+  const phoneClean = phoneVal.replace(/\D/g, '');
+  if (!phoneClean) {
+    alert('O preenchimento do WhatsApp é obrigatório.');
+    return;
+  }
+
+  const p={
+    id:Date.now(),
+    name,
+    age:parseInt(document.getElementById('np-age').value)||null,
+    sex:document.getElementById('np-sex').value||null,
+    diag,
+    cpf:cpfVal,
+    phone:phoneClean,
+    addr:document.getElementById('np-addr').value,
+    obs:document.getElementById('np-obs').value,
+    usuario_id: currentUser.id || currentUser.email,
+    createdAt:new Date().toISOString()
+  };
+
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient.from('tn003_pacientes').insert([{
+        id: p.id.toString(),
+        nome: p.name,
+        idade: p.age,
+        sexo: p.sex,
+        diagnostico: p.diag,
+        cpf: p.cpf,
+        telefone: p.phone,
+        endereco: p.addr,
+        observacoes: p.obs,
+        usuario_id: p.usuario_id
+      }]);
+      if (error) {
+        console.error("Erro ao salvar paciente no Supabase:", error.message);
+      }
+    } catch(err) {
+      console.warn("Falha ao salvar paciente no Supabase:", err);
+    }
+  }
+
   db.patients.push(p); saveDB();
   ['np-name','np-age','np-diag','np-cpf','np-phone','np-addr','np-obs'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('np-sex').value='';
@@ -1433,19 +1568,57 @@ function openEditPatientById(id){
   document.getElementById('ep-obs').value=p.obs||'';
   document.getElementById('modal-edit').classList.add('open');
 }
-function saveEditPatient(){
+async function saveEditPatient(){
   const name=document.getElementById('ep-name').value.trim();
   const diag=document.getElementById('ep-diag').value.trim();
+  const cpfVal=document.getElementById('ep-cpf').value.trim();
+  const phoneVal=document.getElementById('ep-phone').value.trim();
+
   if(!name||!diag){alert('Preencha nome e diagnóstico.');return;}
+
+  const cpfClean = cpfVal.replace(/\D/g, '');
+  if (cpfClean.length !== 11) {
+    alert('Por favor, informe um CPF válido com 11 dígitos para o paciente.');
+    return;
+  }
+
+  const phoneClean = phoneVal.replace(/\D/g, '');
+  if (!phoneClean) {
+    alert('O preenchimento do WhatsApp é obrigatório.');
+    return;
+  }
+
   const p=db.patients.find(x=>x.id===editingPatientId);
   if(!p)return;
+
   p.name=name; p.age=parseInt(document.getElementById('ep-age').value)||null;
   p.sex=document.getElementById('ep-sex').value||null;
-  p.diag=diag; p.cpf=document.getElementById('ep-cpf').value||null;
-  p.phone=document.getElementById('ep-phone').value.replace(/\D/g,'');
+  p.diag=diag; p.cpf=cpfVal;
+  p.phone=phoneClean;
   p.addr=document.getElementById('ep-addr').value;
   p.obs=document.getElementById('ep-obs').value;
   p.updatedAt=new Date().toISOString();
+
+  if (supabaseClient) {
+    try {
+      const { error } = await supabaseClient.from('tn003_pacientes').update({
+        nome: p.name,
+        idade: p.age,
+        sexo: p.sex,
+        diagnostico: p.diag,
+        cpf: p.cpf,
+        telefone: p.phone,
+        endereco: p.addr,
+        observacoes: p.obs
+      }).eq('id', p.id.toString());
+      if (error) {
+        console.error("Erro ao atualizar paciente no Supabase:", error.message);
+      }
+    } catch(err) {
+      console.warn("Falha ao atualizar paciente no Supabase:", err);
+    }
+  }
+
   saveDB(); closeModal('modal-edit');
   renderPatients(db.patients); renderTable();
   if(currentPatientId===editingPatientId) openPatient(editingPatientId);
