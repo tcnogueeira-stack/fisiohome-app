@@ -1106,7 +1106,13 @@ function fillSetup(){
   if (el) el.addEventListener('input',updateStampPreview);
 });
 function updateStampPreview(){
-  const n=v('s-name')||'Dr(a). Nome';const c=v('s-crp')||'CREFITO-00/000000-F';
+  const n=v('s-name')||'Dr(a). Nome';
+  let c=v('s-crp')||'00/000000-F';
+  if (!c.toUpperCase().startsWith('CREFITO')) {
+    c = 'CREFITO: ' + c;
+  } else {
+    c = c.replace(/^(CREFITO)\s*-?\s*/i, 'CREFITO: ');
+  }
   const sp=v('s-spec')||'Fisioterapia';const t=v('s-tel')||'(00) 00000-0000';
   const a=v('s-addr')||'Cidade – UF';const cpf=document.getElementById('s-cpf')?.value.trim()||'000.000.000-00';
   document.getElementById('stamp-preview').innerHTML=`<strong>${n}</strong><br>Fisioterapeuta – ${sp}<br>${c}<br>CPF: ${cpf}<br>${t}<br>${a}`;
