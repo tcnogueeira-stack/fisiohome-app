@@ -359,20 +359,31 @@ async function handleLogin() {
   let userFound = null;
 
   // 1. Tenta autenticar via Supabase na tabela física de usuários
-  if (supabaseClient && SUPABASE_URL !== "https://your-supabase-url.supabase.co") {
-    try {
-      const { data, error } = await supabaseClient
-        .from('tn001_usuarios')
-        .select('*')
-        .eq('e_mail', userInput)
-        .eq('senha', passInput)
-        .maybeSingle();
+ if (supabaseClient && SUPABASE_URL !== "https://your-supabase-url.supabase.co") {
+  try {
+    // Faz o login oficial usando a tabela interna "Users" do Auth do Supabase
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: userInput,
+      password: passInput,
+    });
 
-      if (!error && data) userFound = data;
-    } catch (err) {
-      console.warn("Erro ao ler Supabase, usando verificação local...", err);
+    if (error) {
+      console.error("Erro no Auth do Supabase:", error.message);
     }
+
+    if (data && data.user) {
+      // Mapeia o usuário logado para manter o seu painel funcionando
+      userFound = {
+        id: data.user.id,
+        e_mail: data.user.email,
+        nome: data.user.user_metadata.nome || "Fisioterapeuta"
+      };
+      console.log("Logado com sucesso via Supabase Auth!");
+    }
+  } catch (err) {
+    console.warn("Falha ao conectar no Auth, tentando local...", err);
   }
+}
 
   // 2. Se falhar ou estiver em modo local, busca na estrutura de usuários local
   if (!userFound) {
