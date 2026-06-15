@@ -2940,34 +2940,40 @@
 
     // ── INIT ──
     (async function init() {
-      const params = new URLSearchParams(location.search);
-      const signId = params.get('sign');
-      if (signId) {
-        const sid = parseInt(signId);
-        const s = db.sessions.find(x => x.id === sid);
-        if (s) { const p = db.patients.find(x => x.id === s.patientId); if (p) { openSignScreen(s, p); return; } }
-      }
-
-      const { data: { session } } = await supabase.auth.getSession();
-      if (session) {
-        const email = session.user.email;
-        let localUser = db.users[email];
-        if (!localUser) {
-          db.users[email] = {
-            name: session.user.user_metadata?.nome || "Fisioterapeuta",
-            crp: '', spec: '', tel: '', addr: '', cpf: ''
-          };
-          saveDB();
-          localUser = db.users[email];
+      try {
+        const params = new URLSearchParams(location.search);
+        const signId = params.get('sign');
+        if (signId) {
+          const sid = parseInt(signId);
+          const s = db.sessions.find(x => x.id === sid);
+          if (s) { const p = db.patients.find(x => x.id === s.patientId); if (p) { openSignScreen(s, p); return; } }
         }
-        saveUser({ id: session.user.id, email, ...localUser });
 
-        document.getElementById('content-section').style.display = 'flex';
-        document.getElementById('logout-bar').style.display = 'block';
-        document.getElementById('login').classList.remove('active');
-        bootDash();
-      } else {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (session) {
+          const email = session.user.email;
+          let localUser = db.users[email];
+          if (!localUser) {
+            db.users[email] = {
+              name: session.user.user_metadata?.nome || "Fisioterapeuta",
+              crp: '', spec: '', tel: '', addr: '', cpf: ''
+            };
+            saveDB();
+            localUser = db.users[email];
+          }
+          saveUser({ id: session.user.id, email, ...localUser });
+
+          document.getElementById('content-section').style.display = 'flex';
+          document.getElementById('logout-bar').style.display = 'block';
+          document.getElementById('login').classList.remove('active');
+          bootDash();
+        } else {
+          showScreen('login');
+        }
+      } catch (err) {
+        console.error('Erro de conexão com Supabase:', err);
         showScreen('login');
+        showErr('Não foi possível conectar ao servidor. Verifique sua internet e tente novamente.');
       }
     })();
   </script>
