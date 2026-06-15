@@ -2153,7 +2153,17 @@
     // Chaves Supabase
     const SUPABASE_URL = "https://alwwhsckljdmwcodnnti.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsd3doc2NrbGpkbXdjb2RubnRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODY1MTksImV4cCI6MjA5MDY2MjUxOX0.N-GL1B3ZyVDKwi1bAif40mszwmV8XBUC-yJ44Bxmhnk";
-    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    let supabase = null;
+    try {
+      const supabaseSDK = window.supabase;
+      if (supabaseSDK && supabaseSDK.createClient) {
+        supabase = supabaseSDK.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      } else {
+        console.error('Supabase SDK não carregou (CDN indisponível)');
+      }
+    } catch (err) {
+      console.error('Falha ao inicializar Supabase:', err);
+    }
 
     // ── STATE ──
     let db = JSON.parse(localStorage.getItem('fh_db') || '{"users":{},"patients":[],"sessions":[]}');
