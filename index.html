@@ -1728,52 +1728,41 @@
       <div class="login-logo">Fisio<span>Home</span></div>
       <div class="login-tagline">Prontuário Digital</div>
       <div class="login-divider"></div>
-      <div class="login-tabs">
-        <button class="ltab active" onclick="setLoginTab('login',this)">Entrar</button>
-        <button class="ltab" onclick="setLoginTab('register',this)">Criar conta</button>
-      </div>
-      <div id="login-err" class="login-err"></div>
-      <div id="lf-login">
+      <form id="login-form">
+        <div id="login-err" class="login-err"></div>
         <div class="form-group">
           <label class="form-label">E-mail</label>
-          <input type="email" class="form-input" id="l-email" placeholder="seu@email.com">
+          <input type="email" class="form-input" id="l-email" placeholder="seu@email.com" required>
         </div>
         <div class="form-group">
           <label class="form-label">Senha</label>
-          <input type="password" class="form-input" id="l-pass" placeholder="••••••••">
+          <input type="password" class="form-input" id="l-pass" placeholder="••••••••" required>
         </div>
-        <button class="btn-main" onclick="doLogin()">Entrar</button>
-      </div>
-      <div id="lf-register" style="display:none">
-        <div class="form-group">
-          <label class="form-label">Nome completo</label>
-          <input type="text" class="form-input" id="r-name" placeholder="Dr(a). Nome Sobrenome">
-        </div>
-        <div class="form-group">
-          <label class="form-label">E-mail</label>
-          <input type="email" class="form-input" id="r-email" placeholder="seu@email.com">
-        </div>
-        <div class="form-group">
-          <label class="form-label">Senha</label>
-          <input type="password" class="form-input" id="r-pass" placeholder="Mínimo 6 caracteres">
-        </div>
-        <button class="btn-main" onclick="doRegister()">Criar conta</button>
-      </div>
+        <button type="submit" class="btn-main">Entrar</button>
+      </form>
     </div>
 
   </div>
 
-  <!-- ══ SETUP ══ -->
-  <div id="setup" class="screen">
-    <div class="setup-hero">
-      <h1>Configure seu perfil</h1>
-      <p>Seus dados aparecem no carimbo de cada atendimento</p>
+  <!-- ══ CONTEÚDO PROTEGIDO ══ -->
+  <div id="content-section" style="display:none">
+
+    <!-- ══ TOPBAR LOGOUT ══ -->
+    <div id="logout-bar" style="display:none;background:var(--warm-white);border-bottom:1px solid var(--border);padding:8px 18px;text-align:right">
+      <button onclick="doLogout()" style="background:none;border:1px solid var(--border);border-radius:8px;padding:6px 14px;font-family:'Nunito',sans-serif;font-size:.78rem;font-weight:600;cursor:pointer;color:var(--mid)">🚪 Sair</button>
     </div>
-    <div class="setup-body">
-      <div class="section-card">
-        <div class="section-title-sm">Dados Profissionais</div>
-        <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input"
-            id="s-name" placeholder="Dr(a). Nome Sobrenome"></div>
+
+    <!-- ══ SETUP ══ -->
+    <div id="setup" class="screen">
+      <div class="setup-hero">
+        <h1>Configure seu perfil</h1>
+        <p>Seus dados aparecem no carimbo de cada atendimento</p>
+      </div>
+      <div class="setup-body">
+        <div class="section-card">
+          <div class="section-title-sm">Dados Profissionais</div>
+          <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input"
+              id="s-name" placeholder="Dr(a). Nome Sobrenome"></div>
         <div class="grid2">
           <div class="form-group"><label class="form-label">CREFITO *</label><input type="text" class="form-input"
               id="s-crp" placeholder="CREFITO-00/000000-F"></div>
@@ -2044,6 +2033,8 @@
     </div>
   </div>
 
+  </div><!-- /content-section -->
+
   <!-- ══ MODAL NOVO PACIENTE ══ -->
   <div class="modal-overlay" id="modal-new" onclick="closeMO(event,'modal-new')">
     <div class="modal">
@@ -2159,11 +2150,10 @@
   </div>
 
   <script>
-    // Chaves Supabase configuradas para apontar para as Tabelas Físicas
+    // Chaves Supabase
     const SUPABASE_URL = "https://alwwhsckljdmwcodnnti.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsd3doc2NrbGpkbXdjb2RubnRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODY1MTksImV4cCI6MjA5MDY2MjUxOX0.N-GL1B3ZyVDKwi1bAif40mszwmV8XBUC-yJ44Bxmhnk";
-    let supabaseClient = null;
-    try { supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY); } catch (e) { }
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsd3doc2NrbGpkbXdjb2RubnRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODY1MTksImV4cCI6MjA5MDY2MjUxOX0.N-GL1B3ZyVDKwi1bAif40mszwmV8XBUC-yJ44Bxmhnk";
+    const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     // ── STATE ──
     let db = JSON.parse(localStorage.getItem('fh_db') || '{"users":{},"patients":[],"sessions":[]}');
@@ -2187,92 +2177,58 @@
     function doLogout() {
       document.getElementById('modal-logout').classList.add('open');
     }
-    function confirmLogout() {
-      localStorage.removeItem('fh_user');
-      currentUser = null;
+    async function confirmLogout() {
       closeModal('modal-logout');
-      showScreen('login');
+      await supabase.auth.signOut();
+      location.reload();
     }
 
     // ── AUTH ──
-    function setLoginTab(tab, btn) {
-      document.querySelectorAll('.ltab').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('lf-login').style.display = tab === 'login' ? '' : 'none';
-      document.getElementById('lf-register').style.display = tab === 'register' ? '' : 'none';
-      document.getElementById('login-err').style.display = 'none';
-    }
     function showErr(msg) { const el = document.getElementById('login-err'); el.textContent = msg; el.style.display = 'block'; }
-    async function doLogin() {
+    function hideErr() { document.getElementById('login-err').style.display = 'none'; }
+
+    document.getElementById('login-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      hideErr();
       const email = document.getElementById('l-email').value.trim().toLowerCase();
       const pass = document.getElementById('l-pass').value;
       if (!email || !pass) { showErr('Preencha e-mail e senha.'); return; }
 
-      let userFound = null;
+      try {
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: pass,
+        });
 
-      // 1. Tenta autenticar via Supabase Auth
-      if (supabaseClient) {
-        try {
-          const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email: email,
-            password: pass,
-          });
-
-          if (error) {
-            console.error("Erro no Auth do Supabase:", error.message);
-          }
-
-          if (data && data.user) {
-            // Inicializa ou recupera o perfil local para compatibilidade
-            let localUser = db.users[email];
-            if (!localUser) {
-              db.users[email] = {
-                name: data.user.user_metadata.nome || "Fisioterapeuta",
-                pass: btoa(pass),
-                crp: '', spec: '', tel: '', addr: '', cpf: ''
-              };
-              saveDB();
-              localUser = db.users[email];
-            }
-            userFound = { id: data.user.id, email, ...localUser };
-            console.log("Logado com sucesso via Supabase Auth!");
-          }
-        } catch (err) {
-          console.warn("Falha ao conectar no Auth, tentando local...", err);
+        if (error) {
+          showErr(error.message === 'Invalid login credentials'
+            ? 'E-mail ou senha incorretos.'
+            : error.message);
+          return;
         }
-      }
 
-      // 2. Se falhar ou estiver em modo local, busca no fallback local
-      if (!userFound) {
-        const user = db.users[email];
-        if (user && user.pass === btoa(pass)) {
-          userFound = { id: email, email, ...user };
+        if (data?.user) {
+          // Carrega perfil local (criado via webhook ou setup)
+          let localUser = db.users[email];
+          if (!localUser) {
+            db.users[email] = {
+              name: data.user.user_metadata?.nome || "Fisioterapeuta",
+              crp: '', spec: '', tel: '', addr: '', cpf: ''
+            };
+            saveDB();
+            localUser = db.users[email];
+          }
+          saveUser({ id: data.user.id, email, ...localUser });
+
+          document.getElementById('login').classList.remove('active');
+          document.getElementById('content-section').style.display = 'flex';
+          document.getElementById('logout-bar').style.display = 'block';
+          bootDash();
         }
+      } catch (err) {
+        showErr('Erro ao conectar. Verifique sua internet.');
       }
-
-      if (userFound) {
-        saveUser(userFound);
-        if (!userFound.name || !userFound.crp || !userFound.cpf) { navToSetup(); }
-        else { bootDash(); }
-      } else {
-        showErr('E-mail ou senha incorretos.');
-      }
-    }
-    function doRegister() {
-      const name = document.getElementById('r-name').value.trim();
-      const email = document.getElementById('r-email').value.trim().toLowerCase();
-      const pass = document.getElementById('r-pass').value;
-      if (!name || !email || !pass) { showErr('Preencha todos os campos.'); return; }
-      if (pass.length < 6) { showErr('Senha deve ter ao menos 6 caracteres.'); return; }
-      if (db.users[email]) { showErr('Este e-mail já está cadastrado.'); return; }
-      db.users[email] = { name, pass: btoa(pass), crp: '', spec: '', tel: '', addr: '', cpf: '' };
-      saveDB(); saveUser({ id: email, email, ...db.users[email] });
-      showScreen('setup');
-      setTimeout(() => {
-        document.getElementById('s-name').value = name;
-        updateStampPreview();
-      }, 50);
-    }
+    });
 
     // ── SETUP ──
     function navToSetup() {
@@ -2330,13 +2286,13 @@
       saveDB(); saveUser({ id: currentUser.id, email: currentUser.email, ...db.users[currentUser.email] });
 
       // Salva no Supabase (tn001_usuarios)
-      if (supabaseClient) {
+      if (supabase) {
         try {
           let cidade = u.addr || '';
           let uf = '';
           const addrMatch = u.addr.match(/^(.+?)\s*[–-]\s*(\w{2})$/);
           if (addrMatch) { cidade = addrMatch[1].trim(); uf = addrMatch[2].toUpperCase(); }
-          const { error } = await supabaseClient
+          const { error } = await supabase
             .from('tn001_usuarios')
             .upsert({
               id: currentUser.id || undefined,
@@ -2361,9 +2317,9 @@
 
     // ── DASHBOARD ──
     async function fetchPatientsFromSupabase() {
-      if (!supabaseClient) return;
+      if (!supabase) return;
       try {
-        const { data, error } = await supabaseClient
+        const { data, error } = await supabase
           .from('tn003_pacientes')
           .select('*');
         if (!error && data) {
@@ -2402,9 +2358,9 @@
       }
     }
     async function fetchSessionsFromSupabase() {
-      if (!supabaseClient) return;
+      if (!supabase) return;
       try {
-        const { data, error } = await supabaseClient
+        const { data, error } = await supabase
           .from('tn005_atendimentos')
           .select('*');
         if (!error && data) {
@@ -2505,10 +2461,10 @@
     async function deletePatient(id) {
       if (!confirm('Remover este paciente e todos os atendimentos?')) return;
 
-      if (supabaseClient) {
+      if (supabase) {
         try {
-          await supabaseClient.from('tn003_pacientes').delete().eq('id', id.toString());
-          await supabaseClient.from('tn005_atendimentos').delete().eq('paciente_id', id.toString());
+          await supabase.from('tn003_pacientes').delete().eq('id', id.toString());
+          await supabase.from('tn005_atendimentos').delete().eq('paciente_id', id.toString());
         } catch (err) {
           console.warn("Falha ao deletar paciente/sessões no Supabase:", err);
         }
@@ -2642,9 +2598,9 @@
       updateStats();
 
       // Persiste no Supabase (tn005_atendimentos)
-      if (supabaseClient) {
+      if (supabase) {
         try {
-          await supabaseClient.from('tn005_atendimentos').insert([{
+          await supabase.from('tn005_atendimentos').insert([{
             id: s.id.toString(),
             paciente_id: s.patientId.toString(),
             data_atendimento: s.date,
@@ -2736,7 +2692,7 @@
         if (s) {
           s.signed = true; s.signedAt = new Date().toISOString(); saveDB();
           // Atualiza assinatura no Supabase
-          if (supabaseClient) {
+          if (supabase) {
             try {
               const desc = s._supabaseDesc ? JSON.parse(s._supabaseDesc) : {
                 num: s.num, evolucao: s.evolucao, pa: s.pa, spo2: s.spo2,
@@ -2745,7 +2701,7 @@
               };
               desc.signed = true;
               desc.signedAt = s.signedAt;
-              await supabaseClient.from('tn005_atendimentos').update({
+              await supabase.from('tn005_atendimentos').update({
                 descricao: JSON.stringify(desc)
               }).eq('id', s.id.toString());
             } catch (err) {
@@ -2835,9 +2791,9 @@
         createdAt: new Date().toISOString()
       };
 
-      if (supabaseClient) {
+      if (supabase) {
         try {
-          const { error } = await supabaseClient.from('tn003_pacientes').insert([{
+          const { error } = await supabase.from('tn003_pacientes').insert([{
             id: p.id.toString(),
             nome_completo: p.name,
             data_nascimento: p.birth,
@@ -2915,9 +2871,9 @@
       p.obs = document.getElementById('ep-obs').value;
       p.updatedAt = new Date().toISOString();
 
-      if (supabaseClient) {
+      if (supabase) {
         try {
-          const { error } = await supabaseClient.from('tn003_pacientes').update({
+          const { error } = await supabase.from('tn003_pacientes').update({
             nome_completo: p.name,
             data_nascimento: p.birth,
             sexo: p.sex,
@@ -2983,7 +2939,7 @@
     }
 
     // ── INIT ──
-    (function init() {
+    (async function init() {
       const params = new URLSearchParams(location.search);
       const signId = params.get('sign');
       if (signId) {
@@ -2991,8 +2947,28 @@
         const s = db.sessions.find(x => x.id === sid);
         if (s) { const p = db.patients.find(x => x.id === s.patientId); if (p) { openSignScreen(s, p); return; } }
       }
-      if (currentUser && db.users[currentUser.email]) bootDash();
-      else showScreen('login');
+
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const email = session.user.email;
+        let localUser = db.users[email];
+        if (!localUser) {
+          db.users[email] = {
+            name: session.user.user_metadata?.nome || "Fisioterapeuta",
+            crp: '', spec: '', tel: '', addr: '', cpf: ''
+          };
+          saveDB();
+          localUser = db.users[email];
+        }
+        saveUser({ id: session.user.id, email, ...localUser });
+
+        document.getElementById('content-section').style.display = 'flex';
+        document.getElementById('logout-bar').style.display = 'block';
+        document.getElementById('login').classList.remove('active');
+        bootDash();
+      } else {
+        showScreen('login');
+      }
     })();
   </script>
 </body>
