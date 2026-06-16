@@ -868,12 +868,17 @@ tr:hover td { background:var(--gold-ultra); }
     <div class="modal-sub">Preencha os dados cadastrais</div>
     <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input" id="np-name" placeholder="Maria Aparecida Silva"></div>
     <div class="grid2">
-      <div class="form-group"><label class="form-label">Idade</label><input type="number" class="form-input" id="np-age" placeholder="72"></div>
+      <div class="form-group"><label class="form-label">Data de Nascimento *</label><input type="date" class="form-input" id="np-birth" onchange="calcAgeFromBirth('np-birth','np-age')"></div>
+      <div class="form-group"><label class="form-label">Idade</label><input type="text" class="form-input" id="np-age" readonly style="background:var(--border);cursor:not-allowed"></div>
+    </div>
+    <div class="grid2">
       <div class="form-group"><label class="form-label">Sexo</label><select class="form-select" id="np-sex"><option value="">—</option><option>Feminino</option><option>Masculino</option></select></div>
+      <div class="form-group"><label class="form-label">CEP</label><input type="text" class="form-input" id="np-cep" placeholder="74000-000" maxlength="9" oninput="maskCEP(this); buscaCEP(this,'np-addr','np-city')"></div>
     </div>
     <div class="form-group"><label class="form-label">Diagnóstico / CID *</label><input type="text" class="form-input" id="np-diag" placeholder="AVC isquêmico / I63"></div>
     <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="np-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
     <div class="form-group"><label class="form-label">WhatsApp</label><input type="tel" class="form-input" id="np-phone" placeholder="(62) 99999-9999"></div>
+    <div class="form-group"><label class="form-label">Cidade / UF</label><input type="text" class="form-input" id="np-city" placeholder="Goiânia / GO"></div>
     <div class="form-group"><label class="form-label">Endereço</label><input type="text" class="form-input" id="np-addr" placeholder="Rua, número, bairro"></div>
     <div class="form-group"><label class="form-label">Observação inicial</label><input type="text" class="form-input" id="np-obs" placeholder="Ex: frágil, usa andador..."></div>
     <div class="modal-footer">
@@ -890,12 +895,17 @@ tr:hover td { background:var(--gold-ultra); }
     <div class="modal-sub">Atualize os dados cadastrais</div>
     <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input" id="ep-name"></div>
     <div class="grid2">
-      <div class="form-group"><label class="form-label">Idade</label><input type="number" class="form-input" id="ep-age"></div>
+      <div class="form-group"><label class="form-label">Data de Nascimento *</label><input type="date" class="form-input" id="ep-birth" onchange="calcAgeFromBirth('ep-birth','ep-age')"></div>
+      <div class="form-group"><label class="form-label">Idade</label><input type="text" class="form-input" id="ep-age" readonly style="background:var(--border);cursor:not-allowed"></div>
+    </div>
+    <div class="grid2">
       <div class="form-group"><label class="form-label">Sexo</label><select class="form-select" id="ep-sex"><option value="">—</option><option>Feminino</option><option>Masculino</option></select></div>
+      <div class="form-group"><label class="form-label">CEP</label><input type="text" class="form-input" id="ep-cep" placeholder="74000-000" maxlength="9" oninput="maskCEP(this); buscaCEP(this,'ep-addr','ep-city')"></div>
     </div>
     <div class="form-group"><label class="form-label">Diagnóstico / CID *</label><input type="text" class="form-input" id="ep-diag"></div>
     <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="ep-cpf" maxlength="14" oninput="maskCPF(this)"></div>
     <div class="form-group"><label class="form-label">WhatsApp</label><input type="tel" class="form-input" id="ep-phone"></div>
+    <div class="form-group"><label class="form-label">Cidade / UF</label><input type="text" class="form-input" id="ep-city" placeholder="Goiânia / GO"></div>
     <div class="form-group"><label class="form-label">Endereço</label><input type="text" class="form-input" id="ep-addr"></div>
     <div class="form-group"><label class="form-label">Observação</label><input type="text" class="form-input" id="ep-obs"></div>
     <div class="modal-footer">
@@ -1160,10 +1170,13 @@ function openPatient(id){
   document.getElementById('info-content').innerHTML=`
     <div class="form-group"><label class="form-label">Nome</label><div style="font-size:.88rem">${p.name}</div></div>
     ${p.cpf?`<div class="form-group"><label class="form-label">CPF</label><div style="font-size:.88rem">${p.cpf}</div></div>`:''}
+    ${p.birth?`<div class="form-group"><label class="form-label">Nascimento</label><div style="font-size:.88rem">${new Date(p.birth+'T12:00:00').toLocaleDateString('pt-BR')}</div></div>`:''}
     ${p.age?`<div class="form-group"><label class="form-label">Idade</label><div style="font-size:.88rem">${p.age} anos</div></div>`:''}
     ${p.sex?`<div class="form-group"><label class="form-label">Sexo</label><div style="font-size:.88rem">${p.sex}</div></div>`:''}
     <div class="form-group"><label class="form-label">Diagnóstico</label><div style="font-size:.88rem">${p.diag}</div></div>
     ${p.phone?`<div class="form-group"><label class="form-label">WhatsApp</label><div style="font-size:.88rem">${p.phone}</div></div>`:''}
+    ${p.cep?`<div class="form-group"><label class="form-label">CEP</label><div style="font-size:.88rem">${p.cep}</div></div>`:''}
+    ${p.city?`<div class="form-group"><label class="form-label">Cidade / UF</label><div style="font-size:.88rem">${p.city}</div></div>`:''}
     ${p.addr?`<div class="form-group"><label class="form-label">Endereço</label><div style="font-size:.88rem">${p.addr}</div></div>`:''}
     ${p.obs?`<div class="form-group"><label class="form-label">Observação</label><div style="font-size:.88rem">${p.obs}</div></div>`:''}`;
   document.getElementById('tab-sessions').style.display='';
@@ -1373,9 +1386,12 @@ function saveNewPatient(){
   const name=document.getElementById('np-name').value.trim();
   const diag=document.getElementById('np-diag').value.trim();
   if(!name||!diag){alert('Preencha nome e diagnóstico.');return;}
-  const p={id:Date.now(),name,age:parseInt(document.getElementById('np-age').value)||null,sex:document.getElementById('np-sex').value||null,diag,cpf:document.getElementById('np-cpf').value||null,phone:document.getElementById('np-phone').value.replace(/\D/g,''),addr:document.getElementById('np-addr').value,obs:document.getElementById('np-obs').value,usuario_id:userId(),createdAt:new Date().toISOString()};
+  const birth=document.getElementById('np-birth').value;
+  const cep=document.getElementById('np-cep').value;
+  const city=document.getElementById('np-city').value;
+  const p={id:Date.now(),name,birth:birth||null,age:birth?calcAgeFromBirth('np-birth','np-age',true):null,sex:document.getElementById('np-sex').value||null,diag,cpf:document.getElementById('np-cpf').value||null,phone:document.getElementById('np-phone').value.replace(/\D/g,''),cep,addr:document.getElementById('np-addr').value,city,obs:document.getElementById('np-obs').value,usuario_id:userId(),createdAt:new Date().toISOString()};
   db.patients.push(p); saveDB();
-  ['np-name','np-age','np-diag','np-cpf','np-phone','np-addr','np-obs'].forEach(id=>document.getElementById(id).value='');
+  ['np-name','np-age','np-diag','np-cpf','np-phone','np-addr','np-obs','np-birth','np-cep','np-city'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('np-sex').value='';
   closeModal('modal-new');
   renderPatients(myPatients()); renderTable(); updateStats();
@@ -1386,11 +1402,14 @@ function openEditPatientById(id){
   const p=db.patients.find(x=>x.id===id);
   if(!p)return;
   document.getElementById('ep-name').value=p.name||'';
-  document.getElementById('ep-age').value=p.age||'';
+  document.getElementById('ep-birth').value=p.birth||'';
+  if(p.birth) calcAgeFromBirth('ep-birth','ep-age');
   document.getElementById('ep-sex').value=p.sex||'';
   document.getElementById('ep-diag').value=p.diag||'';
   document.getElementById('ep-cpf').value=p.cpf||'';
   document.getElementById('ep-phone').value=p.phone||'';
+  document.getElementById('ep-cep').value=p.cep||'';
+  document.getElementById('ep-city').value=p.city||'';
   document.getElementById('ep-addr').value=p.addr||'';
   document.getElementById('ep-obs').value=p.obs||'';
   document.getElementById('modal-edit').classList.add('open');
@@ -1401,16 +1420,52 @@ function saveEditPatient(){
   if(!name||!diag){alert('Preencha nome e diagnóstico.');return;}
   const p=db.patients.find(x=>x.id===editingPatientId);
   if(!p)return;
-  p.name=name; p.age=parseInt(document.getElementById('ep-age').value)||null;
+  p.birth=document.getElementById('ep-birth').value||null;
+  p.age=p.birth?calcAgeFromBirth('ep-birth','ep-age',true):null;
   p.sex=document.getElementById('ep-sex').value||null;
   p.diag=diag; p.cpf=document.getElementById('ep-cpf').value||null;
   p.phone=document.getElementById('ep-phone').value.replace(/\D/g,'');
+  p.cep=document.getElementById('ep-cep').value||'';
+  p.city=document.getElementById('ep-city').value||'';
   p.addr=document.getElementById('ep-addr').value;
   p.obs=document.getElementById('ep-obs').value;
   p.updatedAt=new Date().toISOString();
   saveDB(); closeModal('modal-edit');
   renderPatients(myPatients()); renderTable();
   if(currentPatientId===editingPatientId) openPatient(editingPatientId);
+}
+function maskCEP(el){
+  let v=el.value.replace(/\D/g,'').slice(0,8);
+  if(v.length>5) v=v.replace(/(\d{5})(\d{1,3})/,'$1-$2');
+  el.value=v;
+}
+function calcAgeFromBirth(birthId,ageId,returnNum){
+  const birth=document.getElementById(birthId).value;
+  const ageEl=document.getElementById(ageId);
+  if(!birth){if(ageEl)ageEl.value='';return returnNum?null:undefined;}
+  const b=new Date(birth+'T12:00:00');
+  const t=new Date();let age=t.getFullYear()-b.getFullYear();
+  const m=t.getMonth()-b.getMonth();
+  if(m<0||(m===0&&t.getDate()<b.getDate()))age--;
+  if(returnNum)return age>=0?age:null;
+  ageEl.value=age>=0?age+' anos':'—';
+}
+let cepTimer=null;
+function buscaCEP(cepEl,addrId,cityId){
+  clearTimeout(cepTimer);
+  const cep=cepEl.value.replace(/\D/g,'');
+  if(cep.length!==8)return;
+  cepTimer=setTimeout(async()=>{
+    try{
+      const r=await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+      const d=await r.json();
+      if(d.erro)return;
+      const addrEl=document.getElementById(addrId);
+      const cityEl=document.getElementById(cityId);
+      if(addrEl&&!addrEl.value)addrEl.value=`${d.logradouro||''}, ${d.bairro||''}`.replace(/^,\s*/,'').replace(/,\s*$/,'');
+      if(cityEl&&!cityEl.value)cityEl.value=`${d.localidade||''} / ${d.uf||''}`;
+    }catch(e){console.warn("Falha ao buscar CEP:",e);}
+  },400);
 }
 function maskCPF(el){
   let v=el.value.replace(/\D/g,'').slice(0,11);
