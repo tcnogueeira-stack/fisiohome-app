@@ -2155,9 +2155,10 @@
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsd3doc2NrbGpkbXdjb2RubnRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODY1MTksImV4cCI6MjA5MDY2MjUxOX0.N-GL1B3ZyVDKwi1bAif40mszwmV8XBUC-yJ44Bxmhnk";
     let supabase = null;
     try {
-      const supabaseSDK = window.supabase;
-      if (supabaseSDK && supabaseSDK.createClient) {
-        supabase = supabaseSDK.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      const sdk = window.supabase;
+      if (sdk && typeof sdk.createClient === 'function') {
+        supabase = sdk.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.__supa = supabase; // debug no console
       } else {
         console.error('Supabase SDK não carregou (CDN indisponível)');
       }
