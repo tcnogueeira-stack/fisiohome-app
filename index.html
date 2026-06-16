@@ -2402,8 +2402,8 @@
       document.getElementById('f-num-display').dataset.num = nextNum;
       ['f-evolucao', 'f-pa', 'f-spo2', 'f-fc', 'f-obs'].forEach(id => document.getElementById(id).value = '');
       document.querySelectorAll('.proc-tag').forEach(t => t.classList.remove('sel'));
-      document.getElementById('btn-whats').style.display = 'none';
       const bs = document.getElementById('btn-save');
+      bs.disabled = false; bs.style.opacity = '1';
       bs.textContent = '💾 Salvar Atendimento'; bs.style.background = '';
       selectedPain = null; savedSession = null;
       const ps = document.getElementById('pain-scale'); ps.innerHTML = '';
