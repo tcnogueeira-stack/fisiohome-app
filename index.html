@@ -2153,12 +2153,12 @@
     // Chaves Supabase
     const SUPABASE_URL = "https://alwwhsckljdmwcodnnti.supabase.co";
     const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsd3doc2NrbGpkbXdjb2RubnRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODY1MTksImV4cCI6MjA5MDY2MjUxOX0.N-GL1B3ZyVDKwi1bAif40mszwmV8XBUC-yJ44Bxmhnk";
-    let supabase = null;
+    let sb = null;
     try {
       const sdk = window.supabase;
       if (sdk && typeof sdk.createClient === 'function') {
-        supabase = sdk.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-        window.__supa = supabase; // debug no console
+        sb = sdk.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.__supa = sb;
       } else {
         console.error('Supabase SDK não carregou (CDN indisponível)');
       }
@@ -2190,7 +2190,7 @@
     }
     async function confirmLogout() {
       closeModal('modal-logout');
-      await supabase.auth.signOut();
+      await sb.auth.signOut();
       location.reload();
     }
 
@@ -2206,7 +2206,7 @@
       if (!email || !pass) { showErr('Preencha e-mail e senha.'); return; }
 
       try {
-        const { data, error } = await supabase.auth.signInWithPassword({
+        const { data, error } = await sb.auth.signInWithPassword({
           email: email,
           password: pass,
         });
@@ -2297,13 +2297,13 @@
       saveDB(); saveUser({ id: currentUser.id, email: currentUser.email, ...db.users[currentUser.email] });
 
       // Salva no Supabase (tn001_usuarios)
-      if (supabase) {
+      if (sb) {
         try {
           let cidade = u.addr || '';
           let uf = '';
           const addrMatch = u.addr.match(/^(.+?)\s*[–-]\s*(\w{2})$/);
           if (addrMatch) { cidade = addrMatch[1].trim(); uf = addrMatch[2].toUpperCase(); }
-          const { error } = await supabase
+          const { error } = await sb
             .from('tn001_usuarios')
             .upsert({
               id: currentUser.id || undefined,
@@ -2328,9 +2328,9 @@
 
     // ── DASHBOARD ──
     async function fetchPatientsFromSupabase() {
-      if (!supabase) return;
+      if (!sb) return;
       try {
-        const { data, error } = await supabase
+        const { data, error } = await sb
           .from('tn003_pacientes')
           .select('*');
         if (!error && data) {
@@ -2369,9 +2369,9 @@
       }
     }
     async function fetchSessionsFromSupabase() {
-      if (!supabase) return;
+      if (!sb) return;
       try {
-        const { data, error } = await supabase
+        const { data, error } = await sb
           .from('tn005_atendimentos')
           .select('*');
         if (!error && data) {
@@ -2472,10 +2472,10 @@
     async function deletePatient(id) {
       if (!confirm('Remover este paciente e todos os atendimentos?')) return;
 
-      if (supabase) {
+      if (sb) {
         try {
-          await supabase.from('tn003_pacientes').delete().eq('id', id.toString());
-          await supabase.from('tn005_atendimentos').delete().eq('paciente_id', id.toString());
+          await sb.from('tn003_pacientes').delete().eq('id', id.toString());
+          await sb.from('tn005_atendimentos').delete().eq('paciente_id', id.toString());
         } catch (err) {
           console.warn("Falha ao deletar paciente/sessões no Supabase:", err);
         }
@@ -2609,9 +2609,9 @@
       updateStats();
 
       // Persiste no Supabase (tn005_atendimentos)
-      if (supabase) {
+      if (sb) {
         try {
-          await supabase.from('tn005_atendimentos').insert([{
+          await sb.from('tn005_atendimentos').insert([{
             id: s.id.toString(),
             paciente_id: s.patientId.toString(),
             data_atendimento: s.date,
@@ -2703,7 +2703,7 @@
         if (s) {
           s.signed = true; s.signedAt = new Date().toISOString(); saveDB();
           // Atualiza assinatura no Supabase
-          if (supabase) {
+          if (sb) {
             try {
               const desc = s._supabaseDesc ? JSON.parse(s._supabaseDesc) : {
                 num: s.num, evolucao: s.evolucao, pa: s.pa, spo2: s.spo2,
@@ -2712,7 +2712,7 @@
               };
               desc.signed = true;
               desc.signedAt = s.signedAt;
-              await supabase.from('tn005_atendimentos').update({
+              await sb.from('tn005_atendimentos').update({
                 descricao: JSON.stringify(desc)
               }).eq('id', s.id.toString());
             } catch (err) {
@@ -2802,9 +2802,9 @@
         createdAt: new Date().toISOString()
       };
 
-      if (supabase) {
+      if (sb) {
         try {
-          const { error } = await supabase.from('tn003_pacientes').insert([{
+          const { error } = await sb.from('tn003_pacientes').insert([{
             id: p.id.toString(),
             nome_completo: p.name,
             data_nascimento: p.birth,
@@ -2882,9 +2882,9 @@
       p.obs = document.getElementById('ep-obs').value;
       p.updatedAt = new Date().toISOString();
 
-      if (supabase) {
+      if (sb) {
         try {
-          const { error } = await supabase.from('tn003_pacientes').update({
+          const { error } = await sb.from('tn003_pacientes').update({
             nome_completo: p.name,
             data_nascimento: p.birth,
             sexo: p.sex,
@@ -2960,7 +2960,7 @@
           if (s) { const p = db.patients.find(x => x.id === s.patientId); if (p) { openSignScreen(s, p); return; } }
         }
 
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await sb.auth.getSession();
         if (session) {
           const email = session.user.email;
           let localUser = db.users[email];
