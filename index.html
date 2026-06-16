@@ -1957,8 +1957,6 @@
         <textarea class="form-textarea" id="f-obs" placeholder="Plano para próxima sessão..."></textarea>
       </div>
       <button class="btn-save" id="btn-save" onclick="saveSession()">💾 Salvar Atendimento</button>
-      <button class="btn-whatsapp" id="btn-whats" onclick="sendWhatsApp()" style="display:none">📲 Enviar link de
-        assinatura</button>
       <div style="height:28px"></div>
     </div>
   </div>
@@ -1980,6 +1978,8 @@
       <button class="sign-clear" onclick="clearSign()">Limpar assinatura</button>
       <div class="stamp-box" id="stamp-box"></div>
       <div style="height:16px"></div>
+      <button class="btn-whatsapp" id="sign-whats" onclick="sendWhatsApp()" style="display:none">📲 Enviar link de assinatura</button>
+      <div style="height:10px"></div>
       <button class="btn-confirm" onclick="confirmSign()">✅ Confirmar Atendimento</button>
     </div>
     <div class="sign-ok" id="sign-ok" style="display:none">
@@ -2421,6 +2421,8 @@
     }
     function toggleProc(el) { el.classList.toggle('sel'); }
     function saveSession() {
+      const btn = document.getElementById('btn-save');
+      btn.disabled = true; btn.style.opacity = '.5'; btn.textContent = '⏳ Salvando...';
       const p = db.patients.find(x => x.id === currentPatientId);
       const procs = [...document.querySelectorAll('.proc-tag.sel')].map(t => t.textContent);
       const s = {
@@ -2439,10 +2441,9 @@
       db.sessions.push(s); saveDB();
       savedSession = { session: s, patient: p };
       updateStats();
-      document.getElementById('btn-whats').style.display = 'flex';
-      const btn = document.getElementById('btn-save');
-      btn.textContent = '✅ Salvo com sucesso!'; btn.style.background = 'var(--ok)';
-      setTimeout(() => { btn.textContent = '💾 Salvar Atendimento'; btn.style.background = ''; }, 2500);
+      btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '💾 Salvar Atendimento';
+      document.getElementById('sign-whats').style.display = 'flex';
+      openSignScreen(s, p);
     }
     function sendWhatsApp() {
       if (!savedSession) return;
@@ -2470,6 +2471,7 @@
 
     // ── ASSINATURA ──
     function openSignScreen(session, patient) {
+      document.getElementById('sign-whats').style.display = 'none';
       const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
       const d = new Date(session.date + 'T12:00:00');
       const pr = session.professional || {};
