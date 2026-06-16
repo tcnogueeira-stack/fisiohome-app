@@ -649,10 +649,13 @@ tr:hover td { background:var(--gold-ultra); }
       <div class="section-title-sm">Dados Profissionais</div>
       <div class="form-group"><label class="form-label">Nome completo</label><input type="text" class="form-input" id="s-name" placeholder="Dr(a). Nome Sobrenome"></div>
       <div class="grid2">
-        <div class="form-group"><label class="form-label">CREFITO</label><input type="text" class="form-input" id="s-crp" placeholder="CREFITO-00/000000-F"></div>
-        <div class="form-group"><label class="form-label">Especialidade</label><input type="text" class="form-input" id="s-spec" placeholder="Neurológica"></div>
+        <div class="form-group"><label class="form-label">CREFITO *</label><input type="text" class="form-input" id="s-crp" placeholder="CREFITO-00/000000-F"></div>
+        <div class="form-group"><label class="form-label">CPF *</label><input type="text" class="form-input" id="s-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
       </div>
-      <div class="form-group"><label class="form-label">Telefone / WhatsApp</label><input type="tel" class="form-input" id="s-tel" placeholder="(62) 99999-9999"></div>
+      <div class="grid2">
+        <div class="form-group"><label class="form-label">Especialidade</label><input type="text" class="form-input" id="s-spec" placeholder="Neurológica"></div>
+        <div class="form-group"><label class="form-label">Telefone / WhatsApp</label><input type="tel" class="form-input" id="s-tel" placeholder="(62) 99999-9999"></div>
+      </div>
       <div class="form-group"><label class="form-label">Cidade / Estado</label><input type="text" class="form-input" id="s-addr" placeholder="Goiânia – GO"></div>
     </div>
     <div class="section-card">
@@ -1039,21 +1042,27 @@ function fillSetup(){
   document.getElementById('s-spec').value  = u.spec  || '';
   document.getElementById('s-tel').value   = u.tel   || '';
   document.getElementById('s-addr').value  = u.addr  || '';
+  if (document.getElementById('s-cpf')) {
+    document.getElementById('s-cpf').value = u.cpf || '';
+  }
   updateStampPreview();
 }
-['s-name','s-crp','s-spec','s-tel','s-addr'].forEach(id=>
+['s-name','s-crp','s-spec','s-tel','s-addr','s-cpf'].forEach(id=>
   document.getElementById(id).addEventListener('input',updateStampPreview)
 );
 function updateStampPreview(){
   const n=v('s-name')||'Dr(a). Nome';const c=v('s-crp')||'CREFITO-00/000000-F';
   const sp=v('s-spec')||'Fisioterapia';const t=v('s-tel')||'(00) 00000-0000';
-  const a=v('s-addr')||'Cidade – UF';
-  document.getElementById('stamp-preview').innerHTML=`<strong>${n}</strong><br>Fisioterapeuta – ${sp}<br>${c}<br>${t}<br>${a}`;
+  const a=v('s-addr')||'Cidade – UF';const cpf=document.getElementById('s-cpf')?.value.trim()||'000.000.000-00';
+  document.getElementById('stamp-preview').innerHTML=`<strong>${n}</strong><br>Fisioterapeuta – ${sp}<br>${c}<br>CPF: ${cpf}<br>${t}<br>${a}`;
 }
 function v(id){return document.getElementById(id).value.trim();}
 function saveSetup(){
-  const u={name:v('s-name'),crp:v('s-crp'),spec:v('s-spec'),tel:v('s-tel'),addr:v('s-addr'),pass:currentUser.pass};
-  if(!u.name||!u.crp){alert('Preencha nome e CREFITO.');return;}
+  const cpfVal=v('s-cpf');const cpfClean=cpfVal.replace(/\D/g,'');
+  if(cpfClean.length!==11){alert('Por favor, informe um CPF válido com 11 dígitos.');return;}
+  const crpVal=v('s-crp');if(!crpVal){alert('O preenchimento do CREFITO é obrigatório.');return;}
+  const u={name:v('s-name'),crp:crpVal,spec:v('s-spec'),tel:v('s-tel'),addr:v('s-addr'),cpf:cpfVal,pass:currentUser.pass};
+  if(!u.name){alert('Preencha seu nome.');return;}
   db.users[currentUser.email]={...db.users[currentUser.email],...u};
   saveDB(); saveUser({email:currentUser.email,...db.users[currentUser.email]});
   bootDash();
@@ -1249,7 +1258,7 @@ function saveSession(){
     pain:selectedPain!==null?selectedPain:0,
     procs, obs:document.getElementById('f-obs').value,
     signed:false, signedAt:null,
-    professional:{name:currentUser.name,crp:currentUser.crp,spec:currentUser.spec,tel:currentUser.tel,addr:currentUser.addr}
+    professional:{name:currentUser.name,crp:currentUser.crp,spec:currentUser.spec,tel:currentUser.tel,addr:currentUser.addr,cpf:currentUser.cpf||''}
   };
   db.sessions.push(s); saveDB();
   savedSession={session:s,patient:p};
@@ -1296,7 +1305,7 @@ function openSignScreen(session,patient){
     <div class="sign-card-row"><span class="sign-card-key">Dor (EVA)</span><span class="sign-card-val">${session.pain}/10</span></div>`;
   document.getElementById('stamp-box').innerHTML=`
     <div class="stamp-box-title">🔏 Responsável pelo atendimento</div>
-    <div class="stamp-text"><strong>${pr.name||'—'}</strong><br>Fisioterapeuta${pr.spec?' – '+pr.spec:''}<br>${pr.crp||''}<br>${pr.tel||''}<br>${pr.addr||''}</div>`;
+    <div class="stamp-text"><strong>${pr.name||'—'}</strong><br>Fisioterapeuta${pr.spec?' – '+pr.spec:''}<br>${pr.crp||''}${pr.cpf?'<br>CPF: '+pr.cpf:''}<br>${pr.tel||''}<br>${pr.addr||''}</div>`;
   document.getElementById('sign-body').style.display='flex';
   document.getElementById('sign-ok').style.display='none';
   initCanvas(); showScreen('sign');
