@@ -105,17 +105,6 @@ body { font-family:'Nunito',sans-serif; background:var(--cream); color:var(--cha
   width:40px; height:2px; background:linear-gradient(90deg,var(--gold),var(--gold-light));
   margin:0 auto 24px; border-radius:2px;
 }
-.login-tabs {
-  display:flex; background:var(--cream); border-radius:12px;
-  padding:4px; gap:4px; margin-bottom:22px;
-  border:1px solid var(--border);
-}
-.ltab {
-  flex:1; padding:9px; border:none; background:none; border-radius:9px;
-  font-family:'Nunito',sans-serif; font-size:.82rem; font-weight:700;
-  cursor:pointer; color:var(--soft); transition:.2s;
-}
-.ltab.active { background:var(--warm-white); color:var(--green-mid); box-shadow:var(--shadow-sm); }
 .form-group { margin-bottom:14px; }
 .form-label {
   font-size:.7rem; font-weight:700; color:var(--mid);
@@ -635,37 +624,16 @@ tr:hover td { background:var(--gold-ultra); }
     <div class="login-logo">Fisio<span>Home</span></div>
     <div class="login-tagline">Prontuário Digital</div>
     <div class="login-divider"></div>
-    <div class="login-tabs">
-      <button class="ltab active" onclick="setLoginTab('login',this)">Entrar</button>
-      <button class="ltab" onclick="setLoginTab('register',this)">Criar conta</button>
-    </div>
     <div id="login-err" class="login-err"></div>
-    <div id="lf-login">
-      <div class="form-group">
-        <label class="form-label">E-mail</label>
-        <input type="email" class="form-input" id="l-email" placeholder="seu@email.com">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Senha</label>
-        <input type="password" class="form-input" id="l-pass" placeholder="••••••••">
-      </div>
-      <button class="btn-main" onclick="doLogin()">Entrar</button>
+    <div class="form-group">
+      <label class="form-label">E-mail</label>
+      <input type="email" class="form-input" id="l-email" placeholder="seu@email.com">
     </div>
-    <div id="lf-register" style="display:none">
-      <div class="form-group">
-        <label class="form-label">Nome completo</label>
-        <input type="text" class="form-input" id="r-name" placeholder="Dr(a). Nome Sobrenome">
-      </div>
-      <div class="form-group">
-        <label class="form-label">E-mail</label>
-        <input type="email" class="form-input" id="r-email" placeholder="seu@email.com">
-      </div>
-      <div class="form-group">
-        <label class="form-label">Senha</label>
-        <input type="password" class="form-input" id="r-pass" placeholder="Mínimo 6 caracteres">
-      </div>
-      <button class="btn-main" onclick="doRegister()">Criar conta</button>
+    <div class="form-group">
+      <label class="form-label">Senha</label>
+      <input type="password" class="form-input" id="l-pass" placeholder="••••••••">
     </div>
+    <button class="btn-main" onclick="doLogin()">Entrar</button>
   </div>
 
 </div>
@@ -1006,13 +974,6 @@ function confirmLogout(){
 }
 
 // ── AUTH ──
-function setLoginTab(tab,btn){
-  document.querySelectorAll('.ltab').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  document.getElementById('lf-login').style.display=tab==='login'?'':'none';
-  document.getElementById('lf-register').style.display=tab==='register'?'':'none';
-  document.getElementById('login-err').style.display='none';
-}
 function showErr(msg){ const el=document.getElementById('login-err'); el.textContent=msg; el.style.display='block'; }
 async function doLogin(){
     const email=document.getElementById('l-email').value.trim().toLowerCase();
@@ -1037,12 +998,13 @@ async function doLogin(){
           if (!localUser) {
             db.users[email] = {
               name: data.user.user_metadata.nome || "Fisioterapeuta",
-              pass: btoa(pass),
+              pass: btoa(pass), supabaseId: data.user.id,
               crp: '', spec: '', tel: '', addr: ''
             };
             saveDB();
             localUser = db.users[email];
           }
+          if (!localUser.supabaseId) localUser.supabaseId = data.user.id;
           userFound = { email, ...localUser };
         }
       } catch (err) {
@@ -1068,21 +1030,6 @@ async function doLogin(){
         : 'E-mail ou senha incorretos.');
     }
   }
-function doRegister(){
-  const name=document.getElementById('r-name').value.trim();
-  const email=document.getElementById('r-email').value.trim().toLowerCase();
-  const pass=document.getElementById('r-pass').value;
-  if(!name||!email||!pass){showErr('Preencha todos os campos.');return;}
-  if(pass.length<6){showErr('Senha deve ter ao menos 6 caracteres.');return;}
-  if(db.users[email]){showErr('Este e-mail já está cadastrado.');return;}
-  db.users[email]={name,pass:btoa(pass),crp:'',spec:'',tel:'',addr:''};
-  saveDB(); saveUser({email,...db.users[email]});
-  showScreen('setup');
-  setTimeout(()=>{
-    document.getElementById('s-name').value=name;
-    updateStampPreview();
-  },50);
-}
 
 // ── SETUP ──
 function navToSetup(){
@@ -1118,23 +1065,29 @@ function saveSetup(){
   bootDash();
 }
 
+function userId(){ return currentUser?.supabaseId || currentUser?.email || ''; }
+function myPatients(){ return db.patients.filter(p => p.usuario_id === userId()); }
+function mySessions(){ return db.sessions.filter(s => myPatients().some(p => p.id === s.patientId)); }
+
 // ── DASHBOARD ──
 function bootDash(){
   document.getElementById('dash-name').textContent=currentUser.name||'—';
   document.getElementById('dash-crp').textContent=currentUser.crp||'';
-  updateStats(); renderPatients(db.patients); renderTable();
+  updateStats(); renderPatients(myPatients()); renderTable();
   showScreen('dash');
 }
 function updateStats(){
   const today=new Date().toISOString().split('T')[0];
   const month=today.slice(0,7);
-  document.getElementById('st-total').textContent=db.patients.length;
-  document.getElementById('st-hoje').textContent=db.sessions.filter(s=>s.date===today).length;
-  document.getElementById('st-mes').textContent=db.sessions.filter(s=>s.date.startsWith(month)).length;
+  const patients=myPatients();
+  const sessions=mySessions();
+  document.getElementById('st-total').textContent=patients.length;
+  document.getElementById('st-hoje').textContent=sessions.filter(s=>s.date===today).length;
+  document.getElementById('st-mes').textContent=sessions.filter(s=>s.date.startsWith(month)).length;
   if(document.getElementById('table-count'))
-    document.getElementById('table-count').textContent=db.patients.length+' pacientes';
+    document.getElementById('table-count').textContent=patients.length+' pacientes';
 }
-function sessionsOf(pid){return db.sessions.filter(s=>s.patientId===pid);}
+function sessionsOf(pid){ return mySessions().filter(s=>s.patientId===pid); }
 function renderPatients(list){
   const el=document.getElementById('patient-list');
   if(!list.length){el.innerHTML='<div class="empty-state"><div class="icon">🗂️</div><p>Nenhum paciente cadastrado.<br>Toque em <strong>＋ Paciente</strong> para começar.</p></div>';return;}
@@ -1154,18 +1107,19 @@ function renderPatients(list){
 }
 function filterPatients(){
   const q=document.getElementById('searchInput').value.toLowerCase();
-  renderPatients(db.patients.filter(p=>p.name.toLowerCase().includes(q)||p.diag.toLowerCase().includes(q)));
+  renderPatients(myPatients().filter(p=>p.name.toLowerCase().includes(q)||p.diag.toLowerCase().includes(q)));
 }
 
 // ── TABELA ──
 function renderTable(){
   const tbody=document.getElementById('tbl-body');
   if(!tbody) return;
-  if(!db.patients.length){
+  const patients=myPatients();
+  if(!patients.length){
     tbody.innerHTML=`<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--soft)">Nenhum paciente cadastrado ainda</td></tr>`;
     return;
   }
-  tbody.innerHTML=db.patients.map((p,i)=>`
+  tbody.innerHTML=patients.map((p,i)=>`
     <tr>
       <td style="color:var(--soft);font-weight:700">${i+1}</td>
       <td class="td-name">${p.name}</td>
@@ -1180,13 +1134,13 @@ function renderTable(){
         <button class="btn-sm btn-sm-del" onclick="deletePatient(${p.id})">✕</button>
       </div></td>
     </tr>`).join('');
-  document.getElementById('table-count').textContent=db.patients.length+' pacientes';
+  document.getElementById('table-count').textContent=patients.length+' pacientes';
 }
 function deletePatient(id){
   if(!confirm('Remover este paciente e todos os atendimentos?'))return;
   db.patients=db.patients.filter(p=>p.id!==id);
   db.sessions=db.sessions.filter(s=>s.patientId!==id);
-  saveDB(); renderTable(); renderPatients(db.patients); updateStats();
+  saveDB(); renderTable(); renderPatients(myPatients()); updateStats();
 }
 
 // ── PROFILE ──
@@ -1381,12 +1335,12 @@ function openNewPatient(){document.getElementById('modal-new').classList.add('op
 // ── SELECIONAR PACIENTE PARA ATENDIMENTO ──
 function openSelectPatient(){
   document.getElementById('sp-search').value='';
-  renderSelectList(db.patients);
+  renderSelectList(myPatients());
   document.getElementById('modal-select').classList.add('open');
 }
 function filterSelectList(){
   const q=document.getElementById('sp-search').value.toLowerCase();
-  renderSelectList(db.patients.filter(p=>p.name.toLowerCase().includes(q)||p.diag.toLowerCase().includes(q)));
+  renderSelectList(myPatients().filter(p=>p.name.toLowerCase().includes(q)||p.diag.toLowerCase().includes(q)));
 }
 function renderSelectList(list){
   const el=document.getElementById('sp-list');
@@ -1416,12 +1370,12 @@ function saveNewPatient(){
   const name=document.getElementById('np-name').value.trim();
   const diag=document.getElementById('np-diag').value.trim();
   if(!name||!diag){alert('Preencha nome e diagnóstico.');return;}
-  const p={id:Date.now(),name,age:parseInt(document.getElementById('np-age').value)||null,sex:document.getElementById('np-sex').value||null,diag,cpf:document.getElementById('np-cpf').value||null,phone:document.getElementById('np-phone').value.replace(/\D/g,''),addr:document.getElementById('np-addr').value,obs:document.getElementById('np-obs').value,createdAt:new Date().toISOString()};
+  const p={id:Date.now(),name,age:parseInt(document.getElementById('np-age').value)||null,sex:document.getElementById('np-sex').value||null,diag,cpf:document.getElementById('np-cpf').value||null,phone:document.getElementById('np-phone').value.replace(/\D/g,''),addr:document.getElementById('np-addr').value,obs:document.getElementById('np-obs').value,usuario_id:userId(),createdAt:new Date().toISOString()};
   db.patients.push(p); saveDB();
   ['np-name','np-age','np-diag','np-cpf','np-phone','np-addr','np-obs'].forEach(id=>document.getElementById(id).value='');
   document.getElementById('np-sex').value='';
   closeModal('modal-new');
-  renderPatients(db.patients); renderTable(); updateStats();
+  renderPatients(myPatients()); renderTable(); updateStats();
 }
 function openEditPatient(){openEditPatientById(currentPatientId);}
 function openEditPatientById(id){
@@ -1452,7 +1406,7 @@ function saveEditPatient(){
   p.obs=document.getElementById('ep-obs').value;
   p.updatedAt=new Date().toISOString();
   saveDB(); closeModal('modal-edit');
-  renderPatients(db.patients); renderTable();
+  renderPatients(myPatients()); renderTable();
   if(currentPatientId===editingPatientId) openPatient(editingPatientId);
 }
 function maskCPF(el){
