@@ -2382,13 +2382,15 @@
     // ── DASHBOARD ──
     async function bootDash() {
       // Busca perfil atualizado do Supabase (role, crp, etc.)
-      if (supabaseClient && currentUser?.supabaseId) {
+      if (supabaseClient && currentUser) {
         try {
-          const { data: prof } = await supabaseClient
-            .from('profiles')
-            .select('role, crp, spec, phone, addr, cpf')
-            .eq('id', currentUser.supabaseId)
-            .single();
+          let query = supabaseClient.from('profiles').select('id, role, crp, spec, phone, addr, cpf');
+          if (currentUser.supabaseId) {
+            query = query.eq('id', currentUser.supabaseId);
+          } else {
+            query = query.eq('email', currentUser.email);
+          }
+          const { data: prof } = await query.single();
           if (prof) {
             currentUser.role = prof.role || currentUser.role;
             currentUser.crp = prof.crp || currentUser.crp;
@@ -2396,6 +2398,7 @@
             currentUser.tel = prof.phone || currentUser.tel;
             currentUser.addr = prof.addr || currentUser.addr;
             currentUser.cpf = prof.cpf || currentUser.cpf;
+            currentUser.supabaseId = prof.id || currentUser.supabaseId;
             localStorage.setItem('fh_user', JSON.stringify(currentUser));
           }
         } catch (_) {}
@@ -2882,6 +2885,7 @@
                 cpf: prof.cpf || '',
                 role: prof.role || 'user',
               };
+              localStorage.setItem('fh_user', JSON.stringify(currentUser));
               bootDash();
               return;
             }
