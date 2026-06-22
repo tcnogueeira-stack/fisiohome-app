@@ -1687,6 +1687,47 @@
       color: var(--soft);
       font-size: .85rem;
     }
+
+    /* ─── TOAST ─── */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-width: 360px;
+    }
+    .toast {
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: .82rem;
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(10, 92, 82, .15);
+      animation: toastIn .25s ease-out;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-left: 4px solid;
+    }
+    .toast-success { background: #dcf5e8; border-color: var(--ok); color: #1a7a4a; }
+    .toast-error { background: #fde8e8; border-color: var(--red); color: #9b1c1c; }
+    .toast-info { background: #e0f2fe; border-color: #0369a1; color: #0369a1; }
+    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+
+    /* ─── ADMIN BADGE ─── */
+    .admin-tag {
+      font-size: .58rem;
+      background: var(--gold-deep);
+      color: #fff;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-weight: 700;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      margin-left: 6px;
+    }
   </style>
 </head>
 
@@ -1759,6 +1800,9 @@
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;position:relative;z-index:1">
           <div class="dash-badge" onclick="navToSetup()">
             <span>⚙️</span><span>Perfil</span>
+          </div>
+          <div class="dash-badge" id="dash-admin-btn" onclick="openCreateUserModal()" style="display:none">
+            <span>👤</span><span>Criar Usuário</span>
           </div>
         </div>
       </div>
@@ -2107,10 +2151,38 @@
     </div>
   </div>
 
+  <!-- ══ MODAL CRIAR USUÁRIO (admin) ══ -->
+  <div class="modal-overlay" id="modal-create-user" onclick="closeMO(event,'modal-create-user')">
+    <div class="modal">
+      <div class="modal-title">Criar Usuário</div>
+      <div class="modal-sub">Cria uma nova conta de acesso ao FisioHome</div>
+      <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input" id="cu-name" placeholder="Nome do profissional"></div>
+      <div class="form-group"><label class="form-label">E-mail *</label><input type="email" class="form-input" id="cu-email" placeholder="email@provedor.com"></div>
+      <div class="grid2">
+        <div class="form-group"><label class="form-label">Telefone / WhatsApp</label><input type="tel" class="form-input" id="cu-phone" placeholder="(62) 99999-9999"></div>
+        <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="cu-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
+      </div>
+      <div style="background:var(--gold-ultra);border:1px solid var(--border-gold);border-radius:10px;padding:14px;margin-bottom:14px">
+        <p style="font-size:.76rem;color:var(--mid)">Uma senha automática será gerada e enviada por e-mail ao usuário.</p>
+      </div>
+      <div id="cu-result" style="display:none;background:#dcf5e8;border:1px solid #1a7a4a;border-radius:10px;padding:14px;margin-bottom:14px">
+        <p style="font-size:.82rem;color:#1a7a4a;font-weight:700" id="cu-result-text"></p>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('modal-create-user')">Cancelar</button>
+        <button class="btn-primary" id="cu-btn" onclick="createUserManual()">Criar Usuário</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══ TOAST CONTAINER ══ -->
+  <div class="toast-container" id="toast-container"></div>
+
   <script>
-    // Chaves Supabase configuradas para apontar para as Tabelas Físicas
+    // Chaves Supabase
     const SUPABASE_URL = "https://alwwhsckljdmwcodnnti.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsd3doc2NrbGpkbXdjb2RubnRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODY1MTksImV4cCI6MjA5MDY2MjUxOX0.N-GL1B3ZyVDKwi1bAif40mszwmV8XBUC-yJ44Bxmhnk";
+    const SUPABASE_FUNCTIONS_URL = SUPABASE_URL + "/functions/v1";
     let supabaseClient = null;
     try {
       const sdk = window.supabase;
@@ -2131,6 +2203,22 @@
     function saveDB() { localStorage.setItem('fh_db', JSON.stringify(db)); }
     function saveUser(u) { currentUser = u; localStorage.setItem('fh_user', JSON.stringify(u)); }
 
+    // ── TOAST ──
+    function showToast(msg, type = 'success') {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const el = document.createElement('div');
+      el.className = `toast toast-${type}`;
+      el.textContent = msg;
+      container.appendChild(el);
+      setTimeout(() => { el.style.opacity = '0'; el.style.transition = '.3s'; setTimeout(() => el.remove(), 300); }, 4000);
+    }
+
+    // ── IS ADMIN ──
+    function isAdmin() {
+      return currentUser?.role === 'admin';
+    }
+
     // ── SCREENS ──
     function showScreen(id) {
       document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -2145,6 +2233,7 @@
     function confirmLogout() {
       localStorage.removeItem('fh_user');
       currentUser = null;
+      if (supabaseClient) { supabaseClient.auth.signOut().catch(() => {}); }
       closeModal('modal-logout');
       showScreen('login');
     }
@@ -2173,18 +2262,46 @@
           }
 
           if (data && data.user) {
-            let localUser = db.users[email];
-            if (!localUser) {
-              db.users[email] = {
-                name: data.user.user_metadata.nome || "Fisioterapeuta",
-                pass: btoa(pass), supabaseId: data.user.id,
-                crp: '', spec: '', tel: '', addr: ''
+            // Try to fetch profile from Supabase profiles table
+            let profileData = null;
+            try {
+              const { data: prof } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', data.user.id)
+                .single();
+              if (prof) profileData = prof;
+            } catch (_) { /* profile table may not exist yet, fallback */ }
+
+            if (profileData) {
+              // User exists in Supabase profiles — use that data
+              userFound = {
+                email: profileData.email,
+                name: profileData.name,
+                supabaseId: data.user.id,
+                crp: profileData.crp || '',
+                spec: profileData.spec || '',
+                tel: profileData.phone || '',
+                addr: profileData.addr || '',
+                cpf: profileData.cpf || '',
+                role: profileData.role || 'user',
+                pass: btoa(pass),
               };
-              saveDB();
-              localUser = db.users[email];
+            } else {
+              // Fallback to localStorage
+              let localUser = db.users[email];
+              if (!localUser) {
+                db.users[email] = {
+                  name: data.user.user_metadata.nome || "Fisioterapeuta",
+                  pass: btoa(pass), supabaseId: data.user.id,
+                  crp: '', spec: '', tel: '', addr: ''
+                };
+                saveDB();
+                localUser = db.users[email];
+              }
+              if (!localUser.supabaseId) localUser.supabaseId = data.user.id;
+              userFound = { email, ...localUser };
             }
-            if (!localUser.supabaseId) localUser.supabaseId = data.user.id;
-            userFound = { email, ...localUser };
           }
         } catch (err) {
           showErr('Erro de conexão. Verifique sua internet.');
@@ -2230,7 +2347,7 @@
       document.getElementById('stamp-preview').innerHTML = `<strong>${n}</strong><br>Fisioterapeuta – ${sp}<br>${c}<br>CPF: ${cpf}<br>${t}<br>${a}`;
     }
     function v(id) { return document.getElementById(id).value.trim(); }
-    function saveSetup() {
+    async function saveSetup() {
       const cpfVal = v('s-cpf'); const cpfClean = cpfVal.replace(/\D/g, '');
       if (cpfClean.length !== 11) { alert('Por favor, informe um CPF válido com 11 dígitos.'); return; }
       const crpVal = v('s-crp'); if (!crpVal) { alert('O preenchimento do CREFITO é obrigatório.'); return; }
@@ -2238,6 +2355,23 @@
       if (!u.name) { alert('Preencha seu nome.'); return; }
       db.users[currentUser.email] = { ...db.users[currentUser.email], ...u };
       saveDB(); saveUser({ email: currentUser.email, ...db.users[currentUser.email] });
+
+      // Sync profile to Supabase if available
+      if (supabaseClient && currentUser?.supabaseId) {
+        try {
+          const { data: existing } = await supabaseClient
+            .from('profiles')
+            .select('id')
+            .eq('id', currentUser.supabaseId)
+            .single();
+          if (existing) {
+            await supabaseClient.from('profiles').update({
+              name: u.name, crp: crpVal, spec: u.spec, phone: u.tel, addr: u.addr, cpf: cpfVal, updated_at: new Date().toISOString()
+            }).eq('id', currentUser.supabaseId);
+          }
+        } catch (_) { /* profiles table may not exist */ }
+      }
+
       bootDash();
     }
 
@@ -2249,6 +2383,7 @@
     function bootDash() {
       document.getElementById('dash-name').textContent = currentUser.name || '—';
       document.getElementById('dash-crp').textContent = currentUser.crp || '';
+      document.getElementById('dash-admin-btn').style.display = isAdmin() ? 'flex' : 'none';
       updateStats(); renderPatients(myPatients()); renderTable();
       showScreen('dash');
     }
@@ -2510,6 +2645,62 @@
       document.getElementById('sign-ok').style.display = 'flex';
     }
 
+    // ── CRIAR USUÁRIO (admin) ──
+    function openCreateUserModal() {
+      ['cu-name','cu-email','cu-phone','cu-cpf'].forEach(id => document.getElementById(id).value = '');
+      document.getElementById('cu-result').style.display = 'none';
+      document.getElementById('cu-btn').disabled = false;
+      document.getElementById('cu-btn').textContent = 'Criar Usuário';
+      document.getElementById('modal-create-user').classList.add('open');
+    }
+    async function createUserManual() {
+      const name = document.getElementById('cu-name').value.trim();
+      const email = document.getElementById('cu-email').value.trim().toLowerCase();
+      if (!name || !email) { showToast('Preencha nome e e-mail.', 'error'); return; }
+
+      const btn = document.getElementById('cu-btn');
+      btn.disabled = true; btn.textContent = '⏳ Criando...';
+      const resultEl = document.getElementById('cu-result');
+      const resultText = document.getElementById('cu-result-text');
+
+      try {
+        const session = await supabaseClient.auth.getSession();
+        const token = session?.data?.session?.access_token;
+        if (!token) { throw new Error('Você precisa estar logado.'); }
+
+        const r = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-user`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+          body: JSON.stringify({
+            name,
+            email,
+            phone: document.getElementById('cu-phone').value.replace(/\D/g, ''),
+            cpf: document.getElementById('cu-cpf').value.replace(/\D/g, ''),
+          }),
+        });
+
+        const data = await r.json();
+        if (!r.ok) { throw new Error(data.error || 'Erro ao criar usuário'); }
+
+        resultEl.style.display = 'block';
+        resultEl.style.background = '#dcf5e8';
+        resultEl.style.borderColor = '#1a7a4a';
+        resultText.style.color = '#1a7a4a';
+        resultText.innerHTML = `✅ Usuário <strong>${email}</strong> criado com sucesso!<br>Senha temporária: <code style="background:#fff;padding:2px 6px;border-radius:4px;font-size:.9rem">${data.password}</code>`;
+        showToast(`Usuário ${email} criado!`, 'success');
+      } catch (err) {
+        resultEl.style.display = 'block';
+        resultText.innerHTML = `❌ ${err.message}`;
+        resultEl.style.background = '#fde8e8';
+        resultEl.style.borderColor = '#c0392b';
+        resultText.style.color = '#9b1c1c';
+        showToast(err.message, 'error');
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Criar Usuário';
+      }
+    }
+
     // ── MODALS ──
     function openNewPatient() { document.getElementById('modal-new').classList.add('open'); }
 
@@ -2641,7 +2832,7 @@
     }
 
     // ── INIT ──
-    (function init() {
+    (async function init() {
       const params = new URLSearchParams(location.search);
       const signId = params.get('sign');
       if (signId) {
@@ -2649,6 +2840,36 @@
         const s = db.sessions.find(x => x.id === sid);
         if (s) { const p = db.patients.find(x => x.id === s.patientId); if (p) { openSignScreen(s, p); return; } }
       }
+
+      // If we have a Supabase session, fetch profile from profiles table
+      if (supabaseClient) {
+        try {
+          const { data: { session } } = await supabaseClient.auth.getSession();
+          if (session?.user) {
+            const { data: prof } = await supabaseClient
+              .from('profiles')
+              .select('*')
+              .eq('id', session.user.id)
+              .single();
+            if (prof) {
+              currentUser = {
+                email: prof.email,
+                name: prof.name,
+                supabaseId: session.user.id,
+                crp: prof.crp || '',
+                spec: prof.spec || '',
+                tel: prof.phone || '',
+                addr: prof.addr || '',
+                cpf: prof.cpf || '',
+                role: prof.role || 'user',
+              };
+              bootDash();
+              return;
+            }
+          }
+        } catch (_) { /* no session or no profiles table */ }
+      }
+
       if (currentUser && db.users[currentUser.email]) bootDash();
       else showScreen('login');
     })();
