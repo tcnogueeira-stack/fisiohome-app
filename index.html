@@ -2380,7 +2380,26 @@
     function mySessions() { return db.sessions.filter(s => myPatients().some(p => p.id === s.patientId)); }
 
     // ── DASHBOARD ──
-    function bootDash() {
+    async function bootDash() {
+      // Busca perfil atualizado do Supabase (role, crp, etc.)
+      if (supabaseClient && currentUser?.supabaseId) {
+        try {
+          const { data: prof } = await supabaseClient
+            .from('profiles')
+            .select('role, crp, spec, phone, addr, cpf')
+            .eq('id', currentUser.supabaseId)
+            .single();
+          if (prof) {
+            currentUser.role = prof.role || currentUser.role;
+            currentUser.crp = prof.crp || currentUser.crp;
+            currentUser.spec = prof.spec || currentUser.spec;
+            currentUser.tel = prof.phone || currentUser.tel;
+            currentUser.addr = prof.addr || currentUser.addr;
+            currentUser.cpf = prof.cpf || currentUser.cpf;
+            localStorage.setItem('fh_user', JSON.stringify(currentUser));
+          }
+        } catch (_) {}
+      }
       document.getElementById('dash-name').textContent = currentUser.name || '—';
       document.getElementById('dash-crp').textContent = currentUser.crp || '';
       document.getElementById('dash-admin-btn').style.display = isAdmin() ? 'flex' : 'none';
