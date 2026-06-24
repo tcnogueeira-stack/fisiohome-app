@@ -2313,6 +2313,7 @@
       }
 
       if (userFound) {
+        migrateLocalUserId(userFound.email, userFound.supabaseId);
         saveUser(userFound);
         if (!userFound.name || !userFound.crp) { navToSetup(); }
         else { bootDash(); }
@@ -2376,8 +2377,18 @@
     }
 
     function userId() { return currentUser?.supabaseId || currentUser?.email || ''; }
-    function myPatients() { return db.patients.filter(p => p.usuario_id === userId()); }
+    function myPatients() {
+      const id = userId();
+      return db.patients.filter(p => p.usuario_id === id || (currentUser?.email && p.usuario_id === currentUser.email));
+    }
     function mySessions() { return db.sessions.filter(s => myPatients().some(p => p.id === s.patientId)); }
+
+    function migrateLocalUserId(oldId, newId) {
+      if (!oldId || !newId || oldId === newId) return;
+      let changed = false;
+      db.patients.forEach(p => { if (p.usuario_id === oldId) { p.usuario_id = newId; changed = true; } });
+      if (changed) saveDB();
+    }
 
     // ── DASHBOARD ──
     async function bootDash() {
@@ -2875,8 +2886,8 @@
           "createdAt": p.createdAt || new Date().toISOString(),
           "updatedAt": new Date().toISOString(),
         }, { onConflict: 'id' });
-        if (error) console.warn('Sync patient error:', error);
-      } catch (e) { console.warn('Sync patient failed:', e); }
+        if (error) { console.warn('Sync patient error:', error); showToast('Erro ao sincronizar paciente: ' + error.message, 'error'); }
+      } catch (e) { console.warn('Sync patient failed:', e); showToast('Erro de conexão ao sincronizar paciente.', 'error'); }
     }
 
     async function syncSessionToSupabase(s) {
@@ -2889,8 +2900,8 @@
           signed: s.signed || false, signed_at: s.signedAt || null,
           professional: s.professional || null,
         }, { onConflict: 'id' });
-        if (error) console.warn('Sync session error:', error);
-      } catch (e) { console.warn('Sync session failed:', e); }
+        if (error) { console.warn('Sync session error:', error); showToast('Erro ao sincronizar atendimento: ' + error.message, 'error'); }
+      } catch (e) { console.warn('Sync session failed:', e); showToast('Erro de conexão ao sincronizar atendimento.', 'error'); }
     }
 
     async function syncAllToSupabase() {
@@ -2898,9 +2909,14 @@
       showToast('Sincronizando dados...', 'info');
       const patients = myPatients();
       const sessions = mySessions();
-      for (const p of patients) await syncPatientToSupabase(p);
-      for (const s of sessions) await syncSessionToSupabase(s);
-      showToast(`${patients.length} pacientes e ${sessions.length} atendimentos sincronizados!`, 'success');
+      let errCount = 0;
+      for (const p of patients) { try { await syncPatientToSupabase(p); } catch { errCount++; } }
+      for (const s of sessions) { try { await syncSessionToSupabase(s); } catch { errCount++; } }
+      if (errCount > 0) {
+        showToast(`Sincronizado com ${errCount} erro(s). ${patients.length - errCount} pacientes e ${sessions.length - errCount} atendimentos OK.`, 'error');
+      } else {
+        showToast(`${patients.length} pacientes e ${sessions.length} atendimentos sincronizados!`, 'success');
+      }
     }
 
     async function pullFromSupabase() {
@@ -2980,6 +2996,7 @@
                 role: prof.role || 'user',
               };
               localStorage.setItem('fh_user', JSON.stringify(currentUser));
+              migrateLocalUserId(currentUser.email, session.user.id);
               bootDash();
               return;
             }
