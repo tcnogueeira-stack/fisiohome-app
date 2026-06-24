@@ -1699,6 +1699,7 @@
       gap: 8px;
       max-width: 360px;
     }
+
     .toast {
       padding: 14px 18px;
       border-radius: 12px;
@@ -1711,10 +1712,36 @@
       gap: 10px;
       border-left: 4px solid;
     }
-    .toast-success { background: #dcf5e8; border-color: var(--ok); color: #1a7a4a; }
-    .toast-error { background: #fde8e8; border-color: var(--red); color: #9b1c1c; }
-    .toast-info { background: #e0f2fe; border-color: #0369a1; color: #0369a1; }
-    @keyframes toastIn { from { opacity: 0; transform: translateX(40px); } to { opacity: 1; transform: translateX(0); } }
+
+    .toast-success {
+      background: #dcf5e8;
+      border-color: var(--ok);
+      color: #1a7a4a;
+    }
+
+    .toast-error {
+      background: #fde8e8;
+      border-color: var(--red);
+      color: #9b1c1c;
+    }
+
+    .toast-info {
+      background: #e0f2fe;
+      border-color: #0369a1;
+      color: #0369a1;
+    }
+
+    @keyframes toastIn {
+      from {
+        opacity: 0;
+        transform: translateX(40px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateX(0);
+      }
+    }
 
     /* ─── ADMIN BADGE ─── */
     .admin-tag {
@@ -2025,7 +2052,8 @@
       <button class="sign-clear" onclick="clearSign()">Limpar assinatura</button>
       <div class="stamp-box" id="stamp-box"></div>
       <div style="height:16px"></div>
-      <button class="btn-whatsapp" id="sign-whats" onclick="sendWhatsApp()" style="display:none">📲 Enviar link de assinatura</button>
+      <button class="btn-whatsapp" id="sign-whats" onclick="sendWhatsApp()" style="display:none">📲 Enviar link de
+        assinatura</button>
       <div style="height:10px"></div>
       <button class="btn-confirm" onclick="confirmSign()">✅ Confirmar Atendimento</button>
     </div>
@@ -2159,16 +2187,23 @@
     <div class="modal">
       <div class="modal-title">Criar Usuário</div>
       <div class="modal-sub">Cria uma nova conta de acesso ao FisioHome</div>
-      <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input" id="cu-name" placeholder="Nome do profissional"></div>
-      <div class="form-group"><label class="form-label">E-mail *</label><input type="email" class="form-input" id="cu-email" placeholder="email@provedor.com"></div>
+      <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input"
+          id="cu-name" placeholder="Nome do profissional"></div>
+      <div class="form-group"><label class="form-label">E-mail *</label><input type="email" class="form-input"
+          id="cu-email" placeholder="email@provedor.com"></div>
       <div class="grid2">
-        <div class="form-group"><label class="form-label">Telefone / WhatsApp</label><input type="tel" class="form-input" id="cu-phone" placeholder="(62) 99999-9999"></div>
-        <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="cu-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
+        <div class="form-group"><label class="form-label">Telefone / WhatsApp</label><input type="tel"
+            class="form-input" id="cu-phone" placeholder="(62) 99999-9999"></div>
+        <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="cu-cpf"
+            placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
       </div>
-      <div style="background:var(--gold-ultra);border:1px solid var(--border-gold);border-radius:10px;padding:14px;margin-bottom:14px">
-        <p style="font-size:.76rem;color:var(--mid)">Uma senha automática será gerada e enviada por e-mail ao usuário.</p>
+      <div
+        style="background:var(--gold-ultra);border:1px solid var(--border-gold);border-radius:10px;padding:14px;margin-bottom:14px">
+        <p style="font-size:.76rem;color:var(--mid)">Uma senha automática será gerada e enviada por e-mail ao usuário.
+        </p>
       </div>
-      <div id="cu-result" style="display:none;background:#dcf5e8;border:1px solid #1a7a4a;border-radius:10px;padding:14px;margin-bottom:14px">
+      <div id="cu-result"
+        style="display:none;background:#dcf5e8;border:1px solid #1a7a4a;border-radius:10px;padding:14px;margin-bottom:14px">
         <p style="font-size:.82rem;color:#1a7a4a;font-weight:700" id="cu-result-text"></p>
       </div>
       <div class="modal-footer">
@@ -2236,7 +2271,7 @@
     function confirmLogout() {
       localStorage.removeItem('fh_user');
       currentUser = null;
-      if (supabaseClient) { supabaseClient.auth.signOut().catch(() => {}); }
+      if (supabaseClient) { supabaseClient.auth.signOut().catch(() => { }); }
       closeModal('modal-logout');
       showScreen('login');
     }
@@ -2412,7 +2447,7 @@
             currentUser.supabaseId = prof.id || currentUser.supabaseId;
             localStorage.setItem('fh_user', JSON.stringify(currentUser));
           }
-        } catch (_) {}
+        } catch (_) { }
       }
       document.getElementById('dash-name').textContent = currentUser.name || '—';
       document.getElementById('dash-crp').textContent = currentUser.crp || '';
@@ -2488,8 +2523,8 @@
       db.sessions = db.sessions.filter(s => s.patientId !== id);
       saveDB(); renderTable(); renderPatients(myPatients()); updateStats();
       if (canSync()) {
-        supabaseClient.from('patients').delete().eq('id', id).then().catch(() => {});
-        supabaseClient.from('sessions').delete().eq('patient_id', id).then().catch(() => {});
+        supabaseClient.from('patients').delete().eq('id', id).then().catch(() => { });
+        supabaseClient.from('sessions').delete().eq('patient_id', id).then().catch(() => { });
       }
     }
 
@@ -2559,7 +2594,7 @@
           ${s.procs.slice(0, 2).map(p => `<span class="chip chip-gold">${p}</span>`).join('')}
         </div>
         ${s.signed
-            ? '<div class="session-signed">✅ Assinado pelo paciente</div>'
+            ? '<div class="session-signed">✅ Assinado</div>'
             : '<div style="font-size:.66rem;color:var(--amber);font-weight:700;margin-top:5px;display:flex;align-items:center;gap:5px">⏳ Aguardando assinatura &nbsp;·&nbsp; <span style="color:var(--green-mid);text-decoration:underline">Reenviar link 📲</span></div>'}
       </div>
     </div>`;
@@ -2687,7 +2722,7 @@
 
     // ── CRIAR USUÁRIO (admin) ──
     function openCreateUserModal() {
-      ['cu-name','cu-email','cu-phone','cu-cpf'].forEach(id => document.getElementById(id).value = '');
+      ['cu-name', 'cu-email', 'cu-phone', 'cu-cpf'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('cu-result').style.display = 'none';
       document.getElementById('cu-btn').disabled = false;
       document.getElementById('cu-btn').textContent = 'Criar Usuário';
