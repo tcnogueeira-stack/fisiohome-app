@@ -1804,6 +1804,9 @@
           <div class="dash-badge" id="dash-admin-btn" onclick="openCreateUserModal()" style="display:none">
             <span>👤</span><span>Criar Usuário</span>
           </div>
+          <div class="dash-badge" onclick="syncAllToSupabase()" title="Sincronizar dados com a nuvem">
+            <span>☁️</span><span>Sincronizar</span>
+          </div>
         </div>
       </div>
       <div class="dash-stats">
@@ -2356,19 +2359,16 @@
       db.users[currentUser.email] = { ...db.users[currentUser.email], ...u };
       saveDB(); saveUser({ email: currentUser.email, ...db.users[currentUser.email] });
 
-      // Sync profile to Supabase if available
+      // Sync profile to Supabase if available (upsert)
       if (supabaseClient && currentUser?.supabaseId) {
         try {
-          const { data: existing } = await supabaseClient
-            .from('profiles')
-            .select('id')
-            .eq('id', currentUser.supabaseId)
-            .single();
-          if (existing) {
-            await supabaseClient.from('profiles').update({
-              name: u.name, crp: crpVal, spec: u.spec, phone: u.tel, addr: u.addr, cpf: cpfVal, updated_at: new Date().toISOString()
-            }).eq('id', currentUser.supabaseId);
-          }
+          await supabaseClient.from('profiles').upsert({
+            id: currentUser.supabaseId,
+            email: currentUser.email,
+            name: u.name, crp: crpVal, spec: u.spec, phone: u.tel,
+            addr: u.addr, cpf: cpfVal, role: currentUser.role || 'user',
+            updated_at: new Date().toISOString(),
+          }, { onConflict: 'id' });
         } catch (_) { /* profiles table may not exist */ }
       }
 
@@ -2406,7 +2406,9 @@
       document.getElementById('dash-name').textContent = currentUser.name || '—';
       document.getElementById('dash-crp').textContent = currentUser.crp || '';
       document.getElementById('dash-admin-btn').style.display = isAdmin() ? 'flex' : 'none';
-      updateStats(); renderPatients(myPatients()); renderTable();
+      pullFromSupabase().then(() => {
+        updateStats(); renderPatients(myPatients()); renderTable();
+      });
       showScreen('dash');
     }
     function updateStats() {
@@ -2474,6 +2476,10 @@
       db.patients = db.patients.filter(p => p.id !== id);
       db.sessions = db.sessions.filter(s => s.patientId !== id);
       saveDB(); renderTable(); renderPatients(myPatients()); updateStats();
+      if (canSync()) {
+        supabaseClient.from('patients').delete().eq('id', id).then().catch(() => {});
+        supabaseClient.from('sessions').delete().eq('patient_id', id).then().catch(() => {});
+      }
     }
 
     // ── PROFILE ──
@@ -2596,6 +2602,7 @@
         professional: { name: currentUser.name, crp: currentUser.crp, spec: currentUser.spec, tel: currentUser.tel, addr: currentUser.addr, cpf: currentUser.cpf || '' }
       };
       db.sessions.push(s); saveDB();
+      syncSessionToSupabase(s);
       savedSession = { session: s, patient: p };
       updateStats();
       btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '💾 Salvar Atendimento';
@@ -2662,7 +2669,7 @@
     }
     function clearSign() { const c = document.getElementById('signCanvas'); signCtx.clearRect(0, 0, c.width, c.height); document.getElementById('sign-hint').style.display = ''; }
     function confirmSign() {
-      if (savedSession) { const s = db.sessions.find(x => x.id === savedSession.session.id); if (s) { s.signed = true; s.signedAt = new Date().toISOString(); saveDB(); } }
+      if (savedSession) { const s = db.sessions.find(x => x.id === savedSession.session.id); if (s) { s.signed = true; s.signedAt = new Date().toISOString(); saveDB(); syncSessionToSupabase(s); } }
       document.getElementById('sign-body').style.display = 'none';
       document.getElementById('sign-ok').style.display = 'flex';
     }
@@ -2769,6 +2776,7 @@
       const city = document.getElementById('np-city').value;
       const p = { id: Date.now(), name, birth: birth || null, age: birth ? calcAgeFromBirth('np-birth', 'np-age', true) : null, sex: document.getElementById('np-sex').value || null, diag, cpf: document.getElementById('np-cpf').value || null, phone: document.getElementById('np-phone').value.replace(/\D/g, ''), cep, addr: document.getElementById('np-addr').value, city, obs: document.getElementById('np-obs').value, usuario_id: userId(), createdAt: new Date().toISOString() };
       db.patients.push(p); saveDB();
+      syncPatientToSupabase(p);
       ['np-name', 'np-age', 'np-diag', 'np-cpf', 'np-phone', 'np-addr', 'np-obs', 'np-birth', 'np-cep', 'np-city'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('np-sex').value = '';
       closeModal('modal-new');
@@ -2808,7 +2816,7 @@
       p.addr = document.getElementById('ep-addr').value;
       p.obs = document.getElementById('ep-obs').value;
       p.updatedAt = new Date().toISOString();
-      saveDB(); closeModal('modal-edit');
+      saveDB(); syncPatientToSupabase(p); closeModal('modal-edit');
       renderPatients(myPatients()); renderTable();
       if (currentPatientId === editingPatientId) openPatient(editingPatientId);
     }
@@ -2851,6 +2859,92 @@
       else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
       else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
       el.value = v;
+    }
+
+    // ── SUPABASE SYNC ──
+    function canSync() { return supabaseClient && currentUser?.supabaseId; }
+
+    async function syncPatientToSupabase(p) {
+      if (!canSync()) return;
+      try {
+        const { error } = await supabaseClient.from('patients').upsert({
+          id: p.id, name: p.name, birth: p.birth, age: p.age,
+          sex: p.sex, diag: p.diag, cpf: p.cpf, phone: p.phone,
+          cep: p.cep, addr: p.addr, city: p.city, obs: p.obs,
+          usuario_id: userId(),
+          "createdAt": p.createdAt || new Date().toISOString(),
+          "updatedAt": new Date().toISOString(),
+        }, { onConflict: 'id' });
+        if (error) console.warn('Sync patient error:', error);
+      } catch (e) { console.warn('Sync patient failed:', e); }
+    }
+
+    async function syncSessionToSupabase(s) {
+      if (!canSync()) return;
+      try {
+        const { error } = await supabaseClient.from('sessions').upsert({
+          id: s.id, patient_id: s.patientId, date: s.date, num: s.num,
+          evolucao: s.evolucao, pa: s.pa, spo2: s.spo2, fc: s.fc,
+          pain: s.pain, procs: s.procs || [], obs: s.obs || '',
+          signed: s.signed || false, signed_at: s.signedAt || null,
+          professional: s.professional || null,
+        }, { onConflict: 'id' });
+        if (error) console.warn('Sync session error:', error);
+      } catch (e) { console.warn('Sync session failed:', e); }
+    }
+
+    async function syncAllToSupabase() {
+      if (!canSync()) { showToast('Faça login via Supabase para sincronizar.', 'info'); return; }
+      showToast('Sincronizando dados...', 'info');
+      const patients = myPatients();
+      const sessions = mySessions();
+      for (const p of patients) await syncPatientToSupabase(p);
+      for (const s of sessions) await syncSessionToSupabase(s);
+      showToast(`${patients.length} pacientes e ${sessions.length} atendimentos sincronizados!`, 'success');
+    }
+
+    async function pullFromSupabase() {
+      if (!canSync()) return;
+      try {
+        const uid = currentUser.supabaseId;
+        const uemail = currentUser.email;
+        const { data: remotePatients, error: pe } = await supabaseClient
+          .from('patients')
+          .select('*')
+          .or(`usuario_id.eq.${uid},usuario_id.eq.${uemail}`);
+        if (!pe && remotePatients?.length) {
+          for (const rp of remotePatients) {
+            if (!db.patients.some(p => p.id === rp.id)) {
+              db.patients.push({
+                id: rp.id, name: rp.name, birth: rp.birth, age: rp.age,
+                sex: rp.sex, diag: rp.diag, cpf: rp.cpf, phone: rp.phone,
+                cep: rp.cep, addr: rp.addr, city: rp.city, obs: rp.obs,
+                usuario_id: rp.usuario_id,
+                createdAt: rp.createdAt, updatedAt: rp.updatedAt,
+              });
+            }
+          }
+          saveDB();
+        }
+        const { data: remoteSessions, error: se } = await supabaseClient
+          .from('sessions')
+          .select('*');
+        if (!se && remoteSessions?.length) {
+          for (const rs of remoteSessions) {
+            if (!db.sessions.some(s => s.id === rs.id)) {
+              db.sessions.push({
+                id: rs.id, patientId: rs.patient_id, date: rs.date,
+                num: rs.num, evolucao: rs.evolucao, pa: rs.pa,
+                spo2: rs.spo2, fc: rs.fc, pain: rs.pain,
+                procs: rs.procs || [], obs: rs.obs || '',
+                signed: rs.signed || false, signedAt: rs.signed_at,
+                professional: rs.professional || null,
+              });
+            }
+          }
+          saveDB();
+        }
+      } catch (e) { console.warn('Pull from Supabase failed:', e); }
     }
 
     // ── INIT ──
