@@ -2395,6 +2395,17 @@
     }
 
     // ── AUTH ──
+    const __authErrs = {
+      'New password should be different from the old password.': 'A nova senha deve ser diferente da senha anterior.',
+      'Invalid login credentials': 'E-mail ou senha incorretos.',
+      'Email not confirmed': 'E-mail não confirmado.',
+      'User already registered': 'E-mail já cadastrado.',
+      'Password should be at least 6 characters': 'A senha deve ter no mínimo 6 caracteres.',
+      'rate limit exceeded': 'Muitas tentativas. Aguarde alguns minutos.',
+      'Email link is invalid or has expired': 'Link inválido ou expirado. Solicite um novo.',
+    };
+    function __authErr(msg) { return __authErrs[msg] || __authErrs[Object.keys(__authErrs).find(k => msg?.includes(k))] || msg; }
+
     function showErr(msg) { const el = document.getElementById('login-err'); el.textContent = msg; el.style.display = 'block'; }
 
     function showForgotScreen() {
@@ -2418,7 +2429,7 @@
         showToast('Link de recuperação enviado! Verifique seu e-mail.', 'success');
         showScreen('login');
       } catch (err) {
-        errEl.textContent = err.message; errEl.style.display = 'block';
+        errEl.textContent = __authErr(err.message); errEl.style.display = 'block';
       }
     }
     async function doSetNewPassword() {
@@ -2434,7 +2445,7 @@
         await supabaseClient.auth.signOut().catch(() => {});
         showScreen('login');
       } catch (err) {
-        errEl.textContent = err.message; errEl.style.display = 'block';
+        errEl.textContent = __authErr(err.message); errEl.style.display = 'block';
       }
     }
 
@@ -2454,9 +2465,7 @@
           });
 
           if (error) {
-            showErr(error.message === 'Invalid login credentials'
-              ? 'E-mail ou senha incorretos.'
-              : error.message);
+            showErr(__authErr(error.message));
             return;
           }
 
@@ -3142,7 +3151,7 @@
           "createdAt": p.createdAt || new Date().toISOString(),
           "updatedAt": new Date().toISOString(),
         }, { onConflict: 'id' });
-        if (error) { console.warn('Sync patient error:', error); showToast('Erro ao sincronizar paciente: ' + error.message, 'error'); }
+        if (error) { console.warn('Sync patient error:', error); showToast('Erro ao sincronizar paciente: ' + __authErr(error.message), 'error'); }
       } catch (e) { console.warn('Sync patient failed:', e); showToast('Erro de conexão ao sincronizar paciente.', 'error'); }
     }
 
@@ -3156,7 +3165,7 @@
           signed: s.signed || false, signed_at: s.signedAt || null,
           professional: s.professional || null,
         }, { onConflict: 'id' });
-        if (error) { console.warn('Sync session error:', error); showToast('Erro ao sincronizar atendimento: ' + error.message, 'error'); }
+        if (error) { console.warn('Sync session error:', error); showToast('Erro ao sincronizar atendimento: ' + __authErr(error.message), 'error'); }
       } catch (e) { console.warn('Sync session failed:', e); showToast('Erro de conexão ao sincronizar atendimento.', 'error'); }
     }
 
