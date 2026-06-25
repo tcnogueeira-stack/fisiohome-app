@@ -2329,13 +2329,19 @@
     const SUPABASE_URL = "https://alwwhsckljdmwcodnnti.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsd3doc2NrbGpkbXdjb2RubnRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODY1MTksImV4cCI6MjA5MDY2MjUxOX0.N-GL1B3ZyVDKwi1bAif40mszwmV8XBUC-yJ44Bxmhnk";
     const SUPABASE_FUNCTIONS_URL = SUPABASE_URL + "/functions/v1";
-    const __initialHash = window.location.hash; // captured before Supabase clears it
+    const __initialHash = window.location.hash;
+    const __initialSearch = window.location.search; // PKCE may put params in query string
+    const __initialUrl = __initialHash + __initialSearch;
     let supabaseClient = null;
+    let __recoveryFlow = false;
     try {
       const sdk = window.supabase;
       if (sdk && typeof sdk.createClient === 'function') {
         supabaseClient = sdk.createClient(SUPABASE_URL, SUPABASE_KEY);
         window.__supa = supabaseClient;
+        supabaseClient.auth.onAuthStateChange((event) => {
+          if (event === 'PASSWORD_RECOVERY') __recoveryFlow = true;
+        });
       }
     } catch (e) { }
 
@@ -3216,8 +3222,14 @@
       }
 
       // Password recovery flow: user clicked recovery link from email
-      if (__initialHash && __initialHash.includes('type=recovery') && supabaseClient) {
-        // Supabase already processed the token and created a session
+      if (supabaseClient && (__initialUrl.includes('type=recovery') || __recoveryFlow)) {
+        // Wait for Supabase to finish token exchange and set session
+        if (!__recoveryFlow) {
+          for (let i = 0; i < 30; i++) {
+            if (__recoveryFlow) break;
+            await new Promise(r => setTimeout(r, 50));
+          }
+        }
         document.getElementById('recover-err').style.display = 'none';
         showScreen('recover-setpass');
         return;
