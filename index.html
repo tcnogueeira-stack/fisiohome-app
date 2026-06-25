@@ -2328,6 +2328,9 @@
       const email = document.getElementById('l-email').value.trim().toLowerCase();
       const pass = document.getElementById('l-pass').value;
       if (!email || !pass) { showErr('Preencha e-mail e senha.'); return; }
+      const btn = document.querySelector('.btn-main');
+      const resetBtn = () => { btn.disabled = false; btn.textContent = 'Entrar'; };
+      btn.disabled = true; btn.textContent = '⏳ Entrando...';
 
       let userFound = null;
 
@@ -2339,6 +2342,7 @@
           });
 
           if (error) {
+            resetBtn();
             showErr(error.message === 'Invalid login credentials'
               ? 'E-mail ou senha incorretos.'
               : error.message);
@@ -2388,6 +2392,7 @@
             }
           }
         } catch (err) {
+          resetBtn();
           showErr('Erro de conexão. Verifique sua internet.');
           return;
         }
@@ -2400,6 +2405,7 @@
         else if (!userFound.name || !userFound.crp) { navToSetup(); }
         else { bootDash(); }
       } else {
+        resetBtn();
         showErr('E-mail ou senha incorretos.');
       }
     }
@@ -2473,29 +2479,7 @@
     }
 
     // ── DASHBOARD ──
-    async function bootDash() {
-      // Busca perfil atualizado do Supabase (role, crp, etc.)
-      if (supabaseClient && currentUser) {
-        try {
-          let query = supabaseClient.from('profiles').select('id, role, crp, spec, phone, addr, cpf');
-          if (currentUser.supabaseId) {
-            query = query.eq('id', currentUser.supabaseId);
-          } else {
-            query = query.eq('email', currentUser.email);
-          }
-          const { data: prof } = await query.single();
-          if (prof) {
-            currentUser.role = prof.role || currentUser.role;
-            currentUser.crp = prof.crp || currentUser.crp;
-            currentUser.spec = prof.spec || currentUser.spec;
-            currentUser.tel = prof.phone || currentUser.tel;
-            currentUser.addr = prof.addr || currentUser.addr;
-            currentUser.cpf = prof.cpf || currentUser.cpf;
-            currentUser.supabaseId = prof.id || currentUser.supabaseId;
-            localStorage.setItem('fh_user', JSON.stringify(currentUser));
-          }
-        } catch (_) { }
-      }
+    function bootDash() {
       document.getElementById('dash-name').textContent = currentUser.name || '—';
       document.getElementById('dash-crp').textContent = currentUser.crp || '';
       document.getElementById('dash-admin-btn').style.display = isAdmin() ? 'flex' : 'none';
@@ -3103,24 +3087,26 @@
             }
           }
           saveDB();
-        }
-        const { data: remoteSessions, error: se } = await supabaseClient
-          .from('sessions')
-          .select('*');
-        if (!se && remoteSessions?.length) {
-          for (const rs of remoteSessions) {
-            if (!db.sessions.some(s => s.id === rs.id)) {
-              db.sessions.push({
-                id: rs.id, patientId: rs.patient_id, date: rs.date,
-                num: rs.num, evolucao: rs.evolucao, pa: rs.pa,
-                spo2: rs.spo2, fc: rs.fc, pain: rs.pain,
-                procs: rs.procs || [], obs: rs.obs || '',
-                signed: rs.signed || false, signedAt: rs.signed_at,
-                professional: rs.professional || null,
-              });
+          const pIds = remotePatients.map(p => p.id);
+          const { data: remoteSessions, error: se } = await supabaseClient
+            .from('sessions')
+            .select('*')
+            .in('patient_id', pIds);
+          if (!se && remoteSessions?.length) {
+            for (const rs of remoteSessions) {
+              if (!db.sessions.some(s => s.id === rs.id)) {
+                db.sessions.push({
+                  id: rs.id, patientId: rs.patient_id, date: rs.date,
+                  num: rs.num, evolucao: rs.evolucao, pa: rs.pa,
+                  spo2: rs.spo2, fc: rs.fc, pain: rs.pain,
+                  procs: rs.procs || [], obs: rs.obs || '',
+                  signed: rs.signed || false, signedAt: rs.signed_at,
+                  professional: rs.professional || null,
+                });
+              }
             }
+            saveDB();
           }
-          saveDB();
         }
       } catch (e) { console.warn('Pull from Supabase failed:', e); }
     }
