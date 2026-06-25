@@ -3127,17 +3127,18 @@
               .eq('id', session.user.id)
               .single();
             if (prof) {
+              const local = JSON.parse(localStorage.getItem('fh_user') || '{}');
               currentUser = {
                 email: prof.email,
                 name: prof.name,
                 supabaseId: session.user.id,
-                sex: prof.sex || '',
-                crp: prof.crp || '',
-                spec: prof.spec || '',
-                tel: prof.phone || '',
-                addr: prof.addr || '',
-                cpf: prof.cpf || '',
-                role: prof.role || 'user',
+                sex: prof.sex || local.sex || '',
+                crp: prof.crp || local.crp || '',
+                spec: prof.spec || local.spec || '',
+                tel: prof.phone || local.tel || '',
+                addr: prof.addr || local.addr || '',
+                cpf: prof.cpf || local.cpf || '',
+                role: prof.role || local.role || 'user',
               };
               localStorage.setItem('fh_user', JSON.stringify(currentUser));
               migrateLocalUserId(currentUser.email, session.user.id);
