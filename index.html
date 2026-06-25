@@ -806,6 +806,17 @@
       color: var(--red);
     }
 
+    .session-actions {
+      display: flex;
+      gap: 6px;
+      margin-top: 8px;
+    }
+
+    .session-actions .btn-sm {
+      font-size: .66rem;
+      padding: 4px 9px;
+    }
+
     .add-row-btn {
       width: 100%;
       padding: 13px;
@@ -2213,6 +2224,41 @@
     </div>
   </div>
 
+  <!-- ══ MODAL EDITAR SESSÃO ══ -->
+  <div class="modal-overlay" id="modal-edit-session" onclick="closeMO(event,'modal-edit-session')">
+    <div class="modal">
+      <div class="modal-title">Editar Atendimento</div>
+      <div class="modal-sub" id="edit-session-sub"></div>
+      <div class="form-section" style="margin-top:0">
+        <div class="form-section-title">Queixa / Evolução</div>
+        <textarea class="form-textarea" id="edit-evolucao" placeholder="Evolução do paciente..."></textarea>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">Procedimentos Realizados</div>
+        <div class="proc-tags" id="edit-proc-tags">
+          <button class="proc-tag" onclick="toggleProc(this)">Cinesioterapia</button>
+          <button class="proc-tag" onclick="toggleProc(this)">Alongamento</button>
+          <button class="proc-tag" onclick="toggleProc(this)">Fortalecimento</button>
+          <button class="proc-tag" onclick="toggleProc(this)">TENS</button>
+          <button class="proc-tag" onclick="toggleProc(this)">Ultrassom</button>
+          <button class="proc-tag" onclick="toggleProc(this)">Massoterapia</button>
+          <button class="proc-tag" onclick="toggleProc(this)">Bandagem</button>
+          <button class="proc-tag" onclick="toggleProc(this)">RPG</button>
+          <button class="proc-tag" onclick="toggleProc(this)">Pilates</button>
+          <button class="proc-tag" onclick="toggleProc(this)">Neurodesenv.</button>
+        </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">Observações</div>
+        <textarea class="form-textarea" id="edit-obs" placeholder="Observações do atendimento..."></textarea>
+      </div>
+      <div class="modal-footer">
+        <button class="btn-cancel" onclick="closeModal('modal-edit-session')">Cancelar</button>
+        <button class="btn-primary" onclick="saveSessionEdit()">💾 Salvar</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ══ TOAST CONTAINER ══ -->
   <div class="toast-container" id="toast-container"></div>
 
@@ -2568,6 +2614,52 @@
       document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
       btn.classList.add('active'); renderSessions(f);
     }
+    let editingSessionId = null;
+
+    function editSession(sid) {
+      const s = db.sessions.find(x => x.id === sid);
+      if (!s) return;
+      editingSessionId = sid;
+      document.getElementById('edit-evolucao').value = s.evolucao === '(sem registro)' ? '' : s.evolucao;
+      document.getElementById('edit-obs').value = s.obs || '';
+      document.querySelectorAll('#edit-proc-tags .proc-tag').forEach(t => t.classList.remove('sel'));
+      (s.procs || []).forEach(p => {
+        const tag = [...document.querySelectorAll('#edit-proc-tags .proc-tag')].find(t => t.textContent === p);
+        if (tag) tag.classList.add('sel');
+      });
+      document.getElementById('edit-session-sub').textContent = `Sessão #${s.num} - ${s.date}`;
+      document.getElementById('modal-edit-session').classList.add('open');
+    }
+
+    function saveSessionEdit() {
+      const s = db.sessions.find(x => x.id === editingSessionId);
+      if (!s) return;
+      s.evolucao = document.getElementById('edit-evolucao').value || '(sem registro)';
+      s.procs = [...document.querySelectorAll('#edit-proc-tags .proc-tag.sel')].map(t => t.textContent);
+      s.obs = document.getElementById('edit-obs').value;
+      saveDB(); syncSessionToSupabase(s);
+      closeModal('modal-edit-session');
+      const active = document.querySelector('.filter-chip.active');
+      renderSessions(active ? active.textContent.toLowerCase() : 'all');
+      showToast('Atendimento atualizado!', 'success');
+    }
+
+    function deleteSession(sid) {
+      const s = db.sessions.find(x => x.id === sid);
+      if (!s) return;
+      if (s.signed && !confirm('Este atendimento já foi assinado. Remover mesmo assim?')) return;
+      if (!confirm('Remover este atendimento?')) return;
+      db.sessions = db.sessions.filter(x => x.id !== sid);
+      saveDB();
+      if (canSync()) {
+        supabaseClient.from('sessions').delete().eq('id', sid).then().catch(() => { });
+      }
+      const active = document.querySelector('.filter-chip.active');
+      renderSessions(active ? active.textContent.toLowerCase() : 'all');
+      updateStats();
+      showToast('Atendimento removido.', 'info');
+    }
+
     function renderSessions(filter) {
       const now = new Date();
       let list = sessionsOf(currentPatientId).sort((a, b) => b.date.localeCompare(a.date));
@@ -2597,6 +2689,10 @@
         ${s.signed
             ? '<div class="session-signed">✅ Assinado</div>'
             : '<div style="font-size:.66rem;color:var(--amber);font-weight:700;margin-top:5px;display:flex;align-items:center;gap:5px">⏳ Aguardando assinatura &nbsp;·&nbsp; <span style="color:var(--green-mid);text-decoration:underline">Reenviar link 📲</span></div>'}
+        <div class="session-actions">
+          <button class="btn-sm btn-sm-edit" onclick="event.stopPropagation();editSession(${s.id})">✏️ Editar</button>
+          <button class="btn-sm btn-sm-del" onclick="event.stopPropagation();deleteSession(${s.id})">🗑️ Excluir</button>
+        </div>
       </div>
     </div>`;
       }).join('');
