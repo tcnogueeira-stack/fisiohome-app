@@ -1904,9 +1904,7 @@
           <div class="dash-badge" id="dash-admin-btn" onclick="openCreateUserModal()" style="display:none">
             <span>👤</span><span>Criar Usuário</span>
           </div>
-          <div class="dash-badge" onclick="syncAllToSupabase()" title="Sincronizar dados com a nuvem">
-            <span>☁️</span><span>Sincronizar</span>
-          </div>
+
         </div>
       </div>
       <div class="dash-stats">
@@ -3167,21 +3165,6 @@
         }, { onConflict: 'id' });
         if (error) { console.warn('Sync session error:', error); showToast('Erro ao sincronizar atendimento: ' + __authErr(error.message), 'error'); }
       } catch (e) { console.warn('Sync session failed:', e); showToast('Erro de conexão ao sincronizar atendimento.', 'error'); }
-    }
-
-    async function syncAllToSupabase() {
-      if (!canSync()) { showToast('Faça login via Supabase para sincronizar.', 'info'); return; }
-      showToast('Sincronizando dados...', 'info');
-      const patients = myPatients();
-      const sessions = mySessions();
-      let errCount = 0;
-      for (const p of patients) { try { await syncPatientToSupabase(p); } catch { errCount++; } }
-      for (const s of sessions) { try { await syncSessionToSupabase(s); } catch { errCount++; } }
-      if (errCount > 0) {
-        showToast(`Sincronizado com ${errCount} erro(s). ${patients.length - errCount} pacientes e ${sessions.length - errCount} atendimentos OK.`, 'error');
-      } else {
-        showToast(`${patients.length} pacientes e ${sessions.length} atendimentos sincronizados!`, 'success');
-      }
     }
 
     async function pullFromSupabase() {
