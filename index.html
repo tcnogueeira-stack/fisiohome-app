@@ -2350,7 +2350,8 @@
       if (userFound) {
         migrateLocalUserId(userFound.email, userFound.supabaseId);
         saveUser(userFound);
-        if (!userFound.name || !userFound.crp) { navToSetup(); }
+        if (profileData) { bootDash(); }
+        else if (!userFound.name || !userFound.crp) { navToSetup(); }
         else { bootDash(); }
       } else {
         showErr('E-mail ou senha incorretos.');
