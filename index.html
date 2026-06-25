@@ -2309,7 +2309,10 @@
       document.getElementById(id).classList.add('active');
       window.scrollTo(0, 0);
     }
-    function navTo(id) { showScreen(id); }
+    function navTo(id) {
+      showScreen(id);
+      if (id === 'dash') { pullFromSupabase().then(() => { updateStats(); renderPatients(); renderTable(); }); }
+    }
 
     function doLogout() {
       document.getElementById('modal-logout').classList.add('open');
@@ -3063,42 +3066,35 @@
       if (!canSync()) return;
       try {
         const uid = currentUser.supabaseId;
-        const uemail = currentUser.email;
-        const { data: remotePatients, error: pe } = await supabaseClient
+        const email = currentUser.email;
+        const { data: rp, error: pe } = await supabaseClient
           .from('patients')
           .select('*')
-          .or(`usuario_id.eq.${uid},usuario_id.eq.${uemail}`);
-        if (!pe && remotePatients?.length) {
-          for (const rp of remotePatients) {
-            if (!db.patients.some(p => p.id === rp.id)) {
-              db.patients.push({
-                id: rp.id, name: rp.name, birth: rp.birth, age: rp.age,
-                sex: rp.sex, diag: rp.diag, cpf: rp.cpf, phone: rp.phone,
-                cep: rp.cep, addr: rp.addr, city: rp.city, obs: rp.obs,
-                usuario_id: rp.usuario_id,
-                createdAt: rp.createdAt, updatedAt: rp.updatedAt,
-              });
-            }
-          }
+          .or(`usuario_id.eq.${uid},usuario_id.eq.${email}`);
+        if (!pe && rp) {
+          const localP = db.patients;
+          const remoteIds = new Set(rp.map(p => p.id));
+          localP.forEach(p => { if (remoteIds.has(p.id)) remoteIds.delete(p.id); });
+          const merged = rp.map(r => {
+            const old = localP.find(p => p.id === r.id);
+            return old ? Object.assign(old, { name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, createdAt: r.createdAt, updatedAt: r.updatedAt }) : { id: r.id, name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, createdAt: r.createdAt, updatedAt: r.updatedAt };
+          });
+          db.patients = merged;
           saveDB();
-          const pIds = remotePatients.map(p => p.id);
-          const { data: remoteSessions, error: se } = await supabaseClient
+          const pIds = rp.map(p => p.id);
+          const { data: rs, error: se } = await supabaseClient
             .from('sessions')
             .select('*')
             .in('patient_id', pIds);
-          if (!se && remoteSessions?.length) {
-            for (const rs of remoteSessions) {
-              if (!db.sessions.some(s => s.id === rs.id)) {
-                db.sessions.push({
-                  id: rs.id, patientId: rs.patient_id, date: rs.date,
-                  num: rs.num, evolucao: rs.evolucao, pa: rs.pa,
-                  spo2: rs.spo2, fc: rs.fc, pain: rs.pain,
-                  procs: rs.procs || [], obs: rs.obs || '',
-                  signed: rs.signed || false, signedAt: rs.signed_at,
-                  professional: rs.professional || null,
-                });
-              }
-            }
+          if (!se && rs) {
+            const localS = db.sessions;
+            const rIds = new Set(rs.map(s => s.id));
+            localS.forEach(s => { if (rIds.has(s.id)) rIds.delete(s.id); });
+            const mergedS = rs.map(r => {
+              const old = localS.find(s => s.id === r.id);
+              return old ? Object.assign(old, { patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', signed: r.signed || false, signedAt: r.signed_at, professional: r.professional || null }) : { id: r.id, patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', signed: r.signed || false, signedAt: r.signed_at, professional: r.professional || null };
+            });
+            db.sessions = mergedS;
             saveDB();
           }
         }
