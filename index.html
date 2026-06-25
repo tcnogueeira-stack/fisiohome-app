@@ -1853,12 +1853,12 @@
           <div class="stat-label">Pacientes</div>
         </div>
         <div class="stat-card stat-gold">
-          <div class="stat-num" id="st-hoje">0</div>
-          <div class="stat-label">Hoje</div>
+          <div class="stat-num" id="st-sessoes">0</div>
+          <div class="stat-label">Sessões</div>
         </div>
         <div class="stat-card">
-          <div class="stat-num" id="st-mes">0</div>
-          <div class="stat-label">Este mês</div>
+          <div class="stat-num" id="st-receita">R$ 0,00</div>
+          <div class="stat-label">Receita</div>
         </div>
       </div>
     </div>
@@ -2516,8 +2516,8 @@
       document.getElementById('st-total').textContent = list.length;
       const pIds = new Set(list.map(p => p.id));
       const sessions = mySessions().filter(s => pIds.has(s.patientId));
-      document.getElementById('st-hoje').textContent = sessions.filter(s => s.date === today).length;
-      document.getElementById('st-mes').textContent = sessions.filter(s => s.date.startsWith(month)).length;
+      document.getElementById('st-sessoes').textContent = sessions.length;
+      document.getElementById('st-receita').textContent = 'R$ 0,00';
       if (document.getElementById('table-count'))
         document.getElementById('table-count').textContent = list.length + ' pacientes';
     }
