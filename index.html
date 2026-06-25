@@ -287,6 +287,17 @@
       border-left: 3px solid var(--red);
     }
 
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: .8rem;
+      color: var(--gold);
+      cursor: pointer;
+      margin: 6px 0 14px;
+      text-decoration: none;
+    }
+    .forgot-link:hover { text-decoration: underline; }
+
     /* ─── SETUP ─── */
     #setup {
       background: var(--cream);
@@ -1788,9 +1799,45 @@
         <label class="form-label">Senha</label>
         <input type="password" class="form-input" id="l-pass" placeholder="••••••••">
       </div>
+      <a class="forgot-link" onclick="showForgotScreen()">Esqueci minha senha?</a>
       <button class="btn-main" onclick="doLogin()">Entrar</button>
     </div>
+  </div>
 
+  <!-- ══ ESQUECI SENHA ══ -->
+  <div id="forgot-pw" class="screen">
+    <div class="login-box">
+      <div class="login-logo">Fisio<span>Home</span></div>
+      <div class="login-tagline">Recuperar senha</div>
+      <div class="login-divider"></div>
+      <div id="forgot-err" class="login-err"></div>
+      <div class="form-group">
+        <label class="form-label">E-mail cadastrado</label>
+        <input type="email" class="form-input" id="fp-email" placeholder="seu@email.com">
+      </div>
+      <button class="btn-main" onclick="sendResetEmail()">Enviar link</button>
+      <a class="forgot-link" style="display:block;text-align:center;margin-top:12px" onclick="showScreen('login')">Voltar</a>
+    </div>
+  </div>
+
+  <!-- ══ NOVA SENHA (após link de recuperação) ══ -->
+  <div id="recover-setpass" class="screen">
+    <div class="login-box">
+      <div class="login-logo">Fisio<span>Home</span></div>
+      <div class="login-tagline">Nova senha</div>
+      <div class="login-divider"></div>
+      <div id="recover-err" class="login-err"></div>
+      <p style="color:var(--text);font-size:.9rem;margin-bottom:16px">Escolha uma nova senha para sua conta.</p>
+      <div class="form-group">
+        <label class="form-label">Nova senha</label>
+        <input type="password" class="form-input" id="rp-pass" placeholder="mín. 6 caracteres">
+      </div>
+      <div class="form-group">
+        <label class="form-label">Confirmar senha</label>
+        <input type="password" class="form-input" id="rp-confirm" placeholder="repita a senha">
+      </div>
+      <button class="btn-main" onclick="doSetNewPassword()">Redefinir senha</button>
+    </div>
   </div>
 
   <!-- ══ SETUP ══ -->
@@ -2274,6 +2321,7 @@
     const SUPABASE_URL = "https://alwwhsckljdmwcodnnti.supabase.co";
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsd3doc2NrbGpkbXdjb2RubnRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODY1MTksImV4cCI6MjA5MDY2MjUxOX0.N-GL1B3ZyVDKwi1bAif40mszwmV8XBUC-yJ44Bxmhnk";
     const SUPABASE_FUNCTIONS_URL = SUPABASE_URL + "/functions/v1";
+    const __initialHash = window.location.hash; // captured before Supabase clears it
     let supabaseClient = null;
     try {
       const sdk = window.supabase;
@@ -2334,6 +2382,46 @@
 
     // ── AUTH ──
     function showErr(msg) { const el = document.getElementById('login-err'); el.textContent = msg; el.style.display = 'block'; }
+
+    function showForgotScreen() {
+      const email = document.getElementById('l-email').value.trim();
+      if (email) document.getElementById('fp-email').value = email;
+      document.getElementById('forgot-err').style.display = 'none';
+      showScreen('forgot-pw');
+    }
+    async function sendResetEmail() {
+      const email = document.getElementById('fp-email').value.trim().toLowerCase();
+      const errEl = document.getElementById('forgot-err');
+      if (!email) { errEl.textContent = 'Informe seu e-mail.'; errEl.style.display = 'block'; return; }
+      if (!supabaseClient) { errEl.textContent = 'Sem conexão com o servidor.'; errEl.style.display = 'block'; return; }
+      try {
+        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + window.location.pathname,
+        });
+        if (error) throw error;
+        showToast('Link de recuperação enviado! Verifique seu e-mail.', 'success');
+        showScreen('login');
+      } catch (err) {
+        errEl.textContent = err.message; errEl.style.display = 'block';
+      }
+    }
+    async function doSetNewPassword() {
+      const pass = document.getElementById('rp-pass').value;
+      const confirm = document.getElementById('rp-confirm').value;
+      const errEl = document.getElementById('recover-err');
+      if (!pass || pass.length < 6) { errEl.textContent = 'A senha deve ter no mínimo 6 caracteres.'; errEl.style.display = 'block'; return; }
+      if (pass !== confirm) { errEl.textContent = 'As senhas não conferem.'; errEl.style.display = 'block'; return; }
+      try {
+        const { error } = await supabaseClient.auth.updateUser({ password: pass });
+        if (error) throw error;
+        showToast('Senha redefinida com sucesso! Faça login.', 'success');
+        await supabaseClient.auth.signOut().catch(() => {});
+        showScreen('login');
+      } catch (err) {
+        errEl.textContent = err.message; errEl.style.display = 'block';
+      }
+    }
+
     async function doLogin() {
       const email = document.getElementById('l-email').value.trim().toLowerCase();
       const pass = document.getElementById('l-pass').value;
@@ -3115,6 +3203,14 @@
         const sid = parseInt(signId);
         const s = db.sessions.find(x => x.id === sid);
         if (s) { const p = db.patients.find(x => x.id === s.patientId); if (p) { openSignScreen(s, p); return; } }
+      }
+
+      // Password recovery flow: user clicked recovery link from email
+      if (__initialHash && __initialHash.includes('type=recovery') && supabaseClient) {
+        // Supabase already processed the token and created a session
+        document.getElementById('recover-err').style.display = 'none';
+        showScreen('recover-setpass');
+        return;
       }
 
       // If we have a Supabase session, fetch profile from profiles table
