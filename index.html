@@ -2452,16 +2452,15 @@
       db.users[currentUser.email] = { ...db.users[currentUser.email], ...u };
       saveDB(); saveUser({ email: currentUser.email, ...db.users[currentUser.email] });
 
-      // Sync profile to Supabase if available (upsert)
+      // Sync profile to Supabase if available
       if (supabaseClient && currentUser?.supabaseId) {
         try {
-          await supabaseClient.from('profiles').upsert({
-            id: currentUser.supabaseId,
+          await supabaseClient.from('profiles').update({
             email: currentUser.email,
             name: u.name, sex: u.sex, crp: crpVal, spec: u.spec, phone: u.tel,
             addr: u.addr, cpf: cpfVal, role: currentUser.role || 'user',
             updated_at: new Date().toISOString(),
-          }, { onConflict: 'id' });
+          }).eq('id', currentUser.supabaseId);
         } catch (_) { /* profiles table may not exist */ }
       }
 
