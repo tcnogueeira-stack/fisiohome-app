@@ -2515,7 +2515,11 @@
       else if (patientDateFilter === 'year') list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(now.getFullYear().toString())));
       document.getElementById('st-total').textContent = list.length;
       const pIds = new Set(list.map(p => p.id));
-      const sessions = mySessions().filter(s => pIds.has(s.patientId));
+      let sessions = mySessions().filter(s => pIds.has(s.patientId));
+      if (patientDateFilter === 'today') sessions = sessions.filter(s => s.date === today);
+      else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); sessions = sessions.filter(s => new Date(s.date) >= w); }
+      else if (patientDateFilter === 'month') sessions = sessions.filter(s => s.date.startsWith(month));
+      else if (patientDateFilter === 'year') sessions = sessions.filter(s => s.date.startsWith(now.getFullYear().toString()));
       document.getElementById('st-sessoes').textContent = sessions.length;
       document.getElementById('st-receita').textContent = 'R$ 0,00';
       if (document.getElementById('table-count'))
