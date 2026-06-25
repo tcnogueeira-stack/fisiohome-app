@@ -117,8 +117,8 @@
       margin-top: 1px;
     }
 
-    /* ─── LOGIN ─── */
-    #login {
+    /* ─── LOGIN / RECUPERAR SENHA ─── */
+    #login, #forgot-pw, #recover-setpass {
       background: linear-gradient(150deg, var(--green-deep) 0%, #062e28 60%, #0d1f1d 100%);
       align-items: center;
       justify-content: center;
@@ -127,7 +127,7 @@
       overflow: hidden;
     }
 
-    #login::before {
+    #login::before, #forgot-pw::before, #recover-setpass::before {
       content: '';
       position: absolute;
       top: -100px;
@@ -138,7 +138,7 @@
       background: radial-gradient(circle, rgba(212, 184, 150, .12) 0%, transparent 70%);
     }
 
-    #login::after {
+    #login::after, #forgot-pw::after, #recover-setpass::after {
       content: '';
       position: absolute;
       bottom: -80px;
@@ -289,7 +289,7 @@
 
     .forgot-link {
       display: block;
-      text-align: right;
+      text-align: center;
       font-size: .8rem;
       color: var(--gold);
       cursor: pointer;
@@ -2403,6 +2403,8 @@
       if (!email) { errEl.textContent = 'Informe seu e-mail.'; errEl.style.display = 'block'; return; }
       if (!supabaseClient) { errEl.textContent = 'Sem conexão com o servidor.'; errEl.style.display = 'block'; return; }
       try {
+        const { data: prof } = await supabaseClient.from('profiles').select('id').eq('email', email).maybeSingle();
+        if (!prof) { errEl.textContent = 'E-mail não encontrado. Verifique se digitou corretamente.'; errEl.style.display = 'block'; return; }
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
           redirectTo: window.location.origin + window.location.pathname,
         });
