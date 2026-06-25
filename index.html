@@ -2505,15 +2505,21 @@
       showScreen('dash');
     }
     function updateStats() {
-      const today = new Date().toISOString().split('T')[0];
+      const now = new Date();
+      const today = now.toISOString().split('T')[0];
       const month = today.slice(0, 7);
-      const patients = myPatients();
-      const sessions = mySessions();
-      document.getElementById('st-total').textContent = patients.length;
+      let list = myPatients();
+      if (patientDateFilter === 'today') list = list.filter(p => sessionsOf(p.id).some(s => s.date === today));
+      else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); list = list.filter(p => sessionsOf(p.id).some(s => new Date(s.date) >= w)); }
+      else if (patientDateFilter === 'month') list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(month)));
+      else if (patientDateFilter === 'year') list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(now.getFullYear().toString())));
+      document.getElementById('st-total').textContent = list.length;
+      const pIds = new Set(list.map(p => p.id));
+      const sessions = mySessions().filter(s => pIds.has(s.patientId));
       document.getElementById('st-hoje').textContent = sessions.filter(s => s.date === today).length;
       document.getElementById('st-mes').textContent = sessions.filter(s => s.date.startsWith(month)).length;
       if (document.getElementById('table-count'))
-        document.getElementById('table-count').textContent = patients.length + ' pacientes';
+        document.getElementById('table-count').textContent = list.length + ' pacientes';
     }
     function sessionsOf(pid) { return mySessions().filter(s => s.patientId === pid); }
 
@@ -2524,6 +2530,7 @@
       document.querySelectorAll('#dash .filter-chip').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
       renderPatients();
+      updateStats();
     }
 
     function renderPatients() {
