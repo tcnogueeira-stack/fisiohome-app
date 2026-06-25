@@ -3080,7 +3080,7 @@
       if (!name || !diag) { alert('Preencha nome e diagnóstico.'); return; }
       const p = db.patients.find(x => x.id === editingPatientId);
       if (!p) return;
-      p.birth = document.getElementById('ep-birth').value || null;
+      p.name = name; p.birth = document.getElementById('ep-birth').value || null;
       p.age = p.birth ? calcAgeFromBirth('ep-birth', 'ep-age', true) : null;
       p.sex = document.getElementById('ep-sex').value || null;
       p.diag = diag; p.cpf = document.getElementById('ep-cpf').value || null;
