@@ -1803,12 +1803,17 @@
         <div class="form-group"><label class="form-label">Nome completo</label><input type="text" class="form-input"
             id="s-name" placeholder="Dr(a). Nome Sobrenome"></div>
         <div class="grid2">
+          <div class="form-group"><label class="form-label">Sexo</label><select class="form-select" id="s-sex">
+              <option value="">—</option>
+              <option value="M">Masculino</option>
+              <option value="F">Feminino</option>
+            </select></div>
           <div class="form-group"><label class="form-label">CREFITO *</label><input type="text" class="form-input"
               id="s-crp" placeholder="CREFITO-00/000000-F"></div>
-          <div class="form-group"><label class="form-label">CPF *</label><input type="text" class="form-input"
-              id="s-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
         </div>
         <div class="grid2">
+          <div class="form-group"><label class="form-label">CPF *</label><input type="text" class="form-input"
+              id="s-cpf" placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
           <div class="form-group"><label class="form-label">Especialidade</label><input type="text" class="form-input"
               id="s-spec" placeholder="Neurológica"></div>
           <div class="form-group"><label class="form-label">Telefone / WhatsApp</label><input type="tel"
@@ -2366,6 +2371,7 @@
                 email: profileData.email,
                 name: profileData.name,
                 supabaseId: data.user.id,
+                sex: profileData.sex || '',
                 crp: profileData.crp || '',
                 spec: profileData.spec || '',
                 tel: profileData.phone || '',
@@ -2381,7 +2387,7 @@
                 db.users[email] = {
                   name: data.user.user_metadata.nome || "Fisioterapeuta",
                   pass: btoa(pass), supabaseId: data.user.id,
-                  crp: '', spec: '', tel: '', addr: ''
+                  sex: '', crp: '', spec: '', tel: '', addr: ''
                 };
                 saveDB();
                 localUser = db.users[email];
@@ -2417,6 +2423,7 @@
       const u = currentUser;
       if (!u) return;
       document.getElementById('s-name').value = u.name || '';
+      document.getElementById('s-sex').value = u.sex || '';
       document.getElementById('s-crp').value = u.crp || '';
       document.getElementById('s-spec').value = u.spec || '';
       document.getElementById('s-tel').value = u.tel || '';
@@ -2440,7 +2447,7 @@
       const cpfVal = v('s-cpf'); const cpfClean = cpfVal.replace(/\D/g, '');
       if (cpfClean.length !== 11) { alert('Por favor, informe um CPF válido com 11 dígitos.'); return; }
       const crpVal = v('s-crp'); if (!crpVal) { alert('O preenchimento do CREFITO é obrigatório.'); return; }
-      const u = { name: v('s-name'), crp: crpVal, spec: v('s-spec'), tel: v('s-tel'), addr: v('s-addr'), cpf: cpfVal, pass: currentUser.pass };
+      const u = { name: v('s-name'), sex: v('s-sex'), crp: crpVal, spec: v('s-spec'), tel: v('s-tel'), addr: v('s-addr'), cpf: cpfVal, pass: currentUser.pass };
       if (!u.name) { alert('Preencha seu nome.'); return; }
       db.users[currentUser.email] = { ...db.users[currentUser.email], ...u };
       saveDB(); saveUser({ email: currentUser.email, ...db.users[currentUser.email] });
@@ -2451,7 +2458,7 @@
           await supabaseClient.from('profiles').upsert({
             id: currentUser.supabaseId,
             email: currentUser.email,
-            name: u.name, crp: crpVal, spec: u.spec, phone: u.tel,
+            name: u.name, sex: u.sex, crp: crpVal, spec: u.spec, phone: u.tel,
             addr: u.addr, cpf: cpfVal, role: currentUser.role || 'user',
             updated_at: new Date().toISOString(),
           }, { onConflict: 'id' });
@@ -2477,7 +2484,8 @@
 
     // ── DASHBOARD ──
     function bootDash() {
-      document.getElementById('dash-name').textContent = currentUser.name || '—';
+      const prefix = currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : '';
+      document.getElementById('dash-name').textContent = prefix + (currentUser.name || '—');
       document.getElementById('dash-crp').textContent = currentUser.crp || '';
       document.getElementById('dash-admin-btn').style.display = isAdmin() ? 'flex' : 'none';
       pullFromSupabase().then(() => {
@@ -3126,6 +3134,7 @@
                 email: prof.email,
                 name: prof.name,
                 supabaseId: session.user.id,
+                sex: prof.sex || '',
                 crp: prof.crp || '',
                 spec: prof.spec || '',
                 tel: prof.phone || '',
