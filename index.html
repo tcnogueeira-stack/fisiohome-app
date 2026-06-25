@@ -2403,8 +2403,8 @@
       if (!email) { errEl.textContent = 'Informe seu e-mail.'; errEl.style.display = 'block'; return; }
       if (!supabaseClient) { errEl.textContent = 'Sem conexão com o servidor.'; errEl.style.display = 'block'; return; }
       try {
-        const { data: prof } = await supabaseClient.from('profiles').select('id').eq('email', email).maybeSingle();
-        if (!prof) { errEl.textContent = 'E-mail não encontrado. Verifique se digitou corretamente.'; errEl.style.display = 'block'; return; }
+        const { data: exists, error: checkErr } = await supabaseClient.rpc('check_email_exists', { p_email: email });
+        if (checkErr || !exists) { errEl.textContent = 'E-mail não encontrado. Verifique se digitou corretamente.'; errEl.style.display = 'block'; return; }
         const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
           redirectTo: window.location.origin + window.location.pathname,
         });
