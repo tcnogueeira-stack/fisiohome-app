@@ -2644,13 +2644,20 @@
       showToast('Atendimento atualizado!', 'success');
     }
 
+    function renumberSessions(patientId) {
+      const list = db.sessions.filter(s => s.patientId === patientId).sort((a, b) => a.date.localeCompare(b.date));
+      list.forEach((s, i) => { s.num = i + 1; });
+      saveDB();
+    }
+
     function deleteSession(sid) {
       const s = db.sessions.find(x => x.id === sid);
       if (!s) return;
       if (s.signed && !confirm('Este atendimento já foi assinado. Remover mesmo assim?')) return;
       if (!confirm('Remover este atendimento?')) return;
+      const pid = s.patientId;
       db.sessions = db.sessions.filter(x => x.id !== sid);
-      saveDB();
+      renumberSessions(pid);
       if (canSync()) {
         supabaseClient.from('sessions').delete().eq('id', sid).then().catch(() => { });
       }
