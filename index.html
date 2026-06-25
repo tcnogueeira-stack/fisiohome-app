@@ -2535,16 +2535,24 @@
 
     function renderPatients() {
       const now = new Date();
+      const today = now.toISOString().split('T')[0];
+      const month = today.slice(0, 7);
       let list = myPatients();
-      if (patientDateFilter === 'today') { const t = now.toISOString().split('T')[0]; list = list.filter(p => sessionsOf(p.id).some(s => s.date === t)); }
+      if (patientDateFilter === 'today') { const t = today; list = list.filter(p => sessionsOf(p.id).some(s => s.date === t)); }
       else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); list = list.filter(p => sessionsOf(p.id).some(s => new Date(s.date) >= w)); }
-      else if (patientDateFilter === 'month') { const m = now.toISOString().slice(0, 7); list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(m))); }
+      else if (patientDateFilter === 'month') { const m = month; list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(m))); }
       else if (patientDateFilter === 'year') { const y = now.getFullYear().toString(); list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(y))); }
       const q = document.getElementById('searchInput').value.toLowerCase();
       if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.diag.toLowerCase().includes(q));
       const el = document.getElementById('patient-list');
       if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="icon">🗂️</div><p>' + (q ? 'Nenhum paciente encontrado' : 'Nenhum paciente cadastrado.<br>Toque em <strong>＋ Paciente</strong> para começar.') + '</p></div>'; return; }
-      el.innerHTML = list.map(p => `
+      el.innerHTML = list.map(p => {
+        let sc = sessionsOf(p.id);
+        if (patientDateFilter === 'today') sc = sc.filter(s => s.date === today);
+        else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); sc = sc.filter(s => new Date(s.date) >= w); }
+        else if (patientDateFilter === 'month') sc = sc.filter(s => s.date.startsWith(month));
+        else if (patientDateFilter === 'year') sc = sc.filter(s => s.date.startsWith(now.getFullYear().toString()));
+        return `
     <div class="patient-card" onclick="openPatient(${p.id})">
       <div class="patient-avatar">${p.name[0]}</div>
       <div class="patient-info">
@@ -2552,7 +2560,7 @@
         <div class="patient-diag">${p.diag}</div>
         <div class="patient-meta">
           <span class="badge badge-active">Ativo</span>
-          <span style="font-size:.7rem;color:var(--soft)">${sessionsOf(p.id).length} sessões</span>
+          <span style="font-size:.7rem;color:var(--soft)">${sc.length} sessões</span>
         </div>
       </div>
       <span class="badge-arrow">›</span>
