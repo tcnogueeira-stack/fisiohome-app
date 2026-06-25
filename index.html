@@ -1868,6 +1868,13 @@
         <input type="text" id="searchInput" placeholder="Buscar paciente por nome ou diagnóstico..."
           oninput="filterPatients()">
       </div>
+      <div class="filter-row">
+        <button class="filter-chip active" onclick="setPatientFilter('all',this)">Todos</button>
+        <button class="filter-chip" onclick="setPatientFilter('today',this)">Hoje</button>
+        <button class="filter-chip" onclick="setPatientFilter('week',this)">Semana</button>
+        <button class="filter-chip" onclick="setPatientFilter('month',this)">Mês</button>
+        <button class="filter-chip" onclick="setPatientFilter('year',this)">Ano</button>
+      </div>
       <div class="section-header">
         <div class="section-title">Pacientes</div>
       </div>
@@ -1955,13 +1962,6 @@
     <div class="profile-body">
       <div id="tab-sessions">
         <button class="add-session-btn" onclick="openFormAtend()">＋ Registrar Atendimento</button>
-        <div class="filter-row">
-          <button class="filter-chip active" onclick="filterSessions('all',this)">Todos</button>
-          <button class="filter-chip" onclick="filterSessions('today',this)">Hoje</button>
-          <button class="filter-chip" onclick="filterSessions('week',this)">Semana</button>
-          <button class="filter-chip" onclick="filterSessions('month',this)">Mês</button>
-          <button class="filter-chip" onclick="filterSessions('year',this)">Ano</button>
-        </div>
         <div id="sessions-list"></div>
       </div>
       <div id="tab-info" style="display:none">
@@ -2500,7 +2500,7 @@
       document.getElementById('dash-crp').textContent = currentUser.crp || '';
       document.getElementById('dash-admin-btn').style.display = isAdmin() ? 'flex' : 'none';
       pullFromSupabase().then(() => {
-        updateStats(); renderPatients(myPatients()); renderTable();
+        updateStats(); renderPatients(); renderTable();
       });
       showScreen('dash');
     }
@@ -2516,9 +2516,27 @@
         document.getElementById('table-count').textContent = patients.length + ' pacientes';
     }
     function sessionsOf(pid) { return mySessions().filter(s => s.patientId === pid); }
-    function renderPatients(list) {
+
+    let patientDateFilter = 'all';
+
+    function setPatientFilter(f, btn) {
+      patientDateFilter = f;
+      document.querySelectorAll('#dash .filter-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      renderPatients();
+    }
+
+    function renderPatients() {
+      const now = new Date();
+      let list = myPatients();
+      if (patientDateFilter === 'today') { const t = now.toISOString().split('T')[0]; list = list.filter(p => sessionsOf(p.id).some(s => s.date === t)); }
+      else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); list = list.filter(p => sessionsOf(p.id).some(s => new Date(s.date) >= w)); }
+      else if (patientDateFilter === 'month') { const m = now.toISOString().slice(0, 7); list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(m))); }
+      else if (patientDateFilter === 'year') { const y = now.getFullYear().toString(); list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(y))); }
+      const q = document.getElementById('searchInput').value.toLowerCase();
+      if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.diag.toLowerCase().includes(q));
       const el = document.getElementById('patient-list');
-      if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="icon">🗂️</div><p>Nenhum paciente cadastrado.<br>Toque em <strong>＋ Paciente</strong> para começar.</p></div>'; return; }
+      if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="icon">🗂️</div><p>' + (q ? 'Nenhum paciente encontrado' : 'Nenhum paciente cadastrado.<br>Toque em <strong>＋ Paciente</strong> para começar.') + '</p></div>'; return; }
       el.innerHTML = list.map(p => `
     <div class="patient-card" onclick="openPatient(${p.id})">
       <div class="patient-avatar">${p.name[0]}</div>
@@ -2533,10 +2551,7 @@
       <span class="badge-arrow">›</span>
     </div>`).join('');
     }
-    function filterPatients() {
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      renderPatients(myPatients().filter(p => p.name.toLowerCase().includes(q) || p.diag.toLowerCase().includes(q)));
-    }
+    function filterPatients() { renderPatients(); }
 
     // ── TABELA ──
     function renderTable() {
@@ -2568,7 +2583,7 @@
       if (!confirm('Remover este paciente e todos os atendimentos?')) return;
       db.patients = db.patients.filter(p => p.id !== id);
       db.sessions = db.sessions.filter(s => s.patientId !== id);
-      saveDB(); renderTable(); renderPatients(myPatients()); updateStats();
+      saveDB(); renderTable(); renderPatients(); updateStats();
       if (canSync()) {
         supabaseClient.from('patients').delete().eq('id', id).then().catch(() => { });
         supabaseClient.from('sessions').delete().eq('patient_id', id).then().catch(() => { });
@@ -2601,7 +2616,7 @@
       document.getElementById('tab-sessions').style.display = '';
       document.getElementById('tab-info').style.display = 'none';
       document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
-      renderSessions('all');
+      renderSessions();
       showScreen('profile');
     }
     function setTab(tab, btn) {
@@ -2609,10 +2624,6 @@
       btn.classList.add('active');
       document.getElementById('tab-sessions').style.display = tab === 'sessions' ? '' : 'none';
       document.getElementById('tab-info').style.display = tab === 'info' ? '' : 'none';
-    }
-    function filterSessions(f, btn) {
-      document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active'); renderSessions(f);
     }
     let editingSessionId = null;
 
@@ -2639,8 +2650,7 @@
       s.obs = document.getElementById('edit-obs').value;
       saveDB(); syncSessionToSupabase(s);
       closeModal('modal-edit-session');
-      const active = document.querySelector('.filter-chip.active');
-      renderSessions(active ? active.textContent.toLowerCase() : 'all');
+      renderSessions();
       showToast('Atendimento atualizado!', 'success');
     }
 
@@ -2661,19 +2671,13 @@
       if (canSync()) {
         supabaseClient.from('sessions').delete().eq('id', sid).then().catch(() => { });
       }
-      const active = document.querySelector('.filter-chip.active');
-      renderSessions(active ? active.textContent.toLowerCase() : 'all');
+      renderSessions();
       updateStats();
       showToast('Atendimento removido.', 'info');
     }
 
-    function renderSessions(filter) {
-      const now = new Date();
-      let list = sessionsOf(currentPatientId).sort((a, b) => b.date.localeCompare(a.date));
-      if (filter === 'today') list = list.filter(s => s.date === now.toISOString().split('T')[0]);
-      else if (filter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); list = list.filter(s => new Date(s.date) >= w); }
-      else if (filter === 'month') list = list.filter(s => s.date.startsWith(now.toISOString().slice(0, 7)));
-      else if (filter === 'year') list = list.filter(s => s.date.startsWith(now.getFullYear().toString()));
+    function renderSessions() {
+      const list = sessionsOf(currentPatientId).sort((a, b) => b.date.localeCompare(a.date));
       const el = document.getElementById('sessions-list');
       if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Nenhum atendimento neste período</p></div>'; return; }
       el.innerHTML = list.map(s => {
@@ -2930,7 +2934,7 @@
       ['np-name', 'np-age', 'np-diag', 'np-cpf', 'np-phone', 'np-addr', 'np-obs', 'np-birth', 'np-cep', 'np-city'].forEach(id => document.getElementById(id).value = '');
       document.getElementById('np-sex').value = '';
       closeModal('modal-new');
-      renderPatients(myPatients()); renderTable(); updateStats();
+      renderPatients(); renderTable(); updateStats();
     }
     function openEditPatient() { openEditPatientById(currentPatientId); }
     function openEditPatientById(id) {
@@ -2967,7 +2971,7 @@
       p.obs = document.getElementById('ep-obs').value;
       p.updatedAt = new Date().toISOString();
       saveDB(); syncPatientToSupabase(p); closeModal('modal-edit');
-      renderPatients(myPatients()); renderTable();
+      renderPatients(); renderTable();
       if (currentPatientId === editingPatientId) openPatient(editingPatientId);
     }
     function maskCEP(el) {
