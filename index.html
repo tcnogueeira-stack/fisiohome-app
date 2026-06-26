@@ -2889,7 +2889,7 @@
           ${s.procs.slice(0, 2).map(p => `<span class="chip chip-gold">${p}</span>`).join('')}
         </div>
         ${s.signed
-            ? `<div class="session-signed">✅ Assinado${s.signedBy ? ' por ' + s.signedBy : ''}</div>`
+            ? `<div class="session-signed">✅ Enviado${s.signedBy ? ' para ' + s.signedBy : ''}</div>`
             : '<div style="font-size:.66rem;color:var(--amber);font-weight:700;margin-top:5px;display:flex;align-items:center;gap:5px">⏳ Aguardando assinatura &nbsp;·&nbsp; <span style="color:var(--green-mid);text-decoration:underline">Reenviar link 📲</span></div>'}
         <div class="session-actions">
           <button class="btn-sm btn-sm-edit" onclick="event.stopPropagation();editSession(${s.id})">✏️ Editar</button>
