@@ -2349,7 +2349,7 @@
     let savedSession = null;
     let editingPatientId = null;
 
-    function uuid() { return crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); }); }
+    function uuid() { try { if (crypto.randomUUID) return crypto.randomUUID(); } catch (e) {} return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); }); }
     function saveDB() { localStorage.setItem('fh_db', JSON.stringify(db)); }
     function saveUser(u) { currentUser = u; localStorage.setItem('fh_user', JSON.stringify(u)); }
 
@@ -2890,29 +2890,36 @@
     function saveSession() {
       const btn = document.getElementById('btn-save');
       btn.disabled = true; btn.style.opacity = '.5'; btn.textContent = '⏳ Salvando...';
-      const p = db.patients.find(x => x.id === currentPatientId);
-      const procs = [...document.querySelectorAll('.proc-tag.sel')].map(t => t.textContent);
-      const s = {
-        id: Date.now(), patientId: p.id,
-        date: document.getElementById('f-date').value,
-        num: parseInt(document.getElementById('f-num-display').dataset.num) || sessionsOf(p.id).length + 1,
-        evolucao: document.getElementById('f-evolucao').value || '(sem registro)',
-        pa: document.getElementById('f-pa').value || '—',
-        spo2: document.getElementById('f-spo2').value || '—',
-        fc: document.getElementById('f-fc').value || '—',
-        pain: selectedPain !== null ? selectedPain : 0,
-        procs, obs: document.getElementById('f-obs').value,
-        value: parseFloat(document.getElementById('f-value').value) || 0,
-        signed: false, signedAt: null, signedBy: null, userAgent: null,
-        token: uuid(),
-        professional: { name: currentUser.name, crp: currentUser.crp, spec: currentUser.spec, tel: currentUser.tel, addr: currentUser.addr, cpf: currentUser.cpf || '' }
-      };
-      db.sessions.push(s); saveDB();
-      syncSessionToSupabase(s);
-      savedSession = { session: s, patient: p };
-      updateStats();
-      btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '💾 Salvar Atendimento';
-      openSignScreen(s, p);
+      try {
+        const p = db.patients.find(x => x.id === currentPatientId);
+        if (!p) { throw new Error('Paciente não encontrado'); }
+        const procs = [...document.querySelectorAll('.proc-tag.sel')].map(t => t.textContent);
+        const s = {
+          id: Date.now(), patientId: p.id,
+          date: document.getElementById('f-date').value,
+          num: parseInt(document.getElementById('f-num-display').dataset.num) || sessionsOf(p.id).length + 1,
+          evolucao: document.getElementById('f-evolucao').value || '(sem registro)',
+          pa: document.getElementById('f-pa').value || '—',
+          spo2: document.getElementById('f-spo2').value || '—',
+          fc: document.getElementById('f-fc').value || '—',
+          pain: selectedPain !== null ? selectedPain : 0,
+          procs, obs: document.getElementById('f-obs').value,
+          value: parseFloat(document.getElementById('f-value').value) || 0,
+          signed: false, signedAt: null, signedBy: null, userAgent: null,
+          token: uuid(),
+          professional: { name: currentUser.name, crp: currentUser.crp, spec: currentUser.spec, tel: currentUser.tel, addr: currentUser.addr, cpf: currentUser.cpf || '' }
+        };
+        db.sessions.push(s); saveDB();
+        syncSessionToSupabase(s);
+        savedSession = { session: s, patient: p };
+        updateStats();
+        btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '💾 Salvar Atendimento';
+        openSignScreen(s, p);
+      } catch (e) {
+        btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '💾 Salvar Atendimento';
+        showToast('Erro ao salvar: ' + e.message, 'error');
+        console.error('saveSession error:', e);
+      }
     }
 
     function resendSignature(sid) {
@@ -2922,8 +2929,20 @@
       if (!p) return;
       if (!p.phone) { alert('Este paciente não tem WhatsApp cadastrado.'); return; }
       savedSession = { session: s, patient: p };
-      const link = `${location.href.split('?')[0]}?token=${s.token}`;
-      const msg = encodeURIComponent(`Olá ${p.name.split(' ')[0]}! 👋\n\nSeu atendimento ainda não foi confirmado. Confirme com 1 toque:\n\n${link}`);
+      const pr = s.professional || {};
+      const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+      const d = new Date(s.date + 'T12:00:00');
+      const dataStr = `${d.getDate()} de ${months[d.getMonth()]}`;
+      const valor = s.value ? `\n\u{1F4B0} Valor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
+      const procedimentos = s.procs.length ? `\n\u{1F3E5} ${s.procs.join(', ')}` : '';
+      const msg = encodeURIComponent(
+        `\u{1F4DC} Olá ${p.name.split(' ')[0]}!, tudo bem?\n\n` +
+        `Seu atendimento ainda não foi confirmado.\n` +
+        `\u{1F4C5} ${dataStr}\n` +
+        `\u{1F4DC} Sessão nº ${s.num}${procedimentos}${valor}\n\n` +
+        `Assim que possível, confirme no aplicativo.\n` +
+        `Obrigado, ${pr.name || 'equipe FisioHome'}! \u{1F49A}`
+      );
       const phone = p.phone.replace(/\D/g, '');
       window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
       setTimeout(() => openSignScreen(s, p), 600);
@@ -2964,8 +2983,18 @@
         saveDB();
         syncSessionToSupabase(s);
         if (p.phone) {
-          const link = `${location.href.split('?')[0]}?token=${s.token}`;
-          const msg = encodeURIComponent(`Olá ${p.name.split(' ')[0]}! ✅\n\nSeu atendimento foi confirmado!\n\n${link}`);
+          const pr = s.professional || {};
+          const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+          const d = new Date(s.date + 'T12:00:00');
+          const dataStr = `${d.getDate()} de ${months[d.getMonth()]}`;
+          const valor = s.value ? `\n\u{1F4B0} Valor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
+          const procedimentos = s.procs.length ? `\n\u{1F3E5} ${s.procs.join(', ')}` : '';
+          const msg = encodeURIComponent(
+            `\u2705 Olá ${p.name.split(' ')[0]}, seu atendimento foi confirmado!\n\n` +
+            `\u{1F4C5} ${dataStr}\n` +
+            `\u{1F4DC} Sessão nº ${s.num}${procedimentos}${valor}\n\n` +
+            `Obrigado, ${pr.name || 'equipe FisioHome'}! \u{1F49A}`
+          );
           const phone = p.phone.replace(/\D/g, '');
           window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
         }
