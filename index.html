@@ -2967,6 +2967,8 @@
           value: parseFloat(document.getElementById('f-value').value) || 0,
           signed: false, signedAt: null, signedBy: null, userAgent: null,
           token: uuid(),
+          professional_name: (currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : '') + currentUser.name,
+          crefito: currentUser.crp || '',
           professional: { name: (currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : '') + currentUser.name, crp: currentUser.crp, spec: currentUser.spec, tel: currentUser.tel, addr: currentUser.addr, cpf: currentUser.cpf || '' }
         };
         db.sessions.push(s); saveDB();
@@ -3167,7 +3169,7 @@
       const birth = document.getElementById('np-birth').value;
       const cep = document.getElementById('np-cep').value;
       const city = document.getElementById('np-city').value;
-      const p = { id: Date.now(), name, birth: birth || null, age: birth ? calcAgeFromBirth('np-birth', 'np-age', true) : null, sex: document.getElementById('np-sex').value || null, diag, cpf: document.getElementById('np-cpf').value || null, phone: document.getElementById('np-phone').value.replace(/\D/g, ''), cep, addr: document.getElementById('np-addr').value, city, obs: document.getElementById('np-obs').value, usuario_id: userId(), professional_name: professionalName(), createdAt: new Date().toISOString() };
+      const p = { id: Date.now(), name, birth: birth || null, age: birth ? calcAgeFromBirth('np-birth', 'np-age', true) : null, sex: document.getElementById('np-sex').value || null, diag, cpf: document.getElementById('np-cpf').value || null, phone: document.getElementById('np-phone').value.replace(/\D/g, ''), cep, addr: document.getElementById('np-addr').value, city, obs: document.getElementById('np-obs').value, usuario_id: userId(), professional_name: professionalName(), crefito: currentUser?.crp || '', createdAt: new Date().toISOString() };
       db.patients.push(p); saveDB();
       syncPatientToSupabase(p);
       ['np-name', 'np-age', 'np-diag', 'np-cpf', 'np-phone', 'np-addr', 'np-obs', 'np-birth', 'np-cep', 'np-city'].forEach(id => document.getElementById(id).value = '');
@@ -3297,7 +3299,7 @@
           id: p.id, name: p.name, birth: p.birth, age: p.age,
           sex: p.sex, diag: p.diag, cpf: p.cpf, phone: p.phone,
           cep: p.cep, addr: p.addr, city: p.city, obs: p.obs,
-          professional_name: profName, usuario_id: userId(),
+          professional_name: profName, crefito: p.crefito || currentUser?.crp || '', usuario_id: userId(),
           "createdAt": p.createdAt || new Date().toISOString(),
           "updatedAt": new Date().toISOString(),
         }, { onConflict: 'id' });
@@ -3319,6 +3321,7 @@
               sex: p.sex, diag: p.diag, cpf: p.cpf, phone: p.phone,
               cep: p.cep, addr: p.addr, city: p.city, obs: p.obs,
               professional_name: p.professional_name || professionalName(),
+              crefito: p.crefito || currentUser?.crp || '',
               usuario_id: userId(),
               "createdAt": p.createdAt || new Date().toISOString(),
               "updatedAt": new Date().toISOString(),
@@ -3330,6 +3333,8 @@
           evolucao: s.evolucao, pa: s.pa, spo2: s.spo2, fc: s.fc,
           pain: s.pain, procs: s.procs || [], obs: s.obs || '',
           signed: s.signed || false, signed_at: s.signedAt || null,
+          professional_name: s.professional_name || null,
+          crefito: s.crefito || null,
           professional: s.professional || null,
         };
         if (parseFloat(s.value) > 0) payload.value = parseFloat(s.value);
@@ -3363,8 +3368,8 @@
         if (!pe && rp && rp.length) {
           for (const r of rp) {
             const old = db.patients.find(p => p.id === r.id);
-            if (old) Object.assign(old, { name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, professional_name: r.professional_name || null, createdAt: r.createdAt, updatedAt: r.updatedAt });
-            else db.patients.push({ id: r.id, name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, professional_name: r.professional_name || null, createdAt: r.createdAt, updatedAt: r.updatedAt });
+            if (old) Object.assign(old, { name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, professional_name: r.professional_name || null, crefito: r.crefito || null, createdAt: r.createdAt, updatedAt: r.updatedAt });
+            else db.patients.push({ id: r.id, name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, professional_name: r.professional_name || null, crefito: r.crefito || null, createdAt: r.createdAt, updatedAt: r.updatedAt });
           }
           saveDB();
           const { data: rs, error: se } = await supabaseClient
@@ -3374,8 +3379,8 @@
           if (!se && rs && rs.length) {
             for (const r of rs) {
               const old = db.sessions.find(s => s.id === r.id);
-              if (old) Object.assign(old, { patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, signedAt: r.signed_at, signedBy: r.signed_by || null, userAgent: r.user_agent || null, token: r.token || null, professional: r.professional || null });
-              else db.sessions.push({ id: r.id, patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, signedAt: r.signed_at, signedBy: r.signed_by || null, userAgent: r.user_agent || null, token: r.token || null, professional: r.professional || null });
+              if (old) Object.assign(old, { patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, signedAt: r.signed_at, signedBy: r.signed_by || null, userAgent: r.user_agent || null, token: r.token || null, professional_name: r.professional_name || null, crefito: r.crefito || null, professional: r.professional || null });
+              else db.sessions.push({ id: r.id, patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, signedAt: r.signed_at, signedBy: r.signed_by || null, userAgent: r.user_agent || null, token: r.token || null, professional_name: r.professional_name || null, crefito: r.crefito || null, professional: r.professional || null });
             }
             saveDB();
           }
