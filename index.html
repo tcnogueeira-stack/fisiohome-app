@@ -499,6 +499,17 @@
       grid-column: 1 / -1;
     }
 
+    .sync-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: #4caf50;
+      flex-shrink: 0;
+      transition: background .3s;
+      box-shadow: 0 0 6px rgba(76,175,80,.4);
+    }
+    .sync-dot.pending { background: #ffc107; box-shadow: 0 0 6px rgba(255,193,7,.4); }
+    .sync-dot.error { background: #f44336; box-shadow: 0 0 6px rgba(244,67,54,.4); }
+
     .stat-card {
       background: rgba(255, 255, 255, .1);
       backdrop-filter: blur(10px);
@@ -1918,13 +1929,15 @@
           <div class="dash-crp" id="dash-crp"></div>
         </div>
         <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px;position:relative;z-index:1">
-          <div class="dash-badge" onclick="navToSetup()">
-            <span>⚙️</span><span>Perfil</span>
+          <div style="display:flex;align-items:center;gap:8px">
+            <div class="sync-dot" id="sync-dot" title="Sincronizado"></div>
+            <div class="dash-badge" onclick="navToSetup()">
+              <span>⚙️</span><span>Perfil</span>
+            </div>
           </div>
           <div class="dash-badge" id="dash-admin-btn" onclick="openCreateUserModal()" style="display:none">
             <span>👤</span><span>Criar Usuário</span>
           </div>
-
         </div>
       </div>
       <div class="dash-stats">
@@ -3234,6 +3247,36 @@
     // ── SUPABASE SYNC ──
     function canSync() { return supabaseClient && currentUser?.supabaseId; }
 
+    let _syncQueue = [];
+    let _syncing = false;
+    function updateSyncDot(state) {
+      const dot = document.getElementById('sync-dot');
+      if (!dot) return;
+      dot.className = 'sync-dot' + (state === 'ok' ? '' : ' ' + state);
+      dot.title = state === 'ok' ? 'Sincronizado' : state === 'pending' ? 'Sincronizando...' : 'Erro de sincronização';
+    }
+    async function _processSyncQueue() {
+      if (_syncing || !_syncQueue.length) return;
+      _syncing = true;
+      updateSyncDot('pending');
+      const item = _syncQueue.shift();
+      try {
+        await item.fn();
+        updateSyncDot(_syncQueue.length ? 'pending' : 'ok');
+      } catch (e) {
+        updateSyncDot('error');
+        if (item.retries < 5) {
+          setTimeout(() => { _syncQueue.push({ ...item, retries: item.retries + 1 }); _processSyncQueue(); }, 30000);
+        }
+      }
+      _syncing = false;
+      if (_syncQueue.length) _processSyncQueue();
+    }
+    function enqueueSync(label, fn) {
+      _syncQueue.push({ label, fn, retries: 0 });
+      _processSyncQueue();
+    }
+
     async function syncPatientToSupabase(p) {
       if (!canSync()) return;
       try {
@@ -3255,10 +3298,7 @@
       if (!canSync()) return;
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) {
-          console.warn('No active Supabase session – reautentique');
-          return;
-        }
+        if (!session) { enqueueSync('session', () => syncSessionToSupabase(s)); return; }
         const p = db.patients.find(x => x.id === s.patientId);
         if (p) {
           const { data: existing } = await supabaseClient.from('patients').select('id').eq('id', p.id).maybeSingle();
@@ -3288,12 +3328,15 @@
         if (error) {
           console.warn('Sync session error:', error);
           if (error.message?.includes('row-level security')) {
-            showToast('Sessão expirou. Faça login novamente.', 'error');
+            enqueueSync('session', () => syncSessionToSupabase(s));
           } else {
             showToast('Erro ao sincronizar atendimento: ' + __authErr(error.message), 'error');
+            enqueueSync('session', () => syncSessionToSupabase(s));
           }
+        } else {
+          updateSyncDot(_syncQueue.length ? 'pending' : 'ok');
         }
-      } catch (e) { console.warn('Sync session failed:', e); showToast('Erro de conexão ao sincronizar atendimento.', 'error'); }
+      } catch (e) { console.warn('Sync session failed:', e); enqueueSync('session', () => syncSessionToSupabase(s)); }
     }
 
     async function pullFromSupabase() {
