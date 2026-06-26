@@ -2992,7 +2992,7 @@
       const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
       const d = new Date(s.date + 'T12:00:00');
       const dataStr = `${d.getDate()} de ${months[d.getMonth()]}`;
-      const valor = s.value ? `\n\u2022 Valor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
+      const valor = '';
       const procedimentos = s.procs.length ? `\n\u2022 ${s.procs.join(', ')}` : '';
       const msg = encodeURIComponent(
         `Olá ${p.name.split(' ')[0]}! Tudo bem?\n\n` +
@@ -3048,7 +3048,7 @@
           const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
           const d = new Date(s.date + 'T12:00:00');
           const dataStr = `${d.getDate()} de ${months[d.getMonth()]}`;
-          const valor = s.value ? `\n\u2022 Valor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
+      const valor = '';
           const procedimentos = s.procs.length ? `\n\u2022 ${s.procs.join(', ')}` : '';
           const msg = encodeURIComponent(
             `Olá, ${p.name.split(' ')[0]}, seu atendimento foi confirmado.\n\n` +
