@@ -479,12 +479,13 @@
 
     .dash-stats {
       display: grid;
-      grid-template-columns: 1fr 1fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
       margin-top: 20px;
       position: relative;
       z-index: 1;
     }
+    .stat-card-full { grid-column: 1 / -1; }
 
     .stat-card {
       background: rgba(255, 255, 255, .1);
@@ -1916,7 +1917,7 @@
           <div class="stat-num" id="st-sessoes">0</div>
           <div class="stat-label">Sessões</div>
         </div>
-        <div class="stat-card">
+        <div class="stat-card stat-card-full">
           <div class="stat-num" id="st-receita">R$ 0,00</div>
           <div class="stat-label">Receita</div>
         </div>
