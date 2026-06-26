@@ -2907,7 +2907,7 @@
           value: parseFloat(document.getElementById('f-value').value) || 0,
           signed: false, signedAt: null, signedBy: null, userAgent: null,
           token: uuid(),
-          professional: { name: currentUser.name, crp: currentUser.crp, spec: currentUser.spec, tel: currentUser.tel, addr: currentUser.addr, cpf: currentUser.cpf || '' }
+          professional: { name: (currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : '') + currentUser.name, crp: currentUser.crp, spec: currentUser.spec, tel: currentUser.tel, addr: currentUser.addr, cpf: currentUser.cpf || '' }
         };
         db.sessions.push(s); saveDB();
         syncSessionToSupabase(s);
@@ -2937,9 +2937,9 @@
       const procedimentos = s.procs.length ? `\n${s.procs.join(', ')}` : '';
       const msg = encodeURIComponent(
         `Olá ${p.name.split(' ')[0]}! Tudo bem?\n\n` +
-        `Seu atendimento ainda nao foi confirmado.\n` +
-        `${dataStr}\n` +
-        `Sessao nº ${s.num}${procedimentos}${valor}\n\n` +
+        `Seu atendimento ainda nao foi confirmado.\n\n` +
+        `\u2022 ${dataStr}\n` +
+        `\u2022 Sessao nº ${s.num}${procedimentos}${valor}\n\n` +
         `Assim que possivel, confirme no aplicativo.\n\n` +
         `*${pr.name || 'Equipe FisioHome'}*\n` +
         `_Obrigado_`
@@ -2992,8 +2992,8 @@
           const procedimentos = s.procs.length ? `\n${s.procs.join(', ')}` : '';
           const msg = encodeURIComponent(
             `Olá ${p.name.split(' ')[0]}, seu atendimento foi confirmado!\n\n` +
-            `${dataStr}\n` +
-            `Sessão nº ${s.num}${procedimentos}${valor}\n\n` +
+            `\u2022 ${dataStr}\n` +
+            `\u2022 Sessão nº ${s.num}${procedimentos}${valor}\n\n` +
             `*${pr.name || 'Equipe FisioHome'}*\n` +
             `_Obrigado_`
           );
