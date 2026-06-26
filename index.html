@@ -2974,13 +2974,14 @@
       const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
       const d = new Date(s.date + 'T12:00:00');
       const dataStr = `${d.getDate()} de ${months[d.getMonth()]}`;
-      const valor = s.value ? `\nValor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
-      const procedimentos = s.procs.length ? `\n${s.procs.join(', ')}` : '';
+      const valor = s.value ? `\n\u2022 Valor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
+      const procedimentos = s.procs.length ? `\n\u2022 ${s.procs.join(', ')}` : '';
       const msg = encodeURIComponent(
         `Olá ${p.name.split(' ')[0]}! Tudo bem?\n\n` +
         `Seu atendimento ainda nao foi confirmado.\n\n` +
         `\u2022 ${dataStr}\n` +
-        `\u2022 Sessao nº ${s.num}${procedimentos}${valor}\n\n` +
+        `\u2022 Sessao nº ${s.num}` +
+        `${procedimentos}${valor}\n\n` +
         `Assim que possivel, confirme no aplicativo.\n\n` +
         `*${pr.name || 'Equipe FisioHome'}*\n` +
         `_Obrigado_`
@@ -3029,12 +3030,13 @@
           const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
           const d = new Date(s.date + 'T12:00:00');
           const dataStr = `${d.getDate()} de ${months[d.getMonth()]}`;
-          const valor = s.value ? `\nValor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
-          const procedimentos = s.procs.length ? `\n${s.procs.join(', ')}` : '';
+          const valor = s.value ? `\n\u2022 Valor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
+          const procedimentos = s.procs.length ? `\n\u2022 ${s.procs.join(', ')}` : '';
           const msg = encodeURIComponent(
             `Olá, ${p.name.split(' ')[0]}, seu atendimento foi confirmado.\n\n` +
             `\u2022 ${dataStr}\n` +
-            `\u2022 Sessão Nº ${s.num}${procedimentos}${valor}\n\n` +
+            `\u2022 Sessão Nº ${s.num}` +
+            `${procedimentos}${valor}\n\n` +
             `*${pr.name || 'Equipe FisioHome'}*\n` +
             `_Obrigado!_`
           );
