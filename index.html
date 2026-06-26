@@ -2118,12 +2118,9 @@
       <div class="sign-divider"></div>
       <div class="sign-card" id="sign-card"></div>
       <div class="stamp-box" id="stamp-box"></div>
-      <div class="sign-note">Toque no botão abaixo para confirmar seu atendimento</div>
-      <div style="height:8px"></div>
-      <button class="btn-whatsapp" id="sign-whats" onclick="sendWhatsApp()" style="display:none">📲 Enviar link de
-        assinatura</button>
+      <div class="sign-note">Confirme e receba o comprovante no WhatsApp</div>
       <div style="height:10px"></div>
-      <button class="btn-confirm" id="btn-confirm-sign" onclick="confirmSign()">✅ Confirmar Atendimento</button>
+      <button class="btn-confirm" id="btn-confirm-sign" onclick="confirmSign()">Confirmar Atendimento</button>
     </div>
     <div class="sign-ok" id="sign-ok" style="display:none">
       <div class="sign-ok-icon">✅</div>
@@ -2915,18 +2912,7 @@
       savedSession = { session: s, patient: p };
       updateStats();
       btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '💾 Salvar Atendimento';
-      document.getElementById('sign-whats').style.display = 'flex';
       openSignScreen(s, p);
-    }
-    function sendWhatsApp() {
-      if (!savedSession) return;
-      const { session: s, patient: p } = savedSession;
-      if (!p.phone) { alert('Este paciente não tem WhatsApp cadastrado.'); return; }
-      const link = `${location.href.split('?')[0]}?token=${s.token}`;
-      const msg = encodeURIComponent(`Olá ${p.name.split(' ')[0]}! 👋\n\nConfirme seu atendimento com 1 toque:\n\n${link}`);
-      const phone = p.phone.replace(/\D/g, '');
-      window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
-      showToast('Link de confirmação enviado!', 'success');
     }
 
     function resendSignature(sid) {
@@ -2944,18 +2930,20 @@
     }
 
     // ── ASSINATURA ──
-    function openSignScreen(session, patient, isRemote) {
-      document.getElementById('sign-whats').style.display = isRemote ? 'none' : 'flex';
+    function openSignScreen(session, patient) {
       document.getElementById('btn-confirm-sign').disabled = false;
+      document.getElementById('btn-confirm-sign').textContent = 'Confirmar Atendimento';
       const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
       const d = new Date(session.date + 'T12:00:00');
       const pr = session.professional || {};
+      const valor = session.value ? `R$ ${session.value.toFixed(2).replace('.', ',')}` : null;
       document.getElementById('sign-card').innerHTML = `
     <div class="sign-card-row"><span class="sign-card-key">Paciente</span><span class="sign-card-val">${patient.name}</span></div>
     <div class="sign-card-row"><span class="sign-card-key">Data</span><span class="sign-card-val">${d.getDate()} de ${months[d.getMonth()]} de ${d.getFullYear()}</span></div>
     <div class="sign-card-row"><span class="sign-card-key">Sessão nº</span><span class="sign-card-val">${session.num}</span></div>
     <div class="sign-card-row"><span class="sign-card-key">Procedimentos</span><span class="sign-card-val">${session.procs.join(', ') || 'Fisioterapia geral'}</span></div>
-    <div class="sign-card-row"><span class="sign-card-key">Dor (EVA)</span><span class="sign-card-val">${session.pain}/10</span></div>`;
+    <div class="sign-card-row"><span class="sign-card-key">Dor (EVA)</span><span class="sign-card-val">${session.pain}/10</span></div>
+    ${valor ? `<div class="sign-card-row"><span class="sign-card-key">Valor</span><span class="sign-card-val" style="color:var(--green-mid)">${valor}</span></div>` : ''}`;
       document.getElementById('stamp-box').innerHTML = `
     <div class="stamp-box-title">🔏 Responsável pelo atendimento</div>
     <div class="stamp-text"><strong>${pr.name || '—'}</strong><br>Fisioterapeuta${pr.spec ? ' – ' + pr.spec : ''}<br>${pr.crp || ''}${pr.cpf ? '<br>CPF: ' + pr.cpf : ''}<br>${pr.tel || ''}<br>${pr.addr || ''}</div>`;
@@ -2967,14 +2955,20 @@
       if (!savedSession) return;
       const btn = document.getElementById('btn-confirm-sign');
       btn.disabled = true; btn.textContent = '⏳ Confirmando...';
-      const s = db.sessions.find(x => x.id === savedSession.session.id);
-      if (s) {
+      const { session: s, patient: p } = savedSession;
+      if (s && !s.signed) {
         s.signed = true;
         s.signedAt = new Date().toISOString();
-        s.signedBy = savedSession.patient.name;
+        s.signedBy = p.name;
         s.userAgent = navigator.userAgent;
         saveDB();
         syncSessionToSupabase(s);
+        if (p.phone) {
+          const link = `${location.href.split('?')[0]}?token=${s.token}`;
+          const msg = encodeURIComponent(`Olá ${p.name.split(' ')[0]}! ✅\n\nSeu atendimento foi confirmado!\n\n${link}`);
+          const phone = p.phone.replace(/\D/g, '');
+          window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
+        }
       }
       document.getElementById('sign-body').style.display = 'none';
       document.getElementById('sign-ok').style.display = 'flex';
