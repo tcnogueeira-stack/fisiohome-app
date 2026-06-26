@@ -3237,6 +3237,8 @@
     async function syncPatientToSupabase(p) {
       if (!canSync()) return;
       try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) return;
         const { error } = await supabaseClient.from('patients').upsert({
           id: p.id, name: p.name, birth: p.birth, age: p.age,
           sex: p.sex, diag: p.diag, cpf: p.cpf, phone: p.phone,
@@ -3252,6 +3254,11 @@
     async function syncSessionToSupabase(s) {
       if (!canSync()) return;
       try {
+        const { data: { session } } = await supabaseClient.auth.getSession();
+        if (!session) {
+          console.warn('No active Supabase session – reautentique');
+          return;
+        }
         const p = db.patients.find(x => x.id === s.patientId);
         if (p) {
           const { data: existing } = await supabaseClient.from('patients').select('id').eq('id', p.id).maybeSingle();
@@ -3278,7 +3285,14 @@
         if (s.userAgent) payload.user_agent = s.userAgent;
         if (s.token) payload.token = s.token;
         const { error } = await supabaseClient.from('sessions').upsert(payload, { onConflict: 'id' });
-        if (error) { console.warn('Sync session error:', error); showToast('Erro ao sincronizar atendimento: ' + __authErr(error.message), 'error'); }
+        if (error) {
+          console.warn('Sync session error:', error);
+          if (error.message?.includes('row-level security')) {
+            showToast('Sessão expirou. Faça login novamente.', 'error');
+          } else {
+            showToast('Erro ao sincronizar atendimento: ' + __authErr(error.message), 'error');
+          }
+        }
       } catch (e) { console.warn('Sync session failed:', e); showToast('Erro de conexão ao sincronizar atendimento.', 'error'); }
     }
 
