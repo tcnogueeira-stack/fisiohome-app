@@ -3252,6 +3252,20 @@
     async function syncSessionToSupabase(s) {
       if (!canSync()) return;
       try {
+        const p = db.patients.find(x => x.id === s.patientId);
+        if (p) {
+          const { data: existing } = await supabaseClient.from('patients').select('id').eq('id', p.id).maybeSingle();
+          if (!existing) {
+            await supabaseClient.from('patients').upsert({
+              id: p.id, name: p.name, birth: p.birth, age: p.age,
+              sex: p.sex, diag: p.diag, cpf: p.cpf, phone: p.phone,
+              cep: p.cep, addr: p.addr, city: p.city, obs: p.obs,
+              usuario_id: userId(),
+              "createdAt": p.createdAt || new Date().toISOString(),
+              "updatedAt": new Date().toISOString(),
+            }, { onConflict: 'id' });
+          }
+        }
         const payload = {
           id: s.id, patient_id: s.patientId, date: s.date, num: s.num,
           evolucao: s.evolucao, pa: s.pa, spo2: s.spo2, fc: s.fc,
