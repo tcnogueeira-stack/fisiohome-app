@@ -911,6 +911,30 @@
       margin-top: 5px;
     }
 
+    .profile-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      padding: 14px 18px 0;
+      background: var(--warm-white);
+    }
+    .profile-stat {
+      background: var(--cream);
+      border-radius: 12px;
+      padding: 11px 10px;
+      text-align: center;
+      border: 1px solid var(--border);
+    }
+    .profile-stat .stat-num { color: var(--charcoal); font-size: 1.3rem; }
+    .profile-stat .stat-label { color: var(--soft); }
+    .profile-filter {
+      display: flex;
+      gap: 5px;
+      padding: 8px 18px 0;
+      background: var(--warm-white);
+    }
+    .profile-filter .filter-chip { font-size: .7rem; padding: 4px 10px; }
+
     .profile-tabs {
       display: flex;
       background: var(--warm-white);
@@ -2017,6 +2041,15 @@
         <div class="profile-cid" id="ph-diag"></div>
       </div>
     </div>
+    <div class="profile-filter">
+      <button class="filter-chip active" onclick="setProfileFilter('all',this)">Total</button>
+      <button class="filter-chip" onclick="setProfileFilter('week',this)">Semana</button>
+      <button class="filter-chip" onclick="setProfileFilter('month',this)">Mês</button>
+    </div>
+    <div class="profile-stats">
+      <div class="profile-stat"><div class="stat-num" id="ps-sessoes">0</div><div class="stat-label">Sessões</div></div>
+      <div class="profile-stat"><div class="stat-num" id="ps-receita">R$ 0,00</div><div class="stat-label">Receita</div></div>
+    </div>
     <div class="profile-tabs">
       <button class="tab-btn active" onclick="setTab('sessions',this)">Atendimentos</button>
       <button class="tab-btn" onclick="setTab('info',this)">Dados</button>
@@ -2638,6 +2671,25 @@
     function sessionsOf(pid) { return mySessions().filter(s => s.patientId === pid); }
 
     let patientDateFilter = 'all';
+    let profileFilter = 'all';
+
+    function updateProfileStats() {
+      const now = new Date();
+      const month = now.toISOString().slice(0, 7);
+      let sessions = sessionsOf(currentPatientId);
+      if (profileFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); sessions = sessions.filter(s => new Date(s.date) >= w); }
+      else if (profileFilter === 'month') sessions = sessions.filter(s => s.date.startsWith(month));
+      document.getElementById('ps-sessoes').textContent = sessions.length;
+      const total = sessions.reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
+      document.getElementById('ps-receita').textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+    }
+    function setProfileFilter(f, btn) {
+      profileFilter = f;
+      document.querySelectorAll('#profile .profile-filter .filter-chip').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      updateProfileStats();
+      renderSessions();
+    }
 
     function setPatientFilter(f, btn) {
       patientDateFilter = f;
@@ -2746,6 +2798,9 @@
       document.getElementById('tab-sessions').style.display = '';
       document.getElementById('tab-info').style.display = 'none';
       document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+      profileFilter = 'all';
+      document.querySelectorAll('#profile .profile-filter .filter-chip').forEach((b, i) => b.classList.toggle('active', i === 0));
+      updateProfileStats();
       renderSessions();
       showScreen('profile');
     }
@@ -2809,7 +2864,12 @@
     }
 
     function renderSessions() {
-      const list = sessionsOf(currentPatientId).sort((a, b) => b.date.localeCompare(a.date));
+      const now = new Date();
+      const month = now.toISOString().slice(0, 7);
+      let list = sessionsOf(currentPatientId);
+      if (profileFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); list = list.filter(s => new Date(s.date) >= w); }
+      else if (profileFilter === 'month') list = list.filter(s => s.date.startsWith(month));
+      list.sort((a, b) => b.date.localeCompare(a.date));
       const el = document.getElementById('sessions-list');
       if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Nenhum atendimento neste período</p></div>'; return; }
       el.innerHTML = list.map(s => {
