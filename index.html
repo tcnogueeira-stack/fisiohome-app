@@ -2933,15 +2933,16 @@
       const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
       const d = new Date(s.date + 'T12:00:00');
       const dataStr = `${d.getDate()} de ${months[d.getMonth()]}`;
-      const valor = s.value ? `\n\u{1F4B0} Valor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
-      const procedimentos = s.procs.length ? `\n\u{1F3E5} ${s.procs.join(', ')}` : '';
+      const valor = s.value ? `\nValor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
+      const procedimentos = s.procs.length ? `\n${s.procs.join(', ')}` : '';
       const msg = encodeURIComponent(
-        `\u{1F4DC} Olá ${p.name.split(' ')[0]}!, tudo bem?\n\n` +
-        `Seu atendimento ainda não foi confirmado.\n` +
-        `\u{1F4C5} ${dataStr}\n` +
-        `\u{1F4DC} Sessão nº ${s.num}${procedimentos}${valor}\n\n` +
-        `Assim que possível, confirme no aplicativo.\n` +
-        `Obrigado, ${pr.name || 'equipe FisioHome'}! \u{1F49A}`
+        `Olá ${p.name.split(' ')[0]}! Tudo bem?\n\n` +
+        `Seu atendimento ainda nao foi confirmado.\n` +
+        `${dataStr}\n` +
+        `Sessao nº ${s.num}${procedimentos}${valor}\n\n` +
+        `Assim que possivel, confirme no aplicativo.\n\n` +
+        `*${pr.name || 'Equipe FisioHome'}*\n` +
+        `_Obrigado_`
       );
       const phone = p.phone.replace(/\D/g, '');
       window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
@@ -2987,13 +2988,14 @@
           const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
           const d = new Date(s.date + 'T12:00:00');
           const dataStr = `${d.getDate()} de ${months[d.getMonth()]}`;
-          const valor = s.value ? `\n\u{1F4B0} Valor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
-          const procedimentos = s.procs.length ? `\n\u{1F3E5} ${s.procs.join(', ')}` : '';
+          const valor = s.value ? `\nValor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
+          const procedimentos = s.procs.length ? `\n${s.procs.join(', ')}` : '';
           const msg = encodeURIComponent(
-            `\u2705 Olá ${p.name.split(' ')[0]}, seu atendimento foi confirmado!\n\n` +
-            `\u{1F4C5} ${dataStr}\n` +
-            `\u{1F4DC} Sessão nº ${s.num}${procedimentos}${valor}\n\n` +
-            `Obrigado, ${pr.name || 'equipe FisioHome'}! \u{1F49A}`
+            `Olá ${p.name.split(' ')[0]}, seu atendimento foi confirmado!\n\n` +
+            `${dataStr}\n` +
+            `Sessão nº ${s.num}${procedimentos}${valor}\n\n` +
+            `*${pr.name || 'Equipe FisioHome'}*\n` +
+            `_Obrigado_`
           );
           const phone = p.phone.replace(/\D/g, '');
           window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
