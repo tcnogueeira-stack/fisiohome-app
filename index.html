@@ -3306,8 +3306,6 @@
           .select('*')
           .or(`usuario_id.eq.${uid},usuario_id.eq.${email}`);
         if (!pe && rp && rp.length) {
-          const remoteIds = new Set(rp.map(p => p.id));
-          db.patients = db.patients.filter(p => remoteIds.has(p.id));
           for (const r of rp) {
             const old = db.patients.find(p => p.id === r.id);
             if (old) Object.assign(old, { name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, createdAt: r.createdAt, updatedAt: r.updatedAt });
@@ -3319,8 +3317,6 @@
             .select('*')
             .in('patient_id', rp.map(p => p.id));
           if (!se && rs && rs.length) {
-            const rIds = new Set(rs.map(s => s.id));
-            db.sessions = db.sessions.filter(s => rIds.has(s.id));
             for (const r of rs) {
               const old = db.sessions.find(s => s.id === r.id);
               if (old) Object.assign(old, { patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, signedAt: r.signed_at, signedBy: r.signed_by || null, userAgent: r.user_agent || null, token: r.token || null, professional: r.professional || null });
