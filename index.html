@@ -3256,9 +3256,10 @@
           id: s.id, patient_id: s.patientId, date: s.date, num: s.num,
           evolucao: s.evolucao, pa: s.pa, spo2: s.spo2, fc: s.fc,
           pain: s.pain, procs: s.procs || [], obs: s.obs || '',
-          value: parseFloat(s.value) || 0, signed: s.signed || false, signed_at: s.signedAt || null,
+          signed: s.signed || false, signed_at: s.signedAt || null,
           professional: s.professional || null,
         };
+        if (parseFloat(s.value) > 0) payload.value = parseFloat(s.value);
         if (s.signedBy) payload.signed_by = s.signedBy;
         if (s.userAgent) payload.user_agent = s.userAgent;
         if (s.token) payload.token = s.token;
