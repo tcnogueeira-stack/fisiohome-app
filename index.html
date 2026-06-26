@@ -118,7 +118,9 @@
     }
 
     /* ─── LOGIN / RECUPERAR SENHA ─── */
-    #login, #forgot-pw, #recover-setpass {
+    #login,
+    #forgot-pw,
+    #recover-setpass {
       background: linear-gradient(150deg, var(--green-deep) 0%, #062e28 60%, #0d1f1d 100%);
       align-items: center;
       justify-content: center;
@@ -127,7 +129,9 @@
       overflow: hidden;
     }
 
-    #login::before, #forgot-pw::before, #recover-setpass::before {
+    #login::before,
+    #forgot-pw::before,
+    #recover-setpass::before {
       content: '';
       position: absolute;
       top: -100px;
@@ -138,7 +142,9 @@
       background: radial-gradient(circle, rgba(212, 184, 150, .12) 0%, transparent 70%);
     }
 
-    #login::after, #forgot-pw::after, #recover-setpass::after {
+    #login::after,
+    #forgot-pw::after,
+    #recover-setpass::after {
       content: '';
       position: absolute;
       bottom: -80px;
@@ -296,7 +302,10 @@
       margin: 6px 0 14px;
       text-decoration: none;
     }
-    .forgot-link:hover { text-decoration: underline; }
+
+    .forgot-link:hover {
+      text-decoration: underline;
+    }
 
     /* ─── SETUP ─── */
     #setup {
@@ -485,7 +494,10 @@
       position: relative;
       z-index: 1;
     }
-    .stat-card-full { grid-column: 1 / -1; }
+
+    .stat-card-full {
+      grid-column: 1 / -1;
+    }
 
     .stat-card {
       background: rgba(255, 255, 255, .1);
@@ -526,9 +538,17 @@
       flex: 1;
     }
 
-    .dash-top, .dash-stats, .dash-body,
-    #profile .topbar, .profile-hero, .profile-filter, .profile-stats, .profile-tabs,
-    .setup-body, .profile-body, .form-body {
+    .dash-top,
+    .dash-stats,
+    .dash-body,
+    #profile .topbar,
+    .profile-hero,
+    .profile-filter,
+    .profile-stats,
+    .profile-tabs,
+    .setup-body,
+    .profile-body,
+    .form-body {
       max-width: 520px;
       margin-left: auto;
       margin-right: auto;
@@ -919,6 +939,7 @@
       padding: 14px 18px 0;
       background: var(--warm-white);
     }
+
     .profile-stat {
       background: var(--cream);
       border-radius: 12px;
@@ -926,8 +947,16 @@
       text-align: center;
       border: 1px solid var(--border);
     }
-    .profile-stat .stat-num { color: var(--charcoal); font-size: 1.3rem; }
-    .profile-stat .stat-label { color: var(--soft); }
+
+    .profile-stat .stat-num {
+      color: var(--charcoal);
+      font-size: 1.3rem;
+    }
+
+    .profile-stat .stat-label {
+      color: var(--soft);
+    }
+
     .profile-filter {
       display: flex;
       justify-content: center;
@@ -935,7 +964,11 @@
       padding: 8px 18px 0;
       background: var(--warm-white);
     }
-    .profile-filter .filter-chip { font-size: .7rem; padding: 4px 10px; }
+
+    .profile-filter .filter-chip {
+      font-size: .7rem;
+      padding: 4px 10px;
+    }
 
     .profile-tabs {
       display: flex;
@@ -1814,7 +1847,8 @@
         <input type="email" class="form-input" id="fp-email" placeholder="seu@email.com">
       </div>
       <button class="btn-main" onclick="sendResetEmail()">Enviar link</button>
-      <a class="forgot-link" style="display:block;text-align:center;margin-top:12px" onclick="showScreen('login')">Voltar</a>
+      <a class="forgot-link" style="display:block;text-align:center;margin-top:12px"
+        onclick="showScreen('login')">Voltar</a>
     </div>
   </div>
 
@@ -2012,8 +2046,14 @@
       <button class="filter-chip" onclick="setProfileFilter('month',this)">Mês</button>
     </div>
     <div class="profile-stats">
-      <div class="profile-stat"><div class="stat-num" id="ps-sessoes">0</div><div class="stat-label">Sessões</div></div>
-      <div class="profile-stat"><div class="stat-num" id="ps-receita">R$ 0,00</div><div class="stat-label">Receita</div></div>
+      <div class="profile-stat">
+        <div class="stat-num" id="ps-sessoes">0</div>
+        <div class="stat-label">Sessões</div>
+      </div>
+      <div class="profile-stat">
+        <div class="stat-num" id="ps-receita">R$ 0,00</div>
+        <div class="stat-label">Receita</div>
+      </div>
     </div>
     <div class="profile-tabs">
       <button class="tab-btn active" onclick="setTab('sessions',this)">Atendimentos</button>
@@ -2304,7 +2344,8 @@
       </div>
       <div class="form-section">
         <div class="form-section-title">Valor</div>
-        <div class="form-group"><input type="number" class="form-input" id="edit-value" placeholder="R$ 0,00" step="0.01" min="0"></div>
+        <div class="form-group"><input type="number" class="form-input" id="edit-value" placeholder="R$ 0,00"
+            step="0.01" min="0"></div>
       </div>
       <div class="form-section">
         <div class="form-section-title">Observações</div>
@@ -2349,7 +2390,7 @@
     let savedSession = null;
     let editingPatientId = null;
 
-    function uuid() { try { if (crypto.randomUUID) return crypto.randomUUID(); } catch (e) {} return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); }); }
+    function uuid() { try { if (crypto.randomUUID) return crypto.randomUUID(); } catch (e) { } return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); }); }
     function saveDB() { localStorage.setItem('fh_db', JSON.stringify(db)); }
     function saveUser(u) { currentUser = u; localStorage.setItem('fh_user', JSON.stringify(u)); }
 
@@ -2439,7 +2480,7 @@
         const { error } = await supabaseClient.auth.updateUser({ password: pass });
         if (error) throw error;
         showToast('Senha redefinida com sucesso! Faça login.', 'success');
-        await supabaseClient.auth.signOut().catch(() => {});
+        await supabaseClient.auth.signOut().catch(() => { });
         showScreen('login');
       } catch (err) {
         errEl.textContent = __authErr(err.message); errEl.style.display = 'block';
@@ -2991,11 +3032,11 @@
           const valor = s.value ? `\nValor: R$${s.value.toFixed(2).replace('.', ',')}` : '';
           const procedimentos = s.procs.length ? `\n${s.procs.join(', ')}` : '';
           const msg = encodeURIComponent(
-            `Olá ${p.name.split(' ')[0]}, seu atendimento foi confirmado!\n\n` +
+            `Olá, ${p.name.split(' ')[0]}, seu atendimento foi confirmado.\n\n` +
             `\u2022 ${dataStr}\n` +
-            `\u2022 Sessão nº ${s.num}${procedimentos}${valor}\n\n` +
+            `\u2022 Sessão Nº ${s.num}${procedimentos}${valor}\n\n` +
             `*${pr.name || 'Equipe FisioHome'}*\n` +
-            `_Obrigado_`
+            `_Obrigado!_`
           );
           const phone = p.phone.replace(/\D/g, '');
           window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
@@ -3213,15 +3254,17 @@
     async function syncSessionToSupabase(s) {
       if (!canSync()) return;
       try {
-        const { error } = await supabaseClient.from('sessions').upsert({
+        const payload = {
           id: s.id, patient_id: s.patientId, date: s.date, num: s.num,
           evolucao: s.evolucao, pa: s.pa, spo2: s.spo2, fc: s.fc,
           pain: s.pain, procs: s.procs || [], obs: s.obs || '',
           value: parseFloat(s.value) || 0, signed: s.signed || false, signed_at: s.signedAt || null,
-          signed_by: s.signedBy || null, user_agent: s.userAgent || null,
-          token: s.token || null,
           professional: s.professional || null,
-        }, { onConflict: 'id' });
+        };
+        if (s.signedBy) payload.signed_by = s.signedBy;
+        if (s.userAgent) payload.user_agent = s.userAgent;
+        if (s.token) payload.token = s.token;
+        const { error } = await supabaseClient.from('sessions').upsert(payload, { onConflict: 'id' });
         if (error) { console.warn('Sync session error:', error); showToast('Erro ao sincronizar atendimento: ' + __authErr(error.message), 'error'); }
       } catch (e) { console.warn('Sync session failed:', e); showToast('Erro de conexão ao sincronizar atendimento.', 'error'); }
     }
