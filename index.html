@@ -3002,7 +3002,7 @@
         `${procedimentos}${valor}\n\n` +
         `Assim que possivel, confirme no aplicativo.\n\n` +
         `*${pr.name || 'Equipe FisioHome'}*\n` +
-        `_Obrigado_`
+        `_${currentUser.sex === 'F' ? 'Obrigada' : 'Obrigado'}_`
       );
       const phone = p.phone.replace(/\D/g, '');
       window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
@@ -3056,7 +3056,7 @@
             `\u2022 Sessão Nº ${s.num}` +
             `${procedimentos}${valor}\n\n` +
             `*${pr.name || 'Equipe FisioHome'}*\n` +
-            `_Obrigado!_`
+            `_${currentUser.sex === 'F' ? 'Obrigada' : 'Obrigado'}!_`
           );
           const phone = p.phone.replace(/\D/g, '');
           window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
