@@ -1347,10 +1347,13 @@
       border-radius: 2px;
     }
 
-    .sign-subtitle {
-      font-size: .78rem;
+    .sign-note {
+      font-size: .82rem;
       color: var(--soft);
-      margin-bottom: 24px;
+      text-align: center;
+      margin: 20px 0 8px;
+      max-width: 420px;
+      line-height: 1.5;
     }
 
     .sign-card {
@@ -1390,46 +1393,6 @@
       color: var(--charcoal);
       text-align: right;
       max-width: 220px;
-    }
-
-    .sign-canvas-wrap {
-      width: 100%;
-      max-width: 420px;
-      background: var(--warm-white);
-      border: 2px dashed var(--border-gold);
-      border-radius: 16px;
-      margin-bottom: 8px;
-      position: relative;
-      overflow: hidden;
-      box-shadow: inset 0 2px 8px rgba(212, 184, 150, .1);
-    }
-
-    .sign-canvas-label {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: var(--soft);
-      font-size: .82rem;
-      pointer-events: none;
-      text-align: center;
-    }
-
-    #signCanvas {
-      width: 100%;
-      height: 150px;
-      display: block;
-      touch-action: none;
-    }
-
-    .sign-clear {
-      background: none;
-      border: none;
-      color: var(--soft);
-      font-size: .75rem;
-      cursor: pointer;
-      text-decoration: underline;
-      margin-bottom: 16px;
     }
 
     .stamp-box {
@@ -2153,19 +2116,14 @@
     <div class="sign-body" id="sign-body">
       <div class="sign-logo">Fisio<span>Home</span></div>
       <div class="sign-divider"></div>
-      <div class="sign-subtitle">Por favor, assine para confirmar o atendimento</div>
       <div class="sign-card" id="sign-card"></div>
-      <div class="sign-canvas-wrap">
-        <div class="sign-canvas-label" id="sign-hint">✍️ Assine aqui com o dedo</div>
-        <canvas id="signCanvas"></canvas>
-      </div>
-      <button class="sign-clear" onclick="clearSign()">Limpar assinatura</button>
       <div class="stamp-box" id="stamp-box"></div>
-      <div style="height:16px"></div>
+      <div class="sign-note">Toque no botão abaixo para confirmar seu atendimento</div>
+      <div style="height:8px"></div>
       <button class="btn-whatsapp" id="sign-whats" onclick="sendWhatsApp()" style="display:none">📲 Enviar link de
         assinatura</button>
       <div style="height:10px"></div>
-      <button class="btn-confirm" onclick="confirmSign()">✅ Confirmar Atendimento</button>
+      <button class="btn-confirm" id="btn-confirm-sign" onclick="confirmSign()">✅ Confirmar Atendimento</button>
     </div>
     <div class="sign-ok" id="sign-ok" style="display:none">
       <div class="sign-ok-icon">✅</div>
@@ -2394,6 +2352,7 @@
     let savedSession = null;
     let editingPatientId = null;
 
+    function uuid() { return crypto.randomUUID ? crypto.randomUUID() : 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); }); }
     function saveDB() { localStorage.setItem('fh_db', JSON.stringify(db)); }
     function saveUser(u) { currentUser = u; localStorage.setItem('fh_user', JSON.stringify(u)); }
 
@@ -2892,7 +2851,7 @@
           ${s.procs.slice(0, 2).map(p => `<span class="chip chip-gold">${p}</span>`).join('')}
         </div>
         ${s.signed
-            ? '<div class="session-signed">✅ Assinado</div>'
+            ? `<div class="session-signed">✅ Assinado${s.signedBy ? ' por ' + s.signedBy : ''}</div>`
             : '<div style="font-size:.66rem;color:var(--amber);font-weight:700;margin-top:5px;display:flex;align-items:center;gap:5px">⏳ Aguardando assinatura &nbsp;·&nbsp; <span style="color:var(--green-mid);text-decoration:underline">Reenviar link 📲</span></div>'}
         <div class="session-actions">
           <button class="btn-sm btn-sm-edit" onclick="event.stopPropagation();editSession(${s.id})">✏️ Editar</button>
@@ -2947,7 +2906,8 @@
         pain: selectedPain !== null ? selectedPain : 0,
         procs, obs: document.getElementById('f-obs').value,
         value: parseFloat(document.getElementById('f-value').value) || 0,
-        signed: false, signedAt: null,
+        signed: false, signedAt: null, signedBy: null, userAgent: null,
+        token: uuid(),
         professional: { name: currentUser.name, crp: currentUser.crp, spec: currentUser.spec, tel: currentUser.tel, addr: currentUser.addr, cpf: currentUser.cpf || '' }
       };
       db.sessions.push(s); saveDB();
@@ -2961,11 +2921,12 @@
     function sendWhatsApp() {
       if (!savedSession) return;
       const { session: s, patient: p } = savedSession;
-      const link = `${location.href.split('?')[0]}?sign=${s.id}`;
-      const msg = encodeURIComponent(`Olá ${p.name.split(' ')[0]}!\n\nSeu atendimento foi registrado. Obrigado!`);
+      if (!p.phone) { alert('Este paciente não tem WhatsApp cadastrado.'); return; }
+      const link = `${location.href.split('?')[0]}?token=${s.token}`;
+      const msg = encodeURIComponent(`Olá ${p.name.split(' ')[0]}! 👋\n\nConfirme seu atendimento com 1 toque:\n\n${link}`);
       const phone = p.phone.replace(/\D/g, '');
       window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
-      setTimeout(() => openSignScreen(s, p), 600);
+      showToast('Link de confirmação enviado!', 'success');
     }
 
     function resendSignature(sid) {
@@ -2975,16 +2936,17 @@
       if (!p) return;
       if (!p.phone) { alert('Este paciente não tem WhatsApp cadastrado.'); return; }
       savedSession = { session: s, patient: p };
-      const link = `${location.href.split('?')[0]}?sign=${s.id}`;
-      const msg = encodeURIComponent(`Olá ${p.name.split(' ')[0]}! 👋\n\nSeu atendimento ainda não foi confirmado. Assine com 1 toque:\n\n${link}`);
+      const link = `${location.href.split('?')[0]}?token=${s.token}`;
+      const msg = encodeURIComponent(`Olá ${p.name.split(' ')[0]}! 👋\n\nSeu atendimento ainda não foi confirmado. Confirme com 1 toque:\n\n${link}`);
       const phone = p.phone.replace(/\D/g, '');
       window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
       setTimeout(() => openSignScreen(s, p), 600);
     }
 
     // ── ASSINATURA ──
-    function openSignScreen(session, patient) {
-      document.getElementById('sign-whats').style.display = 'none';
+    function openSignScreen(session, patient, isRemote) {
+      document.getElementById('sign-whats').style.display = isRemote ? 'none' : 'flex';
+      document.getElementById('btn-confirm-sign').disabled = false;
       const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
       const d = new Date(session.date + 'T12:00:00');
       const pr = session.professional || {};
@@ -2999,26 +2961,21 @@
     <div class="stamp-text"><strong>${pr.name || '—'}</strong><br>Fisioterapeuta${pr.spec ? ' – ' + pr.spec : ''}<br>${pr.crp || ''}${pr.cpf ? '<br>CPF: ' + pr.cpf : ''}<br>${pr.tel || ''}<br>${pr.addr || ''}</div>`;
       document.getElementById('sign-body').style.display = 'flex';
       document.getElementById('sign-ok').style.display = 'none';
-      initCanvas(); showScreen('sign');
+      showScreen('sign');
     }
-    let signCtx, isDrawing = false;
-    function initCanvas() {
-      const c = document.getElementById('signCanvas');
-      c.width = c.offsetWidth * devicePixelRatio; c.height = c.offsetHeight * devicePixelRatio;
-      signCtx = c.getContext('2d'); signCtx.scale(devicePixelRatio, devicePixelRatio);
-      signCtx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--green-mid').trim();
-      signCtx.lineWidth = 2.5; signCtx.lineCap = 'round';
-      const getP = (e, r) => ({ x: (e.clientX || e.pageX) - r.left, y: (e.clientY || e.pageY) - r.top });
-      c.onmousedown = e => { isDrawing = true; document.getElementById('sign-hint').style.display = 'none'; const r = c.getBoundingClientRect(); signCtx.beginPath(); const p = getP(e, r); signCtx.moveTo(p.x, p.y); };
-      c.onmousemove = e => { if (!isDrawing) return; const r = c.getBoundingClientRect(); const p = getP(e, r); signCtx.lineTo(p.x, p.y); signCtx.stroke(); };
-      c.onmouseup = () => isDrawing = false;
-      c.addEventListener('touchstart', e => { e.preventDefault(); isDrawing = true; document.getElementById('sign-hint').style.display = 'none'; const r = c.getBoundingClientRect(); const t = e.touches[0]; signCtx.beginPath(); signCtx.moveTo(t.clientX - r.left, t.clientY - r.top); }, { passive: false });
-      c.addEventListener('touchmove', e => { e.preventDefault(); if (!isDrawing) return; const r = c.getBoundingClientRect(); const t = e.touches[0]; signCtx.lineTo(t.clientX - r.left, t.clientY - r.top); signCtx.stroke(); }, { passive: false });
-      c.addEventListener('touchend', () => isDrawing = false);
-    }
-    function clearSign() { const c = document.getElementById('signCanvas'); signCtx.clearRect(0, 0, c.width, c.height); document.getElementById('sign-hint').style.display = ''; }
     function confirmSign() {
-      if (savedSession) { const s = db.sessions.find(x => x.id === savedSession.session.id); if (s) { s.signed = true; s.signedAt = new Date().toISOString(); saveDB(); syncSessionToSupabase(s); } }
+      if (!savedSession) return;
+      const btn = document.getElementById('btn-confirm-sign');
+      btn.disabled = true; btn.textContent = '⏳ Confirmando...';
+      const s = db.sessions.find(x => x.id === savedSession.session.id);
+      if (s) {
+        s.signed = true;
+        s.signedAt = new Date().toISOString();
+        s.signedBy = savedSession.patient.name;
+        s.userAgent = navigator.userAgent;
+        saveDB();
+        syncSessionToSupabase(s);
+      }
       document.getElementById('sign-body').style.display = 'none';
       document.getElementById('sign-ok').style.display = 'flex';
     }
@@ -3236,6 +3193,8 @@
           evolucao: s.evolucao, pa: s.pa, spo2: s.spo2, fc: s.fc,
           pain: s.pain, procs: s.procs || [], obs: s.obs || '',
           value: parseFloat(s.value) || 0, signed: s.signed || false, signed_at: s.signedAt || null,
+          signed_by: s.signedBy || null, user_agent: s.userAgent || null,
+          token: s.token || null,
           professional: s.professional || null,
         }, { onConflict: 'id' });
         if (error) { console.warn('Sync session error:', error); showToast('Erro ao sincronizar atendimento: ' + __authErr(error.message), 'error'); }
@@ -3269,8 +3228,8 @@
             db.sessions = db.sessions.filter(s => rIds.has(s.id));
             for (const r of rs) {
               const old = db.sessions.find(s => s.id === r.id);
-              if (old) Object.assign(old, { patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, signedAt: r.signed_at, professional: r.professional || null });
-              else db.sessions.push({ id: r.id, patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, signedAt: r.signed_at, professional: r.professional || null });
+              if (old) Object.assign(old, { patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, signedAt: r.signed_at, signedBy: r.signed_by || null, userAgent: r.user_agent || null, token: r.token || null, professional: r.professional || null });
+              else db.sessions.push({ id: r.id, patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, signedAt: r.signed_at, signedBy: r.signed_by || null, userAgent: r.user_agent || null, token: r.token || null, professional: r.professional || null });
             }
             saveDB();
           }
@@ -3281,11 +3240,10 @@
     // ── INIT ──
     (async function init() {
       const params = new URLSearchParams(location.search);
-      const signId = params.get('sign');
-      if (signId) {
-        const sid = parseInt(signId);
-        const s = db.sessions.find(x => x.id === sid);
-        if (s) { const p = db.patients.find(x => x.id === s.patientId); if (p) { openSignScreen(s, p); return; } }
+      const token = params.get('token');
+      if (token) {
+        const s = db.sessions.find(x => x.token === token);
+        if (s && !s.signed) { const p = db.patients.find(x => x.id === s.patientId); if (p) { savedSession = { session: s, patient: p }; openSignScreen(s, p, true); return; } }
       }
 
       // Password recovery flow: user clicked recovery link from email
