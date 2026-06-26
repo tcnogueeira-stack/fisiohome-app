@@ -2639,6 +2639,7 @@
     }
 
     function userId() { return currentUser?.supabaseId || currentUser?.email || ''; }
+    function professionalName() { const p = currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : ''; return p + (currentUser?.name || ''); }
     function myPatients() {
       const id = userId();
       return db.patients.filter(p => p.usuario_id === id || (currentUser?.email && p.usuario_id === currentUser.email));
@@ -3166,7 +3167,7 @@
       const birth = document.getElementById('np-birth').value;
       const cep = document.getElementById('np-cep').value;
       const city = document.getElementById('np-city').value;
-      const p = { id: Date.now(), name, birth: birth || null, age: birth ? calcAgeFromBirth('np-birth', 'np-age', true) : null, sex: document.getElementById('np-sex').value || null, diag, cpf: document.getElementById('np-cpf').value || null, phone: document.getElementById('np-phone').value.replace(/\D/g, ''), cep, addr: document.getElementById('np-addr').value, city, obs: document.getElementById('np-obs').value, usuario_id: userId(), createdAt: new Date().toISOString() };
+      const p = { id: Date.now(), name, birth: birth || null, age: birth ? calcAgeFromBirth('np-birth', 'np-age', true) : null, sex: document.getElementById('np-sex').value || null, diag, cpf: document.getElementById('np-cpf').value || null, phone: document.getElementById('np-phone').value.replace(/\D/g, ''), cep, addr: document.getElementById('np-addr').value, city, obs: document.getElementById('np-obs').value, usuario_id: userId(), professional_name: professionalName(), createdAt: new Date().toISOString() };
       db.patients.push(p); saveDB();
       syncPatientToSupabase(p);
       ['np-name', 'np-age', 'np-diag', 'np-cpf', 'np-phone', 'np-addr', 'np-obs', 'np-birth', 'np-cep', 'np-city'].forEach(id => document.getElementById(id).value = '');
@@ -3291,11 +3292,12 @@
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         if (!session) return;
+        const profName = p.professional_name || professionalName();
         const { error } = await supabaseClient.from('patients').upsert({
           id: p.id, name: p.name, birth: p.birth, age: p.age,
           sex: p.sex, diag: p.diag, cpf: p.cpf, phone: p.phone,
           cep: p.cep, addr: p.addr, city: p.city, obs: p.obs,
-          usuario_id: userId(),
+          professional_name: profName, usuario_id: userId(),
           "createdAt": p.createdAt || new Date().toISOString(),
           "updatedAt": new Date().toISOString(),
         }, { onConflict: 'id' });
@@ -3316,6 +3318,7 @@
               id: p.id, name: p.name, birth: p.birth, age: p.age,
               sex: p.sex, diag: p.diag, cpf: p.cpf, phone: p.phone,
               cep: p.cep, addr: p.addr, city: p.city, obs: p.obs,
+              professional_name: p.professional_name || professionalName(),
               usuario_id: userId(),
               "createdAt": p.createdAt || new Date().toISOString(),
               "updatedAt": new Date().toISOString(),
@@ -3360,8 +3363,8 @@
         if (!pe && rp && rp.length) {
           for (const r of rp) {
             const old = db.patients.find(p => p.id === r.id);
-            if (old) Object.assign(old, { name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, createdAt: r.createdAt, updatedAt: r.updatedAt });
-            else db.patients.push({ id: r.id, name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, createdAt: r.createdAt, updatedAt: r.updatedAt });
+            if (old) Object.assign(old, { name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, professional_name: r.professional_name || null, createdAt: r.createdAt, updatedAt: r.updatedAt });
+            else db.patients.push({ id: r.id, name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, professional_name: r.professional_name || null, createdAt: r.createdAt, updatedAt: r.updatedAt });
           }
           saveDB();
           const { data: rs, error: se } = await supabaseClient
