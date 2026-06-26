@@ -1979,6 +1979,7 @@
             <th>Diagnóstico</th>
             <th>WhatsApp</th>
             <th>Sessões</th>
+            <th>Valor</th>
             <th>Ações</th>
           </tr>
         </thead>
@@ -2055,6 +2056,8 @@
           <span id="f-num-display"
             style="font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:700;color:var(--gold-deep)"></span>
         </div>
+        <div class="form-group" style="margin-top:8px"><label class="form-label">Valor (R$)</label><input type="number"
+            class="form-input" id="f-value" placeholder="0,00" step="0.01" min="0"></div>
       </div>
       <div class="form-section">
         <div class="form-section-title">Evolução Clínica</div>
@@ -2307,6 +2310,10 @@
           <button class="proc-tag" onclick="toggleProc(this)">Pilates</button>
           <button class="proc-tag" onclick="toggleProc(this)">Neurodesenv.</button>
         </div>
+      </div>
+      <div class="form-section">
+        <div class="form-section-title">Valor</div>
+        <div class="form-group"><input type="number" class="form-input" id="edit-value" placeholder="R$ 0,00" step="0.01" min="0"></div>
       </div>
       <div class="form-section">
         <div class="form-section-title">Observações</div>
@@ -2622,7 +2629,8 @@
       else if (patientDateFilter === 'month') sessions = sessions.filter(s => s.date.startsWith(month));
       else if (patientDateFilter === 'year') sessions = sessions.filter(s => s.date.startsWith(now.getFullYear().toString()));
       document.getElementById('st-sessoes').textContent = sessions.length;
-      document.getElementById('st-receita').textContent = 'R$ 0,00';
+      const totalReceita = sessions.reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
+      document.getElementById('st-receita').textContent = 'R$ ' + totalReceita.toFixed(2).replace('.', ',');
       if (document.getElementById('table-count'))
         document.getElementById('table-count').textContent = list.length + ' pacientes';
     }
@@ -2679,7 +2687,7 @@
       if (!tbody) return;
       const patients = myPatients();
       if (!patients.length) {
-        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:28px;color:var(--soft)">Nenhum paciente cadastrado ainda</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--soft)">Nenhum paciente cadastrado ainda</td></tr>`;
         return;
       }
       tbody.innerHTML = patients.map((p, i) => `
@@ -2691,6 +2699,7 @@
       <td class="td-diag">${p.diag}</td>
       <td style="font-size:.76rem">${p.phone ? '+55' + p.phone : '—'}</td>
       <td class="td-sessions">${sessionsOf(p.id).length}</td>
+      <td style="font-size:.78rem;font-weight:600;color:var(--green-mid)">R$ ${sessionsOf(p.id).reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0).toFixed(2).replace('.', ',')}</td>
       <td><div class="td-actions">
         <button class="btn-sm btn-sm-view" onclick="openPatient(${p.id})">Ver</button>
         <button class="btn-sm btn-sm-edit" onclick="openEditPatientById(${p.id})">✏️</button>
@@ -2753,6 +2762,7 @@
       editingSessionId = sid;
       document.getElementById('edit-evolucao').value = s.evolucao === '(sem registro)' ? '' : s.evolucao;
       document.getElementById('edit-obs').value = s.obs || '';
+      document.getElementById('edit-value').value = s.value || '';
       document.querySelectorAll('#edit-proc-tags .proc-tag').forEach(t => t.classList.remove('sel'));
       (s.procs || []).forEach(p => {
         const tag = [...document.querySelectorAll('#edit-proc-tags .proc-tag')].find(t => t.textContent === p);
@@ -2768,6 +2778,7 @@
       s.evolucao = document.getElementById('edit-evolucao').value || '(sem registro)';
       s.procs = [...document.querySelectorAll('#edit-proc-tags .proc-tag.sel')].map(t => t.textContent);
       s.obs = document.getElementById('edit-obs').value;
+      s.value = parseFloat(document.getElementById('edit-value').value) || 0;
       saveDB(); syncSessionToSupabase(s);
       closeModal('modal-edit-session');
       renderSessions();
@@ -2809,7 +2820,7 @@
         return `<div class="session-item" style="${cursor}" ${clickAttr}>
       <div class="session-date-col"><div class="session-day">${d.getDate()}</div><div class="session-month">${MO[d.getMonth()]}</div></div>
       <div class="session-content">
-        <div class="session-title">Sessão ${s.num}</div>
+        <div class="session-title">Sessão ${s.num}${s.value ? ' <span style="font-weight:400;color:var(--green-mid);font-size:.78rem">R$ ' + s.value.toFixed(2).replace('.', ',') + '</span>' : ''}</div>
         <div class="session-preview">${s.evolucao.slice(0, 80)}${s.evolucao.length > 80 ? '…' : ''}</div>
         <div class="session-chips">
           <span class="chip chip-vital">PA ${s.pa}</span>
@@ -2837,7 +2848,7 @@
       document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
       document.getElementById('f-num-display').textContent = nextNum;
       document.getElementById('f-num-display').dataset.num = nextNum;
-      ['f-evolucao', 'f-pa', 'f-spo2', 'f-fc', 'f-obs'].forEach(id => document.getElementById(id).value = '');
+      ['f-evolucao', 'f-pa', 'f-spo2', 'f-fc', 'f-obs', 'f-value'].forEach(id => document.getElementById(id).value = '');
       document.querySelectorAll('.proc-tag').forEach(t => t.classList.remove('sel'));
       const bs = document.getElementById('btn-save');
       bs.disabled = false; bs.style.opacity = '1';
@@ -2872,6 +2883,7 @@
         fc: document.getElementById('f-fc').value || '—',
         pain: selectedPain !== null ? selectedPain : 0,
         procs, obs: document.getElementById('f-obs').value,
+        value: parseFloat(document.getElementById('f-value').value) || 0,
         signed: false, signedAt: null,
         professional: { name: currentUser.name, crp: currentUser.crp, spec: currentUser.spec, tel: currentUser.tel, addr: currentUser.addr, cpf: currentUser.cpf || '' }
       };
@@ -3160,7 +3172,7 @@
           id: s.id, patient_id: s.patientId, date: s.date, num: s.num,
           evolucao: s.evolucao, pa: s.pa, spo2: s.spo2, fc: s.fc,
           pain: s.pain, procs: s.procs || [], obs: s.obs || '',
-          signed: s.signed || false, signed_at: s.signedAt || null,
+          value: parseFloat(s.value) || 0, signed: s.signed || false, signed_at: s.signedAt || null,
           professional: s.professional || null,
         }, { onConflict: 'id' });
         if (error) { console.warn('Sync session error:', error); showToast('Erro ao sincronizar atendimento: ' + __authErr(error.message), 'error'); }
@@ -3194,8 +3206,8 @@
             db.sessions = db.sessions.filter(s => rIds.has(s.id));
             for (const r of rs) {
               const old = db.sessions.find(s => s.id === r.id);
-              if (old) Object.assign(old, { patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', signed: r.signed || false, signedAt: r.signed_at, professional: r.professional || null });
-              else db.sessions.push({ id: r.id, patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', signed: r.signed || false, signedAt: r.signed_at, professional: r.professional || null });
+              if (old) Object.assign(old, { patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, signedAt: r.signed_at, professional: r.professional || null });
+              else db.sessions.push({ id: r.id, patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, signedAt: r.signed_at, professional: r.professional || null });
             }
             saveDB();
           }
