@@ -5,7 +5,6 @@ CREATE TABLE IF NOT EXISTS public.profiles (
   phone TEXT,
   cpf TEXT,
   role TEXT NOT NULL DEFAULT 'user' CHECK (role IN ('admin', 'user')),
-  created_from TEXT NOT NULL DEFAULT 'manual' CHECK (created_from IN ('hotmart', 'manual')),
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
@@ -38,15 +37,14 @@ LANGUAGE plpgsql
 SECURITY DEFINER SET search_path = ''
 AS $$
 BEGIN
-  INSERT INTO public.profiles (id, email, name, phone, cpf, role, created_from)
+  INSERT INTO public.profiles (id, email, name, phone, cpf, role)
   VALUES (
     NEW.id,
     NEW.email,
     COALESCE(NEW.raw_user_meta_data ->> 'name', 'Fisioterapeuta'),
     COALESCE(NEW.raw_user_meta_data ->> 'phone', ''),
     COALESCE(NEW.raw_user_meta_data ->> 'cpf', ''),
-    'user',
-    'hotmart'
+    'user'
   );
   RETURN NEW;
 END;
