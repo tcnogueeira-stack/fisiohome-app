@@ -499,6 +499,17 @@
       grid-column: 1 / -1;
     }
 
+    .stat-row-full {
+      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: 1.3fr 1fr;
+      gap: 8px;
+    }
+
+    .stat-rev .stat-num {
+      font-size: 1.2rem;
+    }
+
     .sync-dot {
       width: 10px;
       height: 10px;
@@ -1025,7 +1036,7 @@
 
     .profile-stats {
       display: grid;
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: 1fr 1.4fr 1fr;
       gap: 8px;
       padding: 14px 18px 0;
       background: var(--warm-white);
@@ -1041,7 +1052,7 @@
 
     .profile-stat .stat-num {
       color: var(--charcoal);
-      font-size: 1.3rem;
+      font-size: 1.15rem;
     }
 
     .profile-stat .stat-label {
@@ -2033,9 +2044,15 @@
           <div class="stat-num" id="st-sessoes">0</div>
           <div class="stat-label">Sessões</div>
         </div>
-        <div class="stat-card stat-card-full">
-          <div class="stat-num" id="st-receita">R$ 0,00</div>
-          <div class="stat-label">Receita</div>
+        <div class="stat-row-full">
+          <div class="stat-card stat-rev">
+            <div class="stat-num" id="st-receita">R$ 0,00</div>
+            <div class="stat-label">Receita Total</div>
+          </div>
+          <div class="stat-card stat-rev">
+            <div class="stat-num" id="st-receber">R$ 0,00</div>
+            <div class="stat-label">Receita a Receber</div>
+          </div>
         </div>
       </div>
     </div>
@@ -2145,7 +2162,11 @@
       </div>
       <div class="profile-stat">
         <div class="stat-num" id="ps-receita">R$ 0,00</div>
-        <div class="stat-label">Receita</div>
+        <div class="stat-label">Receita Total</div>
+      </div>
+      <div class="profile-stat">
+        <div class="stat-num" id="ps-receber">R$ 0,00</div>
+        <div class="stat-label">Receita a Receber</div>
       </div>
     </div>
     <div class="profile-tabs">
@@ -2756,8 +2777,10 @@
       else if (patientDateFilter === 'month') sessions = sessions.filter(s => s.date.startsWith(month));
       else if (patientDateFilter === 'year') sessions = sessions.filter(s => s.date.startsWith(now.getFullYear().toString()));
       document.getElementById('st-sessoes').textContent = sessions.length;
-      const totalReceita = sessions.filter(s => !s.paid).reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
+      const totalReceita = sessions.reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
+      const receitaAReceber = sessions.filter(s => !s.paid).reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
       document.getElementById('st-receita').textContent = 'R$ ' + totalReceita.toFixed(2).replace('.', ',');
+      document.getElementById('st-receber').textContent = 'R$ ' + receitaAReceber.toFixed(2).replace('.', ',');
       if (document.getElementById('table-count'))
         document.getElementById('table-count').textContent = list.length + ' pacientes';
     }
@@ -2773,8 +2796,10 @@
       if (profileFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); sessions = sessions.filter(s => new Date(s.date) >= w); }
       else if (profileFilter === 'month') sessions = sessions.filter(s => s.date.startsWith(month));
       document.getElementById('ps-sessoes').textContent = sessions.length;
-      const total = sessions.filter(s => !s.paid).reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
+      const total = sessions.reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
+      const receber = sessions.filter(s => !s.paid).reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
       document.getElementById('ps-receita').textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+      document.getElementById('ps-receber').textContent = 'R$ ' + receber.toFixed(2).replace('.', ',');
     }
     function setProfileFilter(f, btn) {
       profileFilter = f;
