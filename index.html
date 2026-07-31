@@ -1036,7 +1036,7 @@
 
     .profile-stats {
       display: grid;
-      grid-template-columns: 1fr 1.4fr 1fr;
+      grid-template-columns: 1fr 1fr;
       gap: 8px;
       padding: 14px 18px 0;
       background: var(--warm-white);
@@ -2161,12 +2161,12 @@
         <div class="stat-label">Sessões</div>
       </div>
       <div class="profile-stat">
-        <div class="stat-num" id="ps-receita">R$ 0,00</div>
-        <div class="stat-label">Receita Total</div>
-      </div>
-      <div class="profile-stat">
         <div class="stat-num" id="ps-receber">R$ 0,00</div>
         <div class="stat-label">Receita a Receber</div>
+      </div>
+      <div class="profile-stat" style="grid-column:1/-1">
+        <div class="stat-num" id="ps-receita">R$ 0,00</div>
+        <div class="stat-label">Receita Total</div>
       </div>
     </div>
     <div class="profile-tabs">
