@@ -3450,6 +3450,8 @@
         updateSyncDot('error');
         if (item.retries < 5) {
           setTimeout(() => { _syncQueue.push({ ...item, retries: item.retries + 1 }); _processSyncQueue(); }, 30000);
+        } else {
+          showToast('Não foi possível sincronizar: ' + (e?.message || 'erro de conexão'), 'error');
         }
       }
       _syncing = false;
@@ -3478,16 +3480,20 @@
       } catch (e) { console.warn('Sync patient failed:', e); showToast('Erro de conexão ao sincronizar paciente.', 'error'); }
     }
 
-    async function syncSessionToSupabase(s) {
+    function syncSessionToSupabase(s) {
       if (!canSync()) return;
+      enqueueSync('session', () => pushSessionToSupabase(s));
+    }
+
+    async function pushSessionToSupabase(s) {
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) { enqueueSync('session', () => syncSessionToSupabase(s)); return; }
+        if (!session) throw new Error('Sessão expirada');
         const p = db.patients.find(x => x.id === s.patientId);
         if (p) {
           const { data: existing } = await supabaseClient.from('patients').select('id').eq('id', p.id).maybeSingle();
           if (!existing) {
-            await supabaseClient.from('patients').upsert({
+            const { error: perr } = await supabaseClient.from('patients').upsert({
               id: p.id, name: p.name, birth: p.birth, age: p.age,
               sex: p.sex, diag: p.diag, cpf: p.cpf, phone: p.phone,
               cep: p.cep, addr: p.addr, city: p.city, obs: p.obs,
@@ -3497,6 +3503,7 @@
               "createdAt": p.createdAt || new Date().toISOString(),
               "updatedAt": new Date().toISOString(),
             }, { onConflict: 'id' });
+            if (perr) throw perr;
           }
         }
         const payload = {
@@ -3514,18 +3521,12 @@
         if (s.userAgent) payload.user_agent = s.userAgent;
         if (s.token) payload.token = s.token;
         const { error } = await supabaseClient.from('sessions').upsert(payload, { onConflict: 'id' });
-        if (error) {
-          console.warn('Sync session error:', error);
-          if (error.message?.includes('row-level security')) {
-            enqueueSync('session', () => syncSessionToSupabase(s));
-          } else {
-            showToast('Erro ao sincronizar atendimento: ' + __authErr(error.message), 'error');
-            enqueueSync('session', () => syncSessionToSupabase(s));
-          }
-        } else {
-          updateSyncDot(_syncQueue.length ? 'pending' : 'ok');
-        }
-      } catch (e) { console.warn('Sync session failed:', e); enqueueSync('session', () => syncSessionToSupabase(s)); }
+
+        if (error) throw error;
+      } catch (e) {
+        console.warn('Sync session error:', e);
+        throw e;
+      }
     }
 
     async function pullFromSupabase() {
