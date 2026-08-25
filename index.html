@@ -2231,612 +2231,615 @@
           <div class="form-group" style="grid-column:1/-1"><label class="form-label">Freq. Cardíaca</label><input
               type="number" class="form-input" id="f-fc" placeholder="72">
             <div class="vital-unit">bpm</div>
+            <div class="form-group" style="grid-column:1/-1"><label class="form-label">Ausculta Pulmonar</label><input
+                type="number" class="form-input" id="f-fc" placeholder="72">
+            </div>
           </div>
         </div>
-      </div>
-      <div class="form-section">
-        <div class="form-section-title">Escala de Dor (EVA)</div>
-        <div class="pain-scale" id="pain-scale"></div>
-      </div>
-      <div class="form-section">
-        <div class="form-section-title">Procedimentos Realizados</div>
-        <div class="proc-tags" id="proc-tags">
-          <button class="proc-tag" onclick="toggleProc(this)">Cinesioterapia</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Alongamento</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Fortalecimento</button>
-          <button class="proc-tag" onclick="toggleProc(this)">TENS</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Ultrassom</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Massoterapia</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Bandagem</button>
-          <button class="proc-tag" onclick="toggleProc(this)">RPG</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Pilates</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Neurodesenv.</button>
+        <div class="form-section">
+          <div class="form-section-title">Escala de Dor (EVA)</div>
+          <div class="pain-scale" id="pain-scale"></div>
         </div>
+        <div class="form-section">
+          <div class="form-section-title">Procedimentos Realizados</div>
+          <div class="proc-tags" id="proc-tags">
+            <button class="proc-tag" onclick="toggleProc(this)">Cinesioterapia</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Alongamento</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Fortalecimento</button>
+            <button class="proc-tag" onclick="toggleProc(this)">TENS</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Ultrassom</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Massoterapia</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Bandagem</button>
+            <button class="proc-tag" onclick="toggleProc(this)">RPG</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Pilates</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Neurodesenv.</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Exerc. Respiratório</button>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Observações</div>
+          <textarea class="form-textarea" id="f-obs" placeholder="Plano para próxima sessão..."></textarea>
+        </div>
+        <button class="btn-save" id="btn-save" onclick="saveSession()">💾 Salvar Atendimento</button>
+        <div style="height:28px"></div>
       </div>
-      <div class="form-section">
-        <div class="form-section-title">Observações</div>
-        <textarea class="form-textarea" id="f-obs" placeholder="Plano para próxima sessão..."></textarea>
-      </div>
-      <button class="btn-save" id="btn-save" onclick="saveSession()">💾 Salvar Atendimento</button>
-      <div style="height:28px"></div>
     </div>
-  </div>
 
-  <!-- ══ ASSINATURA ══ -->
-  <div id="sign" class="screen">
-    <div class="topbar" style="justify-content:center">
-      <div class="topbar-title" style="text-align:center;flex:none">Confirmação de Atendimento</div>
+    <!-- ══ ASSINATURA ══ -->
+    <div id="sign" class="screen">
+      <div class="topbar" style="justify-content:center">
+        <div class="topbar-title" style="text-align:center;flex:none">Confirmação de Atendimento</div>
+      </div>
+      <div class="sign-body" id="sign-body">
+        <div class="sign-logo">Fisio<span>Home</span></div>
+        <div class="sign-divider"></div>
+        <div class="sign-card" id="sign-card"></div>
+        <div class="stamp-box" id="stamp-box"></div>
+        <div class="sign-note">Confirme e envie o comprovante para o WhatsApp do paciente.</div>
+        <div style="height:10px"></div>
+        <button class="btn-confirm" id="btn-confirm-sign" onclick="confirmSign()">Confirmar Atendimento</button>
+      </div>
+      <div class="sign-ok" id="sign-ok" style="display:none">
+        <div class="sign-ok-icon">✅</div>
+        <h2>Atendimento confirmado!</h2>
+        <p>Assinado e registrado com sucesso.</p>
+        <button onclick="bootDash()"
+          style="margin-top:28px;padding:14px 36px;background:linear-gradient(135deg,var(--green-light),var(--green-deep));color:#fff;border:none;border-radius:50px;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(10,92,82,.3);transition:.2s"
+          onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">🏠 Voltar ao
+          início</button>
+      </div>
     </div>
-    <div class="sign-body" id="sign-body">
-      <div class="sign-logo">Fisio<span>Home</span></div>
-      <div class="sign-divider"></div>
-      <div class="sign-card" id="sign-card"></div>
-      <div class="stamp-box" id="stamp-box"></div>
-      <div class="sign-note">Confirme e envie o comprovante para o WhatsApp do paciente.</div>
-      <div style="height:10px"></div>
-      <button class="btn-confirm" id="btn-confirm-sign" onclick="confirmSign()">Confirmar Atendimento</button>
-    </div>
-    <div class="sign-ok" id="sign-ok" style="display:none">
-      <div class="sign-ok-icon">✅</div>
-      <h2>Atendimento confirmado!</h2>
-      <p>Assinado e registrado com sucesso.</p>
-      <button onclick="bootDash()"
-        style="margin-top:28px;padding:14px 36px;background:linear-gradient(135deg,var(--green-light),var(--green-deep));color:#fff;border:none;border-radius:50px;font-family:'Nunito',sans-serif;font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 18px rgba(10,92,82,.3);transition:.2s"
-        onmouseover="this.style.transform='translateY(-1px)'" onmouseout="this.style.transform=''">🏠 Voltar ao
-        início</button>
-    </div>
-  </div>
 
-  <!-- ══ MODAL NOVO PACIENTE ══ -->
-  <div class="modal-overlay" id="modal-new" onclick="closeMO(event,'modal-new')">
-    <div class="modal">
-      <div class="modal-title">Novo Paciente</div>
-      <div class="modal-sub">Preencha os dados cadastrais</div>
-      <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input"
-          id="np-name" placeholder="Maria Aparecida Silva"></div>
-      <div class="grid2">
-        <div class="form-group"><label class="form-label">Data de Nascimento *</label><input type="date"
-            class="form-input" id="np-birth" onchange="calcAgeFromBirth('np-birth','np-age')"></div>
-        <div class="form-group"><label class="form-label">Idade</label><input type="text" class="form-input" id="np-age"
-            readonly style="background:var(--border);cursor:not-allowed"></div>
-      </div>
-      <div class="grid2">
-        <div class="form-group"><label class="form-label">Sexo</label><select class="form-select" id="np-sex">
-            <option value="">—</option>
-            <option>Feminino</option>
-            <option>Masculino</option>
-          </select></div>
-        <div class="form-group"><label class="form-label">CEP</label><input type="text" class="form-input" id="np-cep"
-            placeholder="74000-000" maxlength="9" oninput="maskCEP(this); buscaCEP(this,'np-addr','np-city')"></div>
-      </div>
-      <div class="form-group"><label class="form-label">Diagnóstico / CID *</label><input type="text" class="form-input"
-          id="np-diag" placeholder="AVC isquêmico / I63"></div>
-      <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="np-cpf"
-          placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
-      <div class="form-group"><label class="form-label">WhatsApp</label><input type="tel" class="form-input"
-          id="np-phone" placeholder="(62) 99999-9999"></div>
-      <div class="form-group"><label class="form-label">Cidade / UF</label><input type="text" class="form-input"
-          id="np-city" placeholder="Goiânia / GO"></div>
-      <div class="form-group"><label class="form-label">Endereço</label><input type="text" class="form-input"
-          id="np-addr" placeholder="Rua, número, bairro"></div>
-      <div class="form-group"><label class="form-label">Observação inicial</label><input type="text" class="form-input"
-          id="np-obs" placeholder="Ex: frágil, usa andador..."></div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeModal('modal-new')">Cancelar</button>
-        <button class="btn-primary" onclick="saveNewPatient()">Cadastrar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ MODAL EDITAR PACIENTE ══ -->
-  <div class="modal-overlay" id="modal-edit" onclick="closeMO(event,'modal-edit')">
-    <div class="modal">
-      <div class="modal-title">Editar Paciente</div>
-      <div class="modal-sub">Atualize os dados cadastrais</div>
-      <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input"
-          id="ep-name"></div>
-      <div class="grid2">
-        <div class="form-group"><label class="form-label">Data de Nascimento *</label><input type="date"
-            class="form-input" id="ep-birth" onchange="calcAgeFromBirth('ep-birth','ep-age')"></div>
-        <div class="form-group"><label class="form-label">Idade</label><input type="text" class="form-input" id="ep-age"
-            readonly style="background:var(--border);cursor:not-allowed"></div>
-      </div>
-      <div class="grid2">
-        <div class="form-group"><label class="form-label">Sexo</label><select class="form-select" id="ep-sex">
-            <option value="">—</option>
-            <option>Feminino</option>
-            <option>Masculino</option>
-          </select></div>
-        <div class="form-group"><label class="form-label">CEP</label><input type="text" class="form-input" id="ep-cep"
-            placeholder="74000-000" maxlength="9" oninput="maskCEP(this); buscaCEP(this,'ep-addr','ep-city')"></div>
-      </div>
-      <div class="form-group"><label class="form-label">Diagnóstico / CID *</label><input type="text" class="form-input"
-          id="ep-diag"></div>
-      <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="ep-cpf"
-          maxlength="14" oninput="maskCPF(this)"></div>
-      <div class="form-group"><label class="form-label">WhatsApp</label><input type="tel" class="form-input"
-          id="ep-phone"></div>
-      <div class="form-group"><label class="form-label">Cidade / UF</label><input type="text" class="form-input"
-          id="ep-city" placeholder="Goiânia / GO"></div>
-      <div class="form-group"><label class="form-label">Endereço</label><input type="text" class="form-input"
-          id="ep-addr"></div>
-      <div class="form-group"><label class="form-label">Observação</label><input type="text" class="form-input"
-          id="ep-obs"></div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeModal('modal-edit')">Cancelar</button>
-        <button class="btn-primary" onclick="saveEditPatient()">Salvar alterações</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ MODAL LOGOUT ══ -->
-  <div class="modal-overlay" id="modal-logout" onclick="closeMO(event,'modal-logout')">
-    <div class="modal" style="text-align:center">
-      <div style="font-size:2.5rem;margin-bottom:12px">🚪</div>
-      <div class="modal-title" style="text-align:center">Sair da conta?</div>
-      <div class="modal-sub" style="text-align:center">Seus dados ficam salvos. Você pode entrar novamente a qualquer
-        momento.</div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeModal('modal-logout')">Cancelar</button>
-        <button
-          style="flex:2;padding:13px;background:linear-gradient(135deg,#c0392b,#922b21);color:#fff;border:none;border-radius:11px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer"
-          onclick="confirmLogout()">Sim, sair</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ MODAL SELECIONAR PACIENTE ══ -->
-  <div class="modal-overlay" id="modal-select" onclick="closeMO(event,'modal-select')">
-    <div class="modal">
-      <div class="modal-title">Novo Atendimento</div>
-      <div class="modal-sub">Selecione o paciente que será atendido</div>
-      <div class="select-search">
-        <span style="color:var(--soft)">🔍</span>
-        <input type="text" id="sp-search" placeholder="Buscar paciente..." oninput="filterSelectList()">
-      </div>
-      <div class="select-patient-list" id="sp-list"></div>
-      <div style="margin-top:14px">
-        <button class="btn-cancel" style="width:100%" onclick="closeModal('modal-select')">Cancelar</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ MODAL CRIAR USUÁRIO (admin) ══ -->
-  <div class="modal-overlay" id="modal-create-user" onclick="closeMO(event,'modal-create-user')">
-    <div class="modal">
-      <div class="modal-title">Criar Usuário</div>
-      <div class="modal-sub">Cria uma nova conta de acesso ao FisioHome</div>
-      <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input"
-          id="cu-name" placeholder="Nome do profissional"></div>
-      <div class="form-group"><label class="form-label">E-mail *</label><input type="email" class="form-input"
-          id="cu-email" placeholder="email@provedor.com"></div>
-      <div class="grid2">
-        <div class="form-group"><label class="form-label">Telefone / WhatsApp</label><input type="tel"
-            class="form-input" id="cu-phone" placeholder="(62) 99999-9999"></div>
-        <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="cu-cpf"
+    <!-- ══ MODAL NOVO PACIENTE ══ -->
+    <div class="modal-overlay" id="modal-new" onclick="closeMO(event,'modal-new')">
+      <div class="modal">
+        <div class="modal-title">Novo Paciente</div>
+        <div class="modal-sub">Preencha os dados cadastrais</div>
+        <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input"
+            id="np-name" placeholder="Maria Aparecida Silva"></div>
+        <div class="grid2">
+          <div class="form-group"><label class="form-label">Data de Nascimento *</label><input type="date"
+              class="form-input" id="np-birth" onchange="calcAgeFromBirth('np-birth','np-age')"></div>
+          <div class="form-group"><label class="form-label">Idade</label><input type="text" class="form-input"
+              id="np-age" readonly style="background:var(--border);cursor:not-allowed"></div>
+        </div>
+        <div class="grid2">
+          <div class="form-group"><label class="form-label">Sexo</label><select class="form-select" id="np-sex">
+              <option value="">—</option>
+              <option>Feminino</option>
+              <option>Masculino</option>
+            </select></div>
+          <div class="form-group"><label class="form-label">CEP</label><input type="text" class="form-input" id="np-cep"
+              placeholder="74000-000" maxlength="9" oninput="maskCEP(this); buscaCEP(this,'np-addr','np-city')"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Diagnóstico / CID *</label><input type="text"
+            class="form-input" id="np-diag" placeholder="AVC isquêmico / I63"></div>
+        <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="np-cpf"
             placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
-      </div>
-      <div
-        style="background:var(--gold-ultra);border:1px solid var(--border-gold);border-radius:10px;padding:14px;margin-bottom:14px">
-        <p style="font-size:.76rem;color:var(--mid)">Uma senha automática será gerada e enviada por e-mail ao usuário.
-        </p>
-      </div>
-      <div id="cu-result"
-        style="display:none;background:#dcf5e8;border:1px solid #1a7a4a;border-radius:10px;padding:14px;margin-bottom:14px">
-        <p style="font-size:.82rem;color:#1a7a4a;font-weight:700" id="cu-result-text"></p>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeModal('modal-create-user')">Cancelar</button>
-        <button class="btn-primary" id="cu-btn" onclick="createUserManual()">Criar Usuário</button>
-      </div>
-    </div>
-  </div>
-
-  <!-- ══ MODAL EDITAR SESSÃO ══ -->
-  <div class="modal-overlay" id="modal-edit-session" onclick="closeMO(event,'modal-edit-session')">
-    <div class="modal">
-      <div class="modal-title">Editar Atendimento</div>
-      <div class="modal-sub" id="edit-session-sub"></div>
-      <div class="form-section" style="margin-top:0">
-        <div class="form-section-title">Queixa / Evolução</div>
-        <textarea class="form-textarea" id="edit-evolucao" placeholder="Evolução do paciente..."></textarea>
-      </div>
-      <div class="form-section">
-        <div class="form-section-title">Procedimentos Realizados</div>
-        <div class="proc-tags" id="edit-proc-tags">
-          <button class="proc-tag" onclick="toggleProc(this)">Cinesioterapia</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Alongamento</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Fortalecimento</button>
-          <button class="proc-tag" onclick="toggleProc(this)">TENS</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Ultrassom</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Massoterapia</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Bandagem</button>
-          <button class="proc-tag" onclick="toggleProc(this)">RPG</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Pilates</button>
-          <button class="proc-tag" onclick="toggleProc(this)">Neurodesenv.</button>
+        <div class="form-group"><label class="form-label">WhatsApp</label><input type="tel" class="form-input"
+            id="np-phone" placeholder="(62) 99999-9999"></div>
+        <div class="form-group"><label class="form-label">Cidade / UF</label><input type="text" class="form-input"
+            id="np-city" placeholder="Goiânia / GO"></div>
+        <div class="form-group"><label class="form-label">Endereço</label><input type="text" class="form-input"
+            id="np-addr" placeholder="Rua, número, bairro"></div>
+        <div class="form-group"><label class="form-label">Observação inicial</label><input type="text"
+            class="form-input" id="np-obs" placeholder="Ex: frágil, usa andador..."></div>
+        <div class="modal-footer">
+          <button class="btn-cancel" onclick="closeModal('modal-new')">Cancelar</button>
+          <button class="btn-primary" onclick="saveNewPatient()">Cadastrar</button>
         </div>
       </div>
-      <div class="form-section">
-        <div class="form-section-title">Valor</div>
-        <div class="form-group"><input type="number" class="form-input" id="edit-value" placeholder="R$ 0,00"
-            step="0.01" min="0"></div>
-      </div>
-      <div class="form-section">
-        <div class="form-section-title">Observações</div>
-        <textarea class="form-textarea" id="edit-obs" placeholder="Observações do atendimento..."></textarea>
-      </div>
-      <div class="modal-footer">
-        <button class="btn-cancel" onclick="closeModal('modal-edit-session')">Cancelar</button>
-        <button class="btn-primary" onclick="saveSessionEdit()">💾 Salvar</button>
+    </div>
+
+    <!-- ══ MODAL EDITAR PACIENTE ══ -->
+    <div class="modal-overlay" id="modal-edit" onclick="closeMO(event,'modal-edit')">
+      <div class="modal">
+        <div class="modal-title">Editar Paciente</div>
+        <div class="modal-sub">Atualize os dados cadastrais</div>
+        <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input"
+            id="ep-name"></div>
+        <div class="grid2">
+          <div class="form-group"><label class="form-label">Data de Nascimento *</label><input type="date"
+              class="form-input" id="ep-birth" onchange="calcAgeFromBirth('ep-birth','ep-age')"></div>
+          <div class="form-group"><label class="form-label">Idade</label><input type="text" class="form-input"
+              id="ep-age" readonly style="background:var(--border);cursor:not-allowed"></div>
+        </div>
+        <div class="grid2">
+          <div class="form-group"><label class="form-label">Sexo</label><select class="form-select" id="ep-sex">
+              <option value="">—</option>
+              <option>Feminino</option>
+              <option>Masculino</option>
+            </select></div>
+          <div class="form-group"><label class="form-label">CEP</label><input type="text" class="form-input" id="ep-cep"
+              placeholder="74000-000" maxlength="9" oninput="maskCEP(this); buscaCEP(this,'ep-addr','ep-city')"></div>
+        </div>
+        <div class="form-group"><label class="form-label">Diagnóstico / CID *</label><input type="text"
+            class="form-input" id="ep-diag"></div>
+        <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="ep-cpf"
+            maxlength="14" oninput="maskCPF(this)"></div>
+        <div class="form-group"><label class="form-label">WhatsApp</label><input type="tel" class="form-input"
+            id="ep-phone"></div>
+        <div class="form-group"><label class="form-label">Cidade / UF</label><input type="text" class="form-input"
+            id="ep-city" placeholder="Goiânia / GO"></div>
+        <div class="form-group"><label class="form-label">Endereço</label><input type="text" class="form-input"
+            id="ep-addr"></div>
+        <div class="form-group"><label class="form-label">Observação</label><input type="text" class="form-input"
+            id="ep-obs"></div>
+        <div class="modal-footer">
+          <button class="btn-cancel" onclick="closeModal('modal-edit')">Cancelar</button>
+          <button class="btn-primary" onclick="saveEditPatient()">Salvar alterações</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- ══ TOAST CONTAINER ══ -->
-  <div class="toast-container" id="toast-container"></div>
+    <!-- ══ MODAL LOGOUT ══ -->
+    <div class="modal-overlay" id="modal-logout" onclick="closeMO(event,'modal-logout')">
+      <div class="modal" style="text-align:center">
+        <div style="font-size:2.5rem;margin-bottom:12px">🚪</div>
+        <div class="modal-title" style="text-align:center">Sair da conta?</div>
+        <div class="modal-sub" style="text-align:center">Seus dados ficam salvos. Você pode entrar novamente a qualquer
+          momento.</div>
+        <div class="modal-footer">
+          <button class="btn-cancel" onclick="closeModal('modal-logout')">Cancelar</button>
+          <button
+            style="flex:2;padding:13px;background:linear-gradient(135deg,#c0392b,#922b21);color:#fff;border:none;border-radius:11px;font-family:'Nunito',sans-serif;font-size:.88rem;font-weight:700;cursor:pointer"
+            onclick="confirmLogout()">Sim, sair</button>
+        </div>
+      </div>
+    </div>
 
-  <script>
-    // Chaves Supabase
-    const SUPABASE_URL = "https://alwwhsckljdmwcodnnti.supabase.co";
-    const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsd3doc2NrbGpkbXdjb2RubnRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODY1MTksImV4cCI6MjA5MDY2MjUxOX0.N-GL1B3ZyVDKwi1bAif40mszwmV8XBUC-yJ44Bxmhnk";
-    const SUPABASE_FUNCTIONS_URL = SUPABASE_URL + "/functions/v1";
-    const __initialHash = window.location.hash;
-    const __initialSearch = window.location.search; // PKCE may put params in query string
-    const __initialUrl = __initialHash + __initialSearch;
-    let supabaseClient = null;
-    let __recoveryFlow = false;
-    try {
-      const sdk = window.supabase;
-      if (sdk && typeof sdk.createClient === 'function') {
-        supabaseClient = sdk.createClient(SUPABASE_URL, SUPABASE_KEY);
-        window.__supa = supabaseClient;
-        supabaseClient.auth.onAuthStateChange((event) => {
-          if (event === 'PASSWORD_RECOVERY') __recoveryFlow = true;
-        });
-      }
-    } catch (e) { }
+    <!-- ══ MODAL SELECIONAR PACIENTE ══ -->
+    <div class="modal-overlay" id="modal-select" onclick="closeMO(event,'modal-select')">
+      <div class="modal">
+        <div class="modal-title">Novo Atendimento</div>
+        <div class="modal-sub">Selecione o paciente que será atendido</div>
+        <div class="select-search">
+          <span style="color:var(--soft)">🔍</span>
+          <input type="text" id="sp-search" placeholder="Buscar paciente..." oninput="filterSelectList()">
+        </div>
+        <div class="select-patient-list" id="sp-list"></div>
+        <div style="margin-top:14px">
+          <button class="btn-cancel" style="width:100%" onclick="closeModal('modal-select')">Cancelar</button>
+        </div>
+      </div>
+    </div>
 
-    // ── STATE ──
-    let db = JSON.parse(localStorage.getItem('fh_db') || '{"users":{},"patients":[],"sessions":[]}');
-    let currentUser = JSON.parse(localStorage.getItem('fh_user') || 'null');
-    let currentPatientId = null;
-    let selectedPain = null;
-    let savedSession = null;
-    let editingPatientId = null;
+    <!-- ══ MODAL CRIAR USUÁRIO (admin) ══ -->
+    <div class="modal-overlay" id="modal-create-user" onclick="closeMO(event,'modal-create-user')">
+      <div class="modal">
+        <div class="modal-title">Criar Usuário</div>
+        <div class="modal-sub">Cria uma nova conta de acesso ao FisioHome</div>
+        <div class="form-group"><label class="form-label">Nome completo *</label><input type="text" class="form-input"
+            id="cu-name" placeholder="Nome do profissional"></div>
+        <div class="form-group"><label class="form-label">E-mail *</label><input type="email" class="form-input"
+            id="cu-email" placeholder="email@provedor.com"></div>
+        <div class="grid2">
+          <div class="form-group"><label class="form-label">Telefone / WhatsApp</label><input type="tel"
+              class="form-input" id="cu-phone" placeholder="(62) 99999-9999"></div>
+          <div class="form-group"><label class="form-label">CPF</label><input type="text" class="form-input" id="cu-cpf"
+              placeholder="000.000.000-00" maxlength="14" oninput="maskCPF(this)"></div>
+        </div>
+        <div
+          style="background:var(--gold-ultra);border:1px solid var(--border-gold);border-radius:10px;padding:14px;margin-bottom:14px">
+          <p style="font-size:.76rem;color:var(--mid)">Uma senha automática será gerada e enviada por e-mail ao usuário.
+          </p>
+        </div>
+        <div id="cu-result"
+          style="display:none;background:#dcf5e8;border:1px solid #1a7a4a;border-radius:10px;padding:14px;margin-bottom:14px">
+          <p style="font-size:.82rem;color:#1a7a4a;font-weight:700" id="cu-result-text"></p>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" onclick="closeModal('modal-create-user')">Cancelar</button>
+          <button class="btn-primary" id="cu-btn" onclick="createUserManual()">Criar Usuário</button>
+        </div>
+      </div>
+    </div>
 
-    function uuid() { try { if (crypto.randomUUID) return crypto.randomUUID(); } catch (e) { } return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); }); }
-    function saveDB() { localStorage.setItem('fh_db', JSON.stringify(db)); }
-    function saveUser(u) { currentUser = u; localStorage.setItem('fh_user', JSON.stringify(u)); }
+    <!-- ══ MODAL EDITAR SESSÃO ══ -->
+    <div class="modal-overlay" id="modal-edit-session" onclick="closeMO(event,'modal-edit-session')">
+      <div class="modal">
+        <div class="modal-title">Editar Atendimento</div>
+        <div class="modal-sub" id="edit-session-sub"></div>
+        <div class="form-section" style="margin-top:0">
+          <div class="form-section-title">Queixa / Evolução</div>
+          <textarea class="form-textarea" id="edit-evolucao" placeholder="Evolução do paciente..."></textarea>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Procedimentos Realizados</div>
+          <div class="proc-tags" id="edit-proc-tags">
+            <button class="proc-tag" onclick="toggleProc(this)">Cinesioterapia</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Alongamento</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Fortalecimento</button>
+            <button class="proc-tag" onclick="toggleProc(this)">TENS</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Ultrassom</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Massoterapia</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Bandagem</button>
+            <button class="proc-tag" onclick="toggleProc(this)">RPG</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Pilates</button>
+            <button class="proc-tag" onclick="toggleProc(this)">Neurodesenv.</button>
+          </div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Valor</div>
+          <div class="form-group"><input type="number" class="form-input" id="edit-value" placeholder="R$ 0,00"
+              step="0.01" min="0"></div>
+        </div>
+        <div class="form-section">
+          <div class="form-section-title">Observações</div>
+          <textarea class="form-textarea" id="edit-obs" placeholder="Observações do atendimento..."></textarea>
+        </div>
+        <div class="modal-footer">
+          <button class="btn-cancel" onclick="closeModal('modal-edit-session')">Cancelar</button>
+          <button class="btn-primary" onclick="saveSessionEdit()">💾 Salvar</button>
+        </div>
+      </div>
+    </div>
 
-    // ── TOAST ──
-    function showToast(msg, type = 'success') {
-      const container = document.getElementById('toast-container');
-      if (!container) return;
-      const el = document.createElement('div');
-      el.className = `toast toast-${type}`;
-      el.textContent = msg;
-      container.appendChild(el);
-      setTimeout(() => { el.style.opacity = '0'; el.style.transition = '.3s'; setTimeout(() => el.remove(), 300); }, 4000);
-    }
+    <!-- ══ TOAST CONTAINER ══ -->
+    <div class="toast-container" id="toast-container"></div>
 
-    // ── IS ADMIN ──
-    function isAdmin() {
-      return currentUser?.role === 'admin';
-    }
-
-    // ── SCREENS ──
-    function showScreen(id) {
-      document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      window.scrollTo(0, 0);
-    }
-    function navTo(id) {
-      showScreen(id);
-      if (id === 'dash') { pullFromSupabase().then(() => { updateStats(); renderPatients(); renderTable(); }); }
-    }
-
-    function doLogout() {
-      document.getElementById('modal-logout').classList.add('open');
-    }
-    function confirmLogout() {
-      localStorage.removeItem('fh_user');
-      currentUser = null;
-      if (supabaseClient) { supabaseClient.auth.signOut().catch(() => { }); }
-      closeModal('modal-logout');
-      showScreen('login');
-    }
-
-    // ── AUTH ──
-    const __authErrs = {
-      'New password should be different from the old password.': 'A nova senha deve ser diferente da senha anterior.',
-      'Invalid login credentials': 'E-mail ou senha incorretos.',
-      'Email not confirmed': 'E-mail não confirmado.',
-      'User already registered': 'E-mail já cadastrado.',
-      'Password should be at least 6 characters': 'A senha deve ter no mínimo 6 caracteres.',
-      'rate limit exceeded': 'Muitas tentativas. Aguarde alguns minutos.',
-      'Email link is invalid or has expired': 'Link inválido ou expirado. Solicite um novo.',
-    };
-    function __authErr(msg) { return __authErrs[msg] || __authErrs[Object.keys(__authErrs).find(k => msg?.includes(k))] || msg; }
-
-    function showErr(msg) { const el = document.getElementById('login-err'); el.textContent = msg; el.style.display = 'block'; }
-
-    function showForgotScreen() {
-      const email = document.getElementById('l-email').value.trim();
-      if (email) document.getElementById('fp-email').value = email;
-      document.getElementById('forgot-err').style.display = 'none';
-      showScreen('forgot-pw');
-    }
-    async function sendResetEmail() {
-      const email = document.getElementById('fp-email').value.trim().toLowerCase();
-      const errEl = document.getElementById('forgot-err');
-      if (!email) { errEl.textContent = 'Informe seu e-mail.'; errEl.style.display = 'block'; return; }
-      if (!supabaseClient) { errEl.textContent = 'Sem conexão com o servidor.'; errEl.style.display = 'block'; return; }
+    <script>
+      // Chaves Supabase
+      const SUPABASE_URL = "https://alwwhsckljdmwcodnnti.supabase.co";
+      const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFsd3doc2NrbGpkbXdjb2RubnRpIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUwODY1MTksImV4cCI6MjA5MDY2MjUxOX0.N-GL1B3ZyVDKwi1bAif40mszwmV8XBUC-yJ44Bxmhnk";
+      const SUPABASE_FUNCTIONS_URL = SUPABASE_URL + "/functions/v1";
+      const __initialHash = window.location.hash;
+      const __initialSearch = window.location.search; // PKCE may put params in query string
+      const __initialUrl = __initialHash + __initialSearch;
+      let supabaseClient = null;
+      let __recoveryFlow = false;
       try {
-        const { data: exists, error: checkErr } = await supabaseClient.rpc('check_email_exists', { p_email: email });
-        if (checkErr || !exists) { errEl.textContent = 'E-mail não encontrado. Verifique se digitou corretamente.'; errEl.style.display = 'block'; return; }
-        const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
-          redirectTo: window.location.origin + window.location.pathname,
-        });
-        if (error) throw error;
-        showToast('Link de recuperação enviado! Verifique seu e-mail.', 'success');
-        showScreen('login');
-      } catch (err) {
-        errEl.textContent = __authErr(err.message); errEl.style.display = 'block';
-      }
-    }
-    async function doSetNewPassword() {
-      const pass = document.getElementById('rp-pass').value;
-      const confirm = document.getElementById('rp-confirm').value;
-      const errEl = document.getElementById('recover-err');
-      if (!pass || pass.length < 6) { errEl.textContent = 'A senha deve ter no mínimo 6 caracteres.'; errEl.style.display = 'block'; return; }
-      if (pass !== confirm) { errEl.textContent = 'As senhas não conferem.'; errEl.style.display = 'block'; return; }
-      try {
-        const { error } = await supabaseClient.auth.updateUser({ password: pass });
-        if (error) throw error;
-        showToast('Senha redefinida com sucesso! Faça login.', 'success');
-        await supabaseClient.auth.signOut().catch(() => { });
-        showScreen('login');
-      } catch (err) {
-        errEl.textContent = __authErr(err.message); errEl.style.display = 'block';
-      }
-    }
-
-    async function doLogin() {
-      const email = document.getElementById('l-email').value.trim().toLowerCase();
-      const pass = document.getElementById('l-pass').value;
-      if (!email || !pass) { showErr('Preencha e-mail e senha.'); return; }
-
-      let userFound = null;
-      let profileData = null;
-
-      // 1. Tenta autenticar via Supabase Auth
-      if (supabaseClient) {
-        try {
-          const { data, error } = await supabaseClient.auth.signInWithPassword({
-            email: email, password: pass,
+        const sdk = window.supabase;
+        if (sdk && typeof sdk.createClient === 'function') {
+          supabaseClient = sdk.createClient(SUPABASE_URL, SUPABASE_KEY);
+          window.__supa = supabaseClient;
+          supabaseClient.auth.onAuthStateChange((event) => {
+            if (event === 'PASSWORD_RECOVERY') __recoveryFlow = true;
           });
+        }
+      } catch (e) { }
 
-          if (error) {
-            showErr(__authErr(error.message));
-            return;
-          }
+      // ── STATE ──
+      let db = JSON.parse(localStorage.getItem('fh_db') || '{"users":{},"patients":[],"sessions":[]}');
+      let currentUser = JSON.parse(localStorage.getItem('fh_user') || 'null');
+      let currentPatientId = null;
+      let selectedPain = null;
+      let savedSession = null;
+      let editingPatientId = null;
 
-          if (data && data.user) {
-            // Try to fetch profile from Supabase profiles table
-            try {
-              const { data: prof } = await supabaseClient
-                .from('profiles')
-                .select('*')
-                .eq('id', data.user.id)
-                .single();
-              if (prof) profileData = prof;
-            } catch (_) { /* profile table may not exist yet, fallback */ }
+      function uuid() { try { if (crypto.randomUUID) return crypto.randomUUID(); } catch (e) { } return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => { const r = Math.random() * 16 | 0; return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16); }); }
+      function saveDB() { localStorage.setItem('fh_db', JSON.stringify(db)); }
+      function saveUser(u) { currentUser = u; localStorage.setItem('fh_user', JSON.stringify(u)); }
 
-            if (profileData) {
-              // User exists in Supabase profiles — use that data
-              userFound = {
-                email: profileData.email,
-                name: profileData.name,
-                supabaseId: data.user.id,
-                sex: profileData.sex || '',
-                crp: profileData.crp || '',
-                spec: profileData.spec || '',
-                tel: profileData.phone || '',
-                addr: profileData.addr || '',
-                cpf: profileData.cpf || '',
-                role: profileData.role || 'user',
-                pass: btoa(pass),
-              };
-            } else {
-              // Fallback to localStorage
-              let localUser = db.users[email];
-              if (!localUser) {
-                db.users[email] = {
-                  name: data.user.user_metadata.nome || "Fisioterapeuta",
-                  pass: btoa(pass), supabaseId: data.user.id,
-                  sex: '', crp: '', spec: '', tel: '', addr: ''
-                };
-                saveDB();
-                localUser = db.users[email];
-              }
-              if (!localUser.supabaseId) localUser.supabaseId = data.user.id;
-              userFound = { email, ...localUser };
-            }
-          }
+      // ── TOAST ──
+      function showToast(msg, type = 'success') {
+        const container = document.getElementById('toast-container');
+        if (!container) return;
+        const el = document.createElement('div');
+        el.className = `toast toast-${type}`;
+        el.textContent = msg;
+        container.appendChild(el);
+        setTimeout(() => { el.style.opacity = '0'; el.style.transition = '.3s'; setTimeout(() => el.remove(), 300); }, 4000);
+      }
+
+      // ── IS ADMIN ──
+      function isAdmin() {
+        return currentUser?.role === 'admin';
+      }
+
+      // ── SCREENS ──
+      function showScreen(id) {
+        document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        window.scrollTo(0, 0);
+      }
+      function navTo(id) {
+        showScreen(id);
+        if (id === 'dash') { pullFromSupabase().then(() => { updateStats(); renderPatients(); renderTable(); }); }
+      }
+
+      function doLogout() {
+        document.getElementById('modal-logout').classList.add('open');
+      }
+      function confirmLogout() {
+        localStorage.removeItem('fh_user');
+        currentUser = null;
+        if (supabaseClient) { supabaseClient.auth.signOut().catch(() => { }); }
+        closeModal('modal-logout');
+        showScreen('login');
+      }
+
+      // ── AUTH ──
+      const __authErrs = {
+        'New password should be different from the old password.': 'A nova senha deve ser diferente da senha anterior.',
+        'Invalid login credentials': 'E-mail ou senha incorretos.',
+        'Email not confirmed': 'E-mail não confirmado.',
+        'User already registered': 'E-mail já cadastrado.',
+        'Password should be at least 6 characters': 'A senha deve ter no mínimo 6 caracteres.',
+        'rate limit exceeded': 'Muitas tentativas. Aguarde alguns minutos.',
+        'Email link is invalid or has expired': 'Link inválido ou expirado. Solicite um novo.',
+      };
+      function __authErr(msg) { return __authErrs[msg] || __authErrs[Object.keys(__authErrs).find(k => msg?.includes(k))] || msg; }
+
+      function showErr(msg) { const el = document.getElementById('login-err'); el.textContent = msg; el.style.display = 'block'; }
+
+      function showForgotScreen() {
+        const email = document.getElementById('l-email').value.trim();
+        if (email) document.getElementById('fp-email').value = email;
+        document.getElementById('forgot-err').style.display = 'none';
+        showScreen('forgot-pw');
+      }
+      async function sendResetEmail() {
+        const email = document.getElementById('fp-email').value.trim().toLowerCase();
+        const errEl = document.getElementById('forgot-err');
+        if (!email) { errEl.textContent = 'Informe seu e-mail.'; errEl.style.display = 'block'; return; }
+        if (!supabaseClient) { errEl.textContent = 'Sem conexão com o servidor.'; errEl.style.display = 'block'; return; }
+        try {
+          const { data: exists, error: checkErr } = await supabaseClient.rpc('check_email_exists', { p_email: email });
+          if (checkErr || !exists) { errEl.textContent = 'E-mail não encontrado. Verifique se digitou corretamente.'; errEl.style.display = 'block'; return; }
+          const { error } = await supabaseClient.auth.resetPasswordForEmail(email, {
+            redirectTo: window.location.origin + window.location.pathname,
+          });
+          if (error) throw error;
+          showToast('Link de recuperação enviado! Verifique seu e-mail.', 'success');
+          showScreen('login');
         } catch (err) {
-          showErr('Erro de conexão. Verifique sua internet.');
-          return;
+          errEl.textContent = __authErr(err.message); errEl.style.display = 'block';
+        }
+      }
+      async function doSetNewPassword() {
+        const pass = document.getElementById('rp-pass').value;
+        const confirm = document.getElementById('rp-confirm').value;
+        const errEl = document.getElementById('recover-err');
+        if (!pass || pass.length < 6) { errEl.textContent = 'A senha deve ter no mínimo 6 caracteres.'; errEl.style.display = 'block'; return; }
+        if (pass !== confirm) { errEl.textContent = 'As senhas não conferem.'; errEl.style.display = 'block'; return; }
+        try {
+          const { error } = await supabaseClient.auth.updateUser({ password: pass });
+          if (error) throw error;
+          showToast('Senha redefinida com sucesso! Faça login.', 'success');
+          await supabaseClient.auth.signOut().catch(() => { });
+          showScreen('login');
+        } catch (err) {
+          errEl.textContent = __authErr(err.message); errEl.style.display = 'block';
         }
       }
 
-      if (userFound) {
-        migrateLocalUserId(userFound.email, userFound.supabaseId);
-        saveUser(userFound);
-        if (profileData) { bootDash(); }
-        else if (!userFound.name || !userFound.crp) { navToSetup(); }
-        else { bootDash(); }
-      } else {
-        showErr('E-mail ou senha incorretos.');
+      async function doLogin() {
+        const email = document.getElementById('l-email').value.trim().toLowerCase();
+        const pass = document.getElementById('l-pass').value;
+        if (!email || !pass) { showErr('Preencha e-mail e senha.'); return; }
+
+        let userFound = null;
+        let profileData = null;
+
+        // 1. Tenta autenticar via Supabase Auth
+        if (supabaseClient) {
+          try {
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+              email: email, password: pass,
+            });
+
+            if (error) {
+              showErr(__authErr(error.message));
+              return;
+            }
+
+            if (data && data.user) {
+              // Try to fetch profile from Supabase profiles table
+              try {
+                const { data: prof } = await supabaseClient
+                  .from('profiles')
+                  .select('*')
+                  .eq('id', data.user.id)
+                  .single();
+                if (prof) profileData = prof;
+              } catch (_) { /* profile table may not exist yet, fallback */ }
+
+              if (profileData) {
+                // User exists in Supabase profiles — use that data
+                userFound = {
+                  email: profileData.email,
+                  name: profileData.name,
+                  supabaseId: data.user.id,
+                  sex: profileData.sex || '',
+                  crp: profileData.crp || '',
+                  spec: profileData.spec || '',
+                  tel: profileData.phone || '',
+                  addr: profileData.addr || '',
+                  cpf: profileData.cpf || '',
+                  role: profileData.role || 'user',
+                  pass: btoa(pass),
+                };
+              } else {
+                // Fallback to localStorage
+                let localUser = db.users[email];
+                if (!localUser) {
+                  db.users[email] = {
+                    name: data.user.user_metadata.nome || "Fisioterapeuta",
+                    pass: btoa(pass), supabaseId: data.user.id,
+                    sex: '', crp: '', spec: '', tel: '', addr: ''
+                  };
+                  saveDB();
+                  localUser = db.users[email];
+                }
+                if (!localUser.supabaseId) localUser.supabaseId = data.user.id;
+                userFound = { email, ...localUser };
+              }
+            }
+          } catch (err) {
+            showErr('Erro de conexão. Verifique sua internet.');
+            return;
+          }
+        }
+
+        if (userFound) {
+          migrateLocalUserId(userFound.email, userFound.supabaseId);
+          saveUser(userFound);
+          if (profileData) { bootDash(); }
+          else if (!userFound.name || !userFound.crp) { navToSetup(); }
+          else { bootDash(); }
+        } else {
+          showErr('E-mail ou senha incorretos.');
+        }
       }
-    }
 
-    // ── SETUP ──
-    function navToSetup() {
-      showScreen('setup');
-      setTimeout(fillSetup, 50);
-    }
-
-    function fillSetup() {
-      const u = currentUser;
-      if (!u) return;
-      document.getElementById('s-name').value = u.name || '';
-      document.getElementById('s-sex').value = u.sex || '';
-      document.getElementById('s-crp').value = u.crp || '';
-      document.getElementById('s-spec').value = u.spec || '';
-      document.getElementById('s-tel').value = u.tel || '';
-      document.getElementById('s-addr').value = u.addr || '';
-      if (document.getElementById('s-cpf')) {
-        document.getElementById('s-cpf').value = u.cpf || '';
-      }
-      updateStampPreview();
-    }
-    ['s-name', 's-crp', 's-spec', 's-tel', 's-addr', 's-cpf'].forEach(id =>
-      document.getElementById(id).addEventListener('input', updateStampPreview)
-    );
-    function updateStampPreview() {
-      const n = v('s-name') || 'Dr(a). Nome'; const c = v('s-crp') || 'CREFITO-00/000000-F';
-      const sp = v('s-spec') || 'Fisioterapia'; const t = v('s-tel') || '(00) 00000-0000';
-      const a = v('s-addr') || 'Cidade – UF'; const cpf = document.getElementById('s-cpf')?.value.trim() || '000.000.000-00';
-      document.getElementById('stamp-preview').innerHTML = `<strong>${n}</strong><br>Fisioterapeuta – ${sp}<br>${c}<br>CPF: ${cpf}<br>${t}<br>${a}`;
-    }
-    function v(id) { return document.getElementById(id).value.trim(); }
-    async function saveSetup() {
-      const cpfVal = v('s-cpf'); const cpfClean = cpfVal.replace(/\D/g, '');
-      if (cpfClean.length !== 11) { alert('Por favor, informe um CPF válido com 11 dígitos.'); return; }
-      const crpVal = v('s-crp'); if (!crpVal) { alert('O preenchimento do CREFITO é obrigatório.'); return; }
-      const u = { name: v('s-name'), sex: v('s-sex'), crp: crpVal, spec: v('s-spec'), tel: v('s-tel'), addr: v('s-addr'), cpf: cpfVal, pass: currentUser.pass };
-      if (!u.name) { alert('Preencha seu nome.'); return; }
-      db.users[currentUser.email] = { ...db.users[currentUser.email], ...u };
-      saveDB(); saveUser({ email: currentUser.email, ...db.users[currentUser.email] });
-
-      // Sync profile to Supabase if available
-      if (supabaseClient && currentUser?.supabaseId) {
-        try {
-          await supabaseClient.from('profiles').update({
-            email: currentUser.email,
-            name: u.name, sex: u.sex, crp: crpVal, spec: u.spec, phone: u.tel,
-            addr: u.addr, cpf: cpfVal, role: currentUser.role || 'user',
-            updated_at: new Date().toISOString(),
-          }).eq('id', currentUser.supabaseId);
-        } catch (_) { /* profiles table may not exist */ }
+      // ── SETUP ──
+      function navToSetup() {
+        showScreen('setup');
+        setTimeout(fillSetup, 50);
       }
 
-      bootDash();
-    }
+      function fillSetup() {
+        const u = currentUser;
+        if (!u) return;
+        document.getElementById('s-name').value = u.name || '';
+        document.getElementById('s-sex').value = u.sex || '';
+        document.getElementById('s-crp').value = u.crp || '';
+        document.getElementById('s-spec').value = u.spec || '';
+        document.getElementById('s-tel').value = u.tel || '';
+        document.getElementById('s-addr').value = u.addr || '';
+        if (document.getElementById('s-cpf')) {
+          document.getElementById('s-cpf').value = u.cpf || '';
+        }
+        updateStampPreview();
+      }
+      ['s-name', 's-crp', 's-spec', 's-tel', 's-addr', 's-cpf'].forEach(id =>
+        document.getElementById(id).addEventListener('input', updateStampPreview)
+      );
+      function updateStampPreview() {
+        const n = v('s-name') || 'Dr(a). Nome'; const c = v('s-crp') || 'CREFITO-00/000000-F';
+        const sp = v('s-spec') || 'Fisioterapia'; const t = v('s-tel') || '(00) 00000-0000';
+        const a = v('s-addr') || 'Cidade – UF'; const cpf = document.getElementById('s-cpf')?.value.trim() || '000.000.000-00';
+        document.getElementById('stamp-preview').innerHTML = `<strong>${n}</strong><br>Fisioterapeuta – ${sp}<br>${c}<br>CPF: ${cpf}<br>${t}<br>${a}`;
+      }
+      function v(id) { return document.getElementById(id).value.trim(); }
+      async function saveSetup() {
+        const cpfVal = v('s-cpf'); const cpfClean = cpfVal.replace(/\D/g, '');
+        if (cpfClean.length !== 11) { alert('Por favor, informe um CPF válido com 11 dígitos.'); return; }
+        const crpVal = v('s-crp'); if (!crpVal) { alert('O preenchimento do CREFITO é obrigatório.'); return; }
+        const u = { name: v('s-name'), sex: v('s-sex'), crp: crpVal, spec: v('s-spec'), tel: v('s-tel'), addr: v('s-addr'), cpf: cpfVal, pass: currentUser.pass };
+        if (!u.name) { alert('Preencha seu nome.'); return; }
+        db.users[currentUser.email] = { ...db.users[currentUser.email], ...u };
+        saveDB(); saveUser({ email: currentUser.email, ...db.users[currentUser.email] });
 
-    function userId() { return currentUser?.supabaseId || currentUser?.email || ''; }
-    function professionalName() { const p = currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : ''; return p + (currentUser?.name || ''); }
-    function myPatients() {
-      const id = userId();
-      return db.patients.filter(p => p.usuario_id === id || (currentUser?.email && p.usuario_id === currentUser.email));
-    }
-    function mySessions() { return db.sessions.filter(s => myPatients().some(p => p.id === s.patientId)); }
+        // Sync profile to Supabase if available
+        if (supabaseClient && currentUser?.supabaseId) {
+          try {
+            await supabaseClient.from('profiles').update({
+              email: currentUser.email,
+              name: u.name, sex: u.sex, crp: crpVal, spec: u.spec, phone: u.tel,
+              addr: u.addr, cpf: cpfVal, role: currentUser.role || 'user',
+              updated_at: new Date().toISOString(),
+            }).eq('id', currentUser.supabaseId);
+          } catch (_) { /* profiles table may not exist */ }
+        }
 
-    function migrateLocalUserId(oldId, newId) {
-      if (!oldId || !newId || oldId === newId) return;
-      let changed = false;
-      db.patients.forEach(p => { if (p.usuario_id === oldId) { p.usuario_id = newId; changed = true; } });
-      if (changed) saveDB();
-    }
+        bootDash();
+      }
 
-    // ── DASHBOARD ──
-    function bootDash() {
-      const prefix = currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : '';
-      document.getElementById('dash-name').textContent = prefix + (currentUser.name || '—');
-      document.getElementById('dash-crp').textContent = currentUser.crp || '';
-      document.getElementById('dash-admin-btn').style.display = isAdmin() ? 'flex' : 'none';
-      pullFromSupabase().then(() => {
-        updateStats(); renderPatients(); renderTable();
-      });
-      showScreen('dash');
-    }
-    function updateStats() {
-      const now = new Date();
-      const today = now.toISOString().split('T')[0];
-      const month = today.slice(0, 7);
-      let list = myPatients();
-      if (patientDateFilter === 'today') list = list.filter(p => sessionsOf(p.id).some(s => s.date === today));
-      else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); list = list.filter(p => sessionsOf(p.id).some(s => new Date(s.date) >= w)); }
-      else if (patientDateFilter === 'month') list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(month)));
-      else if (patientDateFilter === 'year') list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(now.getFullYear().toString())));
-      document.getElementById('st-total').textContent = list.length;
-      const pIds = new Set(list.map(p => p.id));
-      let sessions = mySessions().filter(s => pIds.has(s.patientId));
-      if (patientDateFilter === 'today') sessions = sessions.filter(s => s.date === today);
-      else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); sessions = sessions.filter(s => new Date(s.date) >= w); }
-      else if (patientDateFilter === 'month') sessions = sessions.filter(s => s.date.startsWith(month));
-      else if (patientDateFilter === 'year') sessions = sessions.filter(s => s.date.startsWith(now.getFullYear().toString()));
-      document.getElementById('st-sessoes').textContent = sessions.length;
-      const totalReceita = sessions.reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
-      const receitaAReceber = sessions.filter(s => !s.paid).reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
-      document.getElementById('st-receita').textContent = 'R$ ' + totalReceita.toFixed(2).replace('.', ',');
-      document.getElementById('st-receber').textContent = 'R$ ' + receitaAReceber.toFixed(2).replace('.', ',');
-      if (document.getElementById('table-count'))
-        document.getElementById('table-count').textContent = list.length + ' pacientes';
-    }
-    function sessionsOf(pid) { return mySessions().filter(s => s.patientId === pid); }
+      function userId() { return currentUser?.supabaseId || currentUser?.email || ''; }
+      function professionalName() { const p = currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : ''; return p + (currentUser?.name || ''); }
+      function myPatients() {
+        const id = userId();
+        return db.patients.filter(p => p.usuario_id === id || (currentUser?.email && p.usuario_id === currentUser.email));
+      }
+      function mySessions() { return db.sessions.filter(s => myPatients().some(p => p.id === s.patientId)); }
 
-    let patientDateFilter = 'all';
-    let profileFilter = 'all';
+      function migrateLocalUserId(oldId, newId) {
+        if (!oldId || !newId || oldId === newId) return;
+        let changed = false;
+        db.patients.forEach(p => { if (p.usuario_id === oldId) { p.usuario_id = newId; changed = true; } });
+        if (changed) saveDB();
+      }
 
-    function updateProfileStats() {
-      const now = new Date();
-      const month = now.toISOString().slice(0, 7);
-      let sessions = sessionsOf(currentPatientId);
-      if (profileFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); sessions = sessions.filter(s => new Date(s.date) >= w); }
-      else if (profileFilter === 'month') sessions = sessions.filter(s => s.date.startsWith(month));
-      document.getElementById('ps-sessoes').textContent = sessions.length;
-      const total = sessions.reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
-      const receber = sessions.filter(s => !s.paid).reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
-      document.getElementById('ps-receita').textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
-      document.getElementById('ps-receber').textContent = 'R$ ' + receber.toFixed(2).replace('.', ',');
-    }
-    function setProfileFilter(f, btn) {
-      profileFilter = f;
-      document.querySelectorAll('#profile .profile-filter .filter-chip').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      updateProfileStats();
-      renderSessions();
-    }
+      // ── DASHBOARD ──
+      function bootDash() {
+        const prefix = currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : '';
+        document.getElementById('dash-name').textContent = prefix + (currentUser.name || '—');
+        document.getElementById('dash-crp').textContent = currentUser.crp || '';
+        document.getElementById('dash-admin-btn').style.display = isAdmin() ? 'flex' : 'none';
+        pullFromSupabase().then(() => {
+          updateStats(); renderPatients(); renderTable();
+        });
+        showScreen('dash');
+      }
+      function updateStats() {
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+        const month = today.slice(0, 7);
+        let list = myPatients();
+        if (patientDateFilter === 'today') list = list.filter(p => sessionsOf(p.id).some(s => s.date === today));
+        else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); list = list.filter(p => sessionsOf(p.id).some(s => new Date(s.date) >= w)); }
+        else if (patientDateFilter === 'month') list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(month)));
+        else if (patientDateFilter === 'year') list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(now.getFullYear().toString())));
+        document.getElementById('st-total').textContent = list.length;
+        const pIds = new Set(list.map(p => p.id));
+        let sessions = mySessions().filter(s => pIds.has(s.patientId));
+        if (patientDateFilter === 'today') sessions = sessions.filter(s => s.date === today);
+        else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); sessions = sessions.filter(s => new Date(s.date) >= w); }
+        else if (patientDateFilter === 'month') sessions = sessions.filter(s => s.date.startsWith(month));
+        else if (patientDateFilter === 'year') sessions = sessions.filter(s => s.date.startsWith(now.getFullYear().toString()));
+        document.getElementById('st-sessoes').textContent = sessions.length;
+        const totalReceita = sessions.reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
+        const receitaAReceber = sessions.filter(s => !s.paid).reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
+        document.getElementById('st-receita').textContent = 'R$ ' + totalReceita.toFixed(2).replace('.', ',');
+        document.getElementById('st-receber').textContent = 'R$ ' + receitaAReceber.toFixed(2).replace('.', ',');
+        if (document.getElementById('table-count'))
+          document.getElementById('table-count').textContent = list.length + ' pacientes';
+      }
+      function sessionsOf(pid) { return mySessions().filter(s => s.patientId === pid); }
 
-    function setPatientFilter(f, btn) {
-      patientDateFilter = f;
-      document.querySelectorAll('#dash .filter-chip').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      renderPatients();
-      updateStats();
-    }
+      let patientDateFilter = 'all';
+      let profileFilter = 'all';
 
-    function renderPatients() {
-      const now = new Date();
-      const today = now.toISOString().split('T')[0];
-      const month = today.slice(0, 7);
-      let list = myPatients();
-      if (patientDateFilter === 'today') { const t = today; list = list.filter(p => sessionsOf(p.id).some(s => s.date === t)); }
-      else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); list = list.filter(p => sessionsOf(p.id).some(s => new Date(s.date) >= w)); }
-      else if (patientDateFilter === 'month') { const m = month; list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(m))); }
-      else if (patientDateFilter === 'year') { const y = now.getFullYear().toString(); list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(y))); }
-      const q = document.getElementById('searchInput').value.toLowerCase();
-      if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.diag.toLowerCase().includes(q));
-      const el = document.getElementById('patient-list');
-      if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="icon">🗂️</div><p>' + (q ? 'Nenhum paciente encontrado' : 'Nenhum paciente cadastrado.<br>Toque em <strong>＋ Paciente</strong> para começar.') + '</p></div>'; return; }
-      el.innerHTML = list.map(p => {
-        let sc = sessionsOf(p.id);
-        if (patientDateFilter === 'today') sc = sc.filter(s => s.date === today);
-        else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); sc = sc.filter(s => new Date(s.date) >= w); }
-        else if (patientDateFilter === 'month') sc = sc.filter(s => s.date.startsWith(month));
-        else if (patientDateFilter === 'year') sc = sc.filter(s => s.date.startsWith(now.getFullYear().toString()));
-        return `
+      function updateProfileStats() {
+        const now = new Date();
+        const month = now.toISOString().slice(0, 7);
+        let sessions = sessionsOf(currentPatientId);
+        if (profileFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); sessions = sessions.filter(s => new Date(s.date) >= w); }
+        else if (profileFilter === 'month') sessions = sessions.filter(s => s.date.startsWith(month));
+        document.getElementById('ps-sessoes').textContent = sessions.length;
+        const total = sessions.reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
+        const receber = sessions.filter(s => !s.paid).reduce((sum, s) => sum + (parseFloat(s.value) || 0), 0);
+        document.getElementById('ps-receita').textContent = 'R$ ' + total.toFixed(2).replace('.', ',');
+        document.getElementById('ps-receber').textContent = 'R$ ' + receber.toFixed(2).replace('.', ',');
+      }
+      function setProfileFilter(f, btn) {
+        profileFilter = f;
+        document.querySelectorAll('#profile .profile-filter .filter-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updateProfileStats();
+        renderSessions();
+      }
+
+      function setPatientFilter(f, btn) {
+        patientDateFilter = f;
+        document.querySelectorAll('#dash .filter-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        renderPatients();
+        updateStats();
+      }
+
+      function renderPatients() {
+        const now = new Date();
+        const today = now.toISOString().split('T')[0];
+        const month = today.slice(0, 7);
+        let list = myPatients();
+        if (patientDateFilter === 'today') { const t = today; list = list.filter(p => sessionsOf(p.id).some(s => s.date === t)); }
+        else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); list = list.filter(p => sessionsOf(p.id).some(s => new Date(s.date) >= w)); }
+        else if (patientDateFilter === 'month') { const m = month; list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(m))); }
+        else if (patientDateFilter === 'year') { const y = now.getFullYear().toString(); list = list.filter(p => sessionsOf(p.id).some(s => s.date.startsWith(y))); }
+        const q = document.getElementById('searchInput').value.toLowerCase();
+        if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.diag.toLowerCase().includes(q));
+        const el = document.getElementById('patient-list');
+        if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="icon">🗂️</div><p>' + (q ? 'Nenhum paciente encontrado' : 'Nenhum paciente cadastrado.<br>Toque em <strong>＋ Paciente</strong> para começar.') + '</p></div>'; return; }
+        el.innerHTML = list.map(p => {
+          let sc = sessionsOf(p.id);
+          if (patientDateFilter === 'today') sc = sc.filter(s => s.date === today);
+          else if (patientDateFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); sc = sc.filter(s => new Date(s.date) >= w); }
+          else if (patientDateFilter === 'month') sc = sc.filter(s => s.date.startsWith(month));
+          else if (patientDateFilter === 'year') sc = sc.filter(s => s.date.startsWith(now.getFullYear().toString()));
+          return `
     <div class="swipe-wrap">
       <div class="swipe-reveal" onclick="deletePatient(${p.id})"><span>🗑️</span>Excluir</div>
       <div class="swipe-inner">
@@ -2854,69 +2857,69 @@
         </div>
       </div>
     </div>`}).join('');
-      el.querySelectorAll('.swipe-wrap').forEach(setupSwipe);
-    }
-    function filterPatients() { renderPatients(); }
-
-    function setupSwipe(wrap) {
-      const inner = wrap.querySelector('.swipe-inner');
-      const W = 92;
-      let startX = 0, startY = 0, base = 0, dragging = false, moved = false, suppress = false;
-
-      wrap.addEventListener('click', (e) => {
-        if (suppress) { suppress = false; e.preventDefault(); e.stopPropagation(); return; }
-        if (inner.classList.contains('open') && !e.target.closest('.swipe-reveal')) {
-          e.preventDefault(); e.stopPropagation(); inner.classList.remove('open');
-        }
-      }, true);
-
-      wrap.addEventListener('pointerdown', (e) => {
-        if (e.target.closest('.swipe-reveal')) return;
-        dragging = true; moved = false;
-        startX = e.clientX; startY = e.clientY;
-        base = inner.classList.contains('open') ? -W : 0;
-        inner.style.transition = 'none';
-      });
-
-      wrap.addEventListener('pointermove', (e) => {
-        if (!dragging) return;
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        if (!moved && Math.abs(dx) < 6) return;
-        if (Math.abs(dy) > Math.abs(dx)) return;
-        e.preventDefault();
-        moved = true;
-        let nx = base + dx;
-        if (nx > 0) nx = 0;
-        if (nx < -W) nx = -W;
-        inner.style.transform = 'translateX(' + nx + 'px)';
-      });
-
-      const end = () => {
-        if (!dragging) return;
-        dragging = false;
-        inner.style.transition = '';
-        const m = inner.style.transform.match(/-?\d+/);
-        const cur = m ? parseInt(m[0], 10) : 0;
-        if (cur < -W / 2) inner.classList.add('open'); else inner.classList.remove('open');
-        inner.style.transform = '';
-        suppress = moved;
-      };
-      wrap.addEventListener('pointerup', end);
-      wrap.addEventListener('pointercancel', end);
-      wrap.addEventListener('pointerleave', end);
-    }
-
-    // ── TABELA ──
-    function renderTable() {
-      const tbody = document.getElementById('tbl-body');
-      if (!tbody) return;
-      const patients = myPatients();
-      if (!patients.length) {
-        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--soft)">Nenhum paciente cadastrado ainda</td></tr>`;
-        return;
+        el.querySelectorAll('.swipe-wrap').forEach(setupSwipe);
       }
-      tbody.innerHTML = patients.map((p, i) => `
+      function filterPatients() { renderPatients(); }
+
+      function setupSwipe(wrap) {
+        const inner = wrap.querySelector('.swipe-inner');
+        const W = 92;
+        let startX = 0, startY = 0, base = 0, dragging = false, moved = false, suppress = false;
+
+        wrap.addEventListener('click', (e) => {
+          if (suppress) { suppress = false; e.preventDefault(); e.stopPropagation(); return; }
+          if (inner.classList.contains('open') && !e.target.closest('.swipe-reveal')) {
+            e.preventDefault(); e.stopPropagation(); inner.classList.remove('open');
+          }
+        }, true);
+
+        wrap.addEventListener('pointerdown', (e) => {
+          if (e.target.closest('.swipe-reveal')) return;
+          dragging = true; moved = false;
+          startX = e.clientX; startY = e.clientY;
+          base = inner.classList.contains('open') ? -W : 0;
+          inner.style.transition = 'none';
+        });
+
+        wrap.addEventListener('pointermove', (e) => {
+          if (!dragging) return;
+          const dx = e.clientX - startX;
+          const dy = e.clientY - startY;
+          if (!moved && Math.abs(dx) < 6) return;
+          if (Math.abs(dy) > Math.abs(dx)) return;
+          e.preventDefault();
+          moved = true;
+          let nx = base + dx;
+          if (nx > 0) nx = 0;
+          if (nx < -W) nx = -W;
+          inner.style.transform = 'translateX(' + nx + 'px)';
+        });
+
+        const end = () => {
+          if (!dragging) return;
+          dragging = false;
+          inner.style.transition = '';
+          const m = inner.style.transform.match(/-?\d+/);
+          const cur = m ? parseInt(m[0], 10) : 0;
+          if (cur < -W / 2) inner.classList.add('open'); else inner.classList.remove('open');
+          inner.style.transform = '';
+          suppress = moved;
+        };
+        wrap.addEventListener('pointerup', end);
+        wrap.addEventListener('pointercancel', end);
+        wrap.addEventListener('pointerleave', end);
+      }
+
+      // ── TABELA ──
+      function renderTable() {
+        const tbody = document.getElementById('tbl-body');
+        if (!tbody) return;
+        const patients = myPatients();
+        if (!patients.length) {
+          tbody.innerHTML = `<tr><td colspan="9" style="text-align:center;padding:28px;color:var(--soft)">Nenhum paciente cadastrado ainda</td></tr>`;
+          return;
+        }
+        tbody.innerHTML = patients.map((p, i) => `
     <tr>
       <td style="color:var(--soft);font-weight:700">${i + 1}</td>
       <td class="td-name">${p.name}</td>
@@ -2932,32 +2935,32 @@
         <button class="btn-sm btn-sm-del" onclick="deletePatient(${p.id})">✕</button>
       </div></td>
     </tr>`).join('');
-      document.getElementById('table-count').textContent = patients.length + ' pacientes';
-    }
-    function deletePatient(id) {
-      if (!confirm('Remover este paciente e todos os atendimentos?')) return;
-      db.patients = db.patients.filter(p => p.id !== id);
-      db.sessions = db.sessions.filter(s => s.patientId !== id);
-      saveDB(); renderTable(); renderPatients(); updateStats();
-      showToast('Paciente removido.', 'info');
-      if (canSync()) {
-        supabaseClient.from('patients').delete().eq('id', id).then().catch(() => { });
-        supabaseClient.from('sessions').delete().eq('patient_id', id).then().catch(() => { });
+        document.getElementById('table-count').textContent = patients.length + ' pacientes';
       }
-    }
+      function deletePatient(id) {
+        if (!confirm('Remover este paciente e todos os atendimentos?')) return;
+        db.patients = db.patients.filter(p => p.id !== id);
+        db.sessions = db.sessions.filter(s => s.patientId !== id);
+        saveDB(); renderTable(); renderPatients(); updateStats();
+        showToast('Paciente removido.', 'info');
+        if (canSync()) {
+          supabaseClient.from('patients').delete().eq('id', id).then().catch(() => { });
+          supabaseClient.from('sessions').delete().eq('patient_id', id).then().catch(() => { });
+        }
+      }
 
-    // ── PROFILE ──
-    const MO = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
-    function openPatient(id) {
-      currentPatientId = id;
-      const p = db.patients.find(x => x.id === id);
-      document.getElementById('profile-title').textContent = p.name.split(' ').slice(0, 2).join(' ');
-      document.getElementById('profile-sub').textContent = p.diag;
-      document.getElementById('profile-avatar').textContent = p.name[0];
-      document.getElementById('ph-name').textContent = p.name;
-      document.getElementById('ph-age').textContent = (p.age ? p.age + ' anos · ' : '') + '' + (p.phone || '');
-      document.getElementById('ph-diag').textContent = p.diag;
-      document.getElementById('info-content').innerHTML = `
+      // ── PROFILE ──
+      const MO = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+      function openPatient(id) {
+        currentPatientId = id;
+        const p = db.patients.find(x => x.id === id);
+        document.getElementById('profile-title').textContent = p.name.split(' ').slice(0, 2).join(' ');
+        document.getElementById('profile-sub').textContent = p.diag;
+        document.getElementById('profile-avatar').textContent = p.name[0];
+        document.getElementById('ph-name').textContent = p.name;
+        document.getElementById('ph-age').textContent = (p.age ? p.age + ' anos · ' : '') + '' + (p.phone || '');
+        document.getElementById('ph-diag').textContent = p.diag;
+        document.getElementById('info-content').innerHTML = `
     <div class="form-group"><label class="form-label">Nome</label><div style="font-size:.88rem">${p.name}</div></div>
     ${p.cpf ? `<div class="form-group"><label class="form-label">CPF</label><div style="font-size:.88rem">${p.cpf}</div></div>` : ''}
     ${p.birth ? `<div class="form-group"><label class="form-label">Nascimento</label><div style="font-size:.88rem">${new Date(p.birth + 'T12:00:00').toLocaleDateString('pt-BR')}</div></div>` : ''}
@@ -2969,102 +2972,102 @@
     ${p.city ? `<div class="form-group"><label class="form-label">Cidade / UF</label><div style="font-size:.88rem">${p.city}</div></div>` : ''}
     ${p.addr ? `<div class="form-group"><label class="form-label">Endereço</label><div style="font-size:.88rem">${p.addr}</div></div>` : ''}
     ${p.obs ? `<div class="form-group"><label class="form-label">Observação</label><div style="font-size:.88rem">${p.obs}</div></div>` : ''}`;
-      document.getElementById('tab-sessions').style.display = '';
-      document.getElementById('tab-info').style.display = 'none';
-      document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
-      profileFilter = 'all';
-      document.querySelectorAll('#profile .profile-filter .filter-chip').forEach((b, i) => b.classList.toggle('active', i === 0));
-      updateProfileStats();
-      renderSessions();
-      showScreen('profile');
-    }
-    function setTab(tab, btn) {
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById('tab-sessions').style.display = tab === 'sessions' ? '' : 'none';
-      document.getElementById('tab-info').style.display = tab === 'info' ? '' : 'none';
-    }
-    let editingSessionId = null;
-
-    function editSession(sid) {
-      const s = db.sessions.find(x => x.id === sid);
-      if (!s) return;
-      editingSessionId = sid;
-      document.getElementById('edit-evolucao').value = s.evolucao === '(sem registro)' ? '' : s.evolucao;
-      document.getElementById('edit-obs').value = s.obs || '';
-      document.getElementById('edit-value').value = s.value || '';
-      document.querySelectorAll('#edit-proc-tags .proc-tag').forEach(t => t.classList.remove('sel'));
-      (s.procs || []).forEach(p => {
-        const tag = [...document.querySelectorAll('#edit-proc-tags .proc-tag')].find(t => t.textContent === p);
-        if (tag) tag.classList.add('sel');
-      });
-      document.getElementById('edit-session-sub').textContent = `Sessão #${s.num} - ${s.date}`;
-      document.getElementById('modal-edit-session').classList.add('open');
-    }
-
-    function saveSessionEdit() {
-      const s = db.sessions.find(x => x.id === editingSessionId);
-      if (!s) return;
-      s.evolucao = document.getElementById('edit-evolucao').value || '(sem registro)';
-      s.procs = [...document.querySelectorAll('#edit-proc-tags .proc-tag.sel')].map(t => t.textContent);
-      s.obs = document.getElementById('edit-obs').value;
-      s.value = parseFloat(document.getElementById('edit-value').value) || 0;
-      saveDB(); syncSessionToSupabase(s);
-      closeModal('modal-edit-session');
-      renderSessions();
-      showToast('Atendimento atualizado!', 'success');
-    }
-
-    function renumberSessions(patientId) {
-      const list = db.sessions.filter(s => s.patientId === patientId).sort((a, b) => a.date.localeCompare(b.date));
-      list.forEach((s, i) => { s.num = i + 1; });
-      saveDB();
-    }
-
-    function deleteSession(sid) {
-      const s = db.sessions.find(x => x.id === sid);
-      if (!s) return;
-      if (s.signed && !confirm('Este atendimento já foi assinado. Remover mesmo assim?')) return;
-      if (!confirm('Remover este atendimento?')) return;
-      const pid = s.patientId;
-      db.sessions = db.sessions.filter(x => x.id !== sid);
-      renumberSessions(pid);
-      if (canSync()) {
-        supabaseClient.from('sessions').delete().eq('id', sid).then().catch(() => { });
+        document.getElementById('tab-sessions').style.display = '';
+        document.getElementById('tab-info').style.display = 'none';
+        document.querySelectorAll('.tab-btn').forEach((b, i) => b.classList.toggle('active', i === 0));
+        profileFilter = 'all';
+        document.querySelectorAll('#profile .profile-filter .filter-chip').forEach((b, i) => b.classList.toggle('active', i === 0));
+        updateProfileStats();
+        renderSessions();
+        showScreen('profile');
       }
-      renderSessions();
-      updateStats();
-      showToast('Atendimento removido.', 'info');
-    }
+      function setTab(tab, btn) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('tab-sessions').style.display = tab === 'sessions' ? '' : 'none';
+        document.getElementById('tab-info').style.display = tab === 'info' ? '' : 'none';
+      }
+      let editingSessionId = null;
 
-    function togglePaidSession(sid) {
-      const s = db.sessions.find(x => x.id === sid);
-      if (!s) return;
-      s.paid = !s.paid;
-      saveDB();
-      syncSessionToSupabase(s);
-      renderSessions();
-      updateStats();
-      updateProfileStats();
-      showToast(s.paid ? 'Atendimento marcado como recebido.' : 'Atendimento marcado como não recebido.', s.paid ? 'success' : 'info');
-    }
+      function editSession(sid) {
+        const s = db.sessions.find(x => x.id === sid);
+        if (!s) return;
+        editingSessionId = sid;
+        document.getElementById('edit-evolucao').value = s.evolucao === '(sem registro)' ? '' : s.evolucao;
+        document.getElementById('edit-obs').value = s.obs || '';
+        document.getElementById('edit-value').value = s.value || '';
+        document.querySelectorAll('#edit-proc-tags .proc-tag').forEach(t => t.classList.remove('sel'));
+        (s.procs || []).forEach(p => {
+          const tag = [...document.querySelectorAll('#edit-proc-tags .proc-tag')].find(t => t.textContent === p);
+          if (tag) tag.classList.add('sel');
+        });
+        document.getElementById('edit-session-sub').textContent = `Sessão #${s.num} - ${s.date}`;
+        document.getElementById('modal-edit-session').classList.add('open');
+      }
 
-    function renderSessions() {
-      const now = new Date();
-      const month = now.toISOString().slice(0, 7);
-      let list = sessionsOf(currentPatientId);
-      if (profileFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); list = list.filter(s => new Date(s.date) >= w); }
-      else if (profileFilter === 'month') list = list.filter(s => s.date.startsWith(month));
-      list.sort((a, b) => b.date.localeCompare(a.date));
-      const el = document.getElementById('sessions-list');
-      if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Nenhum atendimento neste período</p></div>'; return; }
-      el.innerHTML = list.map(s => {
-        const d = new Date(s.date + 'T12:00:00');
-        const pc = s.pain <= 3 ? 'chip-done' : s.pain <= 6 ? 'chip-gold' : 'chip-pain';
-        const unsigned = !s.signed;
-        const clickAttr = unsigned ? `onclick="resendSignature(${s.id})" title="Toque para reenviar assinatura"` : '';
-        const cursor = unsigned ? 'cursor:pointer' : '';
-        return `<div class="session-item${s.paid ? ' paid' : ''}" style="${cursor}" ${clickAttr}>
+      function saveSessionEdit() {
+        const s = db.sessions.find(x => x.id === editingSessionId);
+        if (!s) return;
+        s.evolucao = document.getElementById('edit-evolucao').value || '(sem registro)';
+        s.procs = [...document.querySelectorAll('#edit-proc-tags .proc-tag.sel')].map(t => t.textContent);
+        s.obs = document.getElementById('edit-obs').value;
+        s.value = parseFloat(document.getElementById('edit-value').value) || 0;
+        saveDB(); syncSessionToSupabase(s);
+        closeModal('modal-edit-session');
+        renderSessions();
+        showToast('Atendimento atualizado!', 'success');
+      }
+
+      function renumberSessions(patientId) {
+        const list = db.sessions.filter(s => s.patientId === patientId).sort((a, b) => a.date.localeCompare(b.date));
+        list.forEach((s, i) => { s.num = i + 1; });
+        saveDB();
+      }
+
+      function deleteSession(sid) {
+        const s = db.sessions.find(x => x.id === sid);
+        if (!s) return;
+        if (s.signed && !confirm('Este atendimento já foi assinado. Remover mesmo assim?')) return;
+        if (!confirm('Remover este atendimento?')) return;
+        const pid = s.patientId;
+        db.sessions = db.sessions.filter(x => x.id !== sid);
+        renumberSessions(pid);
+        if (canSync()) {
+          supabaseClient.from('sessions').delete().eq('id', sid).then().catch(() => { });
+        }
+        renderSessions();
+        updateStats();
+        showToast('Atendimento removido.', 'info');
+      }
+
+      function togglePaidSession(sid) {
+        const s = db.sessions.find(x => x.id === sid);
+        if (!s) return;
+        s.paid = !s.paid;
+        saveDB();
+        syncSessionToSupabase(s);
+        renderSessions();
+        updateStats();
+        updateProfileStats();
+        showToast(s.paid ? 'Atendimento marcado como recebido.' : 'Atendimento marcado como não recebido.', s.paid ? 'success' : 'info');
+      }
+
+      function renderSessions() {
+        const now = new Date();
+        const month = now.toISOString().slice(0, 7);
+        let list = sessionsOf(currentPatientId);
+        if (profileFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); list = list.filter(s => new Date(s.date) >= w); }
+        else if (profileFilter === 'month') list = list.filter(s => s.date.startsWith(month));
+        list.sort((a, b) => b.date.localeCompare(a.date));
+        const el = document.getElementById('sessions-list');
+        if (!list.length) { el.innerHTML = '<div class="empty-state"><div class="icon">📋</div><p>Nenhum atendimento neste período</p></div>'; return; }
+        el.innerHTML = list.map(s => {
+          const d = new Date(s.date + 'T12:00:00');
+          const pc = s.pain <= 3 ? 'chip-done' : s.pain <= 6 ? 'chip-gold' : 'chip-pain';
+          const unsigned = !s.signed;
+          const clickAttr = unsigned ? `onclick="resendSignature(${s.id})" title="Toque para reenviar assinatura"` : '';
+          const cursor = unsigned ? 'cursor:pointer' : '';
+          return `<div class="session-item${s.paid ? ' paid' : ''}" style="${cursor}" ${clickAttr}>
       <div class="session-date-col"><div class="session-day">${d.getDate()}</div><div class="session-month">${MO[d.getMonth()]}</div></div>
       <div class="session-content">
         <div class="session-title">Sessão ${s.num}${s.value ? ' <span style="font-weight:400;color:var(--green-mid);font-size:.78rem">R$ ' + s.value.toFixed(2).replace('.', ',') + '</span>' : ''}</div>
@@ -3077,8 +3080,8 @@
           ${s.paid ? '<span class="chip chip-paid">💵 Recebido</span>' : ''}
         </div>
         ${s.signed
-            ? `<div class="session-signed">✅ Enviado${s.signedBy ? ' para ' + s.signedBy : ''}</div>`
-            : '<div style="font-size:.66rem;color:var(--amber);font-weight:700;margin-top:5px;display:flex;align-items:center;gap:5px">⏳ Aguardando assinatura &nbsp;·&nbsp; <span style="color:var(--green-mid);text-decoration:underline">Reenviar link 📲</span></div>'}
+              ? `<div class="session-signed">✅ Enviado${s.signedBy ? ' para ' + s.signedBy : ''}</div>`
+              : '<div style="font-size:.66rem;color:var(--amber);font-weight:700;margin-top:5px;display:flex;align-items:center;gap:5px">⏳ Aguardando assinatura &nbsp;·&nbsp; <span style="color:var(--green-mid);text-decoration:underline">Reenviar link 📲</span></div>'}
         <div class="session-actions">
           <button class="btn-sm btn-sm-paid${s.paid ? ' active' : ''}" onclick="event.stopPropagation();togglePaidSession(${s.id})">${s.paid ? '✓ Recebido' : '💵 Recebido'}</button>
           <button class="btn-sm btn-sm-edit" onclick="event.stopPropagation();editSession(${s.id})">✏️ Editar</button>
@@ -3086,236 +3089,236 @@
         </div>
       </div>
     </div>`;
-      }).join('');
-    }
-
-    // ── FORM ──
-    function openFormAtend() {
-      const p = db.patients.find(x => x.id === currentPatientId);
-      const nextNum = sessionsOf(p.id).length + 1;
-      document.getElementById('form-patient-name').textContent = p.name;
-      document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
-      document.getElementById('f-num-display').textContent = nextNum;
-      document.getElementById('f-num-display').dataset.num = nextNum;
-      ['f-evolucao', 'f-pa', 'f-spo2', 'f-fc', 'f-obs', 'f-value'].forEach(id => document.getElementById(id).value = '');
-      document.querySelectorAll('.proc-tag').forEach(t => t.classList.remove('sel'));
-      const bs = document.getElementById('btn-save');
-      bs.disabled = false; bs.style.opacity = '1';
-      bs.textContent = '💾 Salvar Atendimento'; bs.style.background = '';
-      selectedPain = null; savedSession = null;
-      const ps = document.getElementById('pain-scale'); ps.innerHTML = '';
-      for (let i = 0; i <= 10; i++) {
-        const b = document.createElement('button');
-        b.className = 'pain-btn'; b.dataset.v = i; b.textContent = i;
-        b.onclick = () => selectPain(i); ps.appendChild(b);
+        }).join('');
       }
-      showScreen('form-atend');
-    }
-    function selectPain(v) {
-      selectedPain = v;
-      document.querySelectorAll('.pain-btn').forEach(b => b.classList.remove('sel'));
-      document.querySelector(`.pain-btn[data-v="${v}"]`).classList.add('sel');
-    }
-    function toggleProc(el) { el.classList.toggle('sel'); }
-    function saveSession() {
-      const btn = document.getElementById('btn-save');
-      btn.disabled = true; btn.style.opacity = '.5'; btn.textContent = '⏳ Salvando...';
-      try {
+
+      // ── FORM ──
+      function openFormAtend() {
         const p = db.patients.find(x => x.id === currentPatientId);
-        if (!p) { throw new Error('Paciente não encontrado'); }
-        const procs = [...document.querySelectorAll('.proc-tag.sel')].map(t => t.textContent);
-        const s = {
-          id: Date.now(), patientId: p.id,
-          date: document.getElementById('f-date').value,
-          num: parseInt(document.getElementById('f-num-display').dataset.num) || sessionsOf(p.id).length + 1,
-          evolucao: document.getElementById('f-evolucao').value || '(sem registro)',
-          pa: document.getElementById('f-pa').value || '—',
-          spo2: document.getElementById('f-spo2').value || '—',
-          fc: document.getElementById('f-fc').value || '—',
-          pain: selectedPain !== null ? selectedPain : 0,
-          procs, obs: document.getElementById('f-obs').value,
-          value: parseFloat(document.getElementById('f-value').value) || 0,
-          signed: false, signedAt: null, signedBy: null, userAgent: null,
-          paid: false,
-          token: uuid(),
-          professional_name: (currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : '') + currentUser.name,
-          crefito: currentUser.crp || '',
-          professional: { name: (currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : '') + currentUser.name, crp: currentUser.crp, spec: currentUser.spec, tel: currentUser.tel, addr: currentUser.addr, cpf: currentUser.cpf || '' }
-        };
-        db.sessions.push(s); saveDB();
-        syncSessionToSupabase(s);
-        savedSession = { session: s, patient: p };
-        updateStats();
-        btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '💾 Salvar Atendimento';
-        openSignScreen(s, p);
-      } catch (e) {
-        btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '💾 Salvar Atendimento';
-        showToast('Erro ao salvar: ' + e.message, 'error');
-        console.error('saveSession error:', e);
+        const nextNum = sessionsOf(p.id).length + 1;
+        document.getElementById('form-patient-name').textContent = p.name;
+        document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('f-num-display').textContent = nextNum;
+        document.getElementById('f-num-display').dataset.num = nextNum;
+        ['f-evolucao', 'f-pa', 'f-spo2', 'f-fc', 'f-obs', 'f-value'].forEach(id => document.getElementById(id).value = '');
+        document.querySelectorAll('.proc-tag').forEach(t => t.classList.remove('sel'));
+        const bs = document.getElementById('btn-save');
+        bs.disabled = false; bs.style.opacity = '1';
+        bs.textContent = '💾 Salvar Atendimento'; bs.style.background = '';
+        selectedPain = null; savedSession = null;
+        const ps = document.getElementById('pain-scale'); ps.innerHTML = '';
+        for (let i = 0; i <= 10; i++) {
+          const b = document.createElement('button');
+          b.className = 'pain-btn'; b.dataset.v = i; b.textContent = i;
+          b.onclick = () => selectPain(i); ps.appendChild(b);
+        }
+        showScreen('form-atend');
       }
-    }
+      function selectPain(v) {
+        selectedPain = v;
+        document.querySelectorAll('.pain-btn').forEach(b => b.classList.remove('sel'));
+        document.querySelector(`.pain-btn[data-v="${v}"]`).classList.add('sel');
+      }
+      function toggleProc(el) { el.classList.toggle('sel'); }
+      function saveSession() {
+        const btn = document.getElementById('btn-save');
+        btn.disabled = true; btn.style.opacity = '.5'; btn.textContent = '⏳ Salvando...';
+        try {
+          const p = db.patients.find(x => x.id === currentPatientId);
+          if (!p) { throw new Error('Paciente não encontrado'); }
+          const procs = [...document.querySelectorAll('.proc-tag.sel')].map(t => t.textContent);
+          const s = {
+            id: Date.now(), patientId: p.id,
+            date: document.getElementById('f-date').value,
+            num: parseInt(document.getElementById('f-num-display').dataset.num) || sessionsOf(p.id).length + 1,
+            evolucao: document.getElementById('f-evolucao').value || '(sem registro)',
+            pa: document.getElementById('f-pa').value || '—',
+            spo2: document.getElementById('f-spo2').value || '—',
+            fc: document.getElementById('f-fc').value || '—',
+            pain: selectedPain !== null ? selectedPain : 0,
+            procs, obs: document.getElementById('f-obs').value,
+            value: parseFloat(document.getElementById('f-value').value) || 0,
+            signed: false, signedAt: null, signedBy: null, userAgent: null,
+            paid: false,
+            token: uuid(),
+            professional_name: (currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : '') + currentUser.name,
+            crefito: currentUser.crp || '',
+            professional: { name: (currentUser.sex === 'M' ? 'Dr. ' : currentUser.sex === 'F' ? 'Dra. ' : '') + currentUser.name, crp: currentUser.crp, spec: currentUser.spec, tel: currentUser.tel, addr: currentUser.addr, cpf: currentUser.cpf || '' }
+          };
+          db.sessions.push(s); saveDB();
+          syncSessionToSupabase(s);
+          savedSession = { session: s, patient: p };
+          updateStats();
+          btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '💾 Salvar Atendimento';
+          openSignScreen(s, p);
+        } catch (e) {
+          btn.disabled = false; btn.style.opacity = '1'; btn.textContent = '💾 Salvar Atendimento';
+          showToast('Erro ao salvar: ' + e.message, 'error');
+          console.error('saveSession error:', e);
+        }
+      }
 
-    function resendSignature(sid) {
-      const s = db.sessions.find(x => x.id === sid);
-      if (!s) return;
-      const p = db.patients.find(x => x.id === s.patientId);
-      if (!p) return;
-      if (!p.phone) { alert('Este paciente não tem WhatsApp cadastrado.'); return; }
-      savedSession = { session: s, patient: p };
-      const pr = s.professional || {};
-      const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-      const d = new Date(s.date + 'T12:00:00');
-      const dataStr = `${d.getDate()} de ${months[d.getMonth()]}`;
-      const valor = '';
-      const procedimentos = s.procs.length ? `\n\u2022 ${s.procs.join(', ')}` : '';
-      const msg = encodeURIComponent(
-        `Olá ${p.name.split(' ')[0]}! Tudo bem?\n\n` +
-        `Seu atendimento ainda nao foi confirmado.\n\n` +
-        `\u2022 ${dataStr}\n` +
-        `\u2022 Sessao nº ${s.num}` +
-        `${procedimentos}${valor}\n\n` +
-        `Assim que possivel, confirme no aplicativo.\n\n` +
-        `*${pr.name || 'Equipe FisioHome'}*\n` +
-        `_${currentUser.sex === 'F' ? 'Obrigada' : 'Obrigado'}_`
-      );
-      const phone = p.phone.replace(/\D/g, '');
-      window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
-      setTimeout(() => openSignScreen(s, p), 600);
-    }
+      function resendSignature(sid) {
+        const s = db.sessions.find(x => x.id === sid);
+        if (!s) return;
+        const p = db.patients.find(x => x.id === s.patientId);
+        if (!p) return;
+        if (!p.phone) { alert('Este paciente não tem WhatsApp cadastrado.'); return; }
+        savedSession = { session: s, patient: p };
+        const pr = s.professional || {};
+        const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+        const d = new Date(s.date + 'T12:00:00');
+        const dataStr = `${d.getDate()} de ${months[d.getMonth()]}`;
+        const valor = '';
+        const procedimentos = s.procs.length ? `\n\u2022 ${s.procs.join(', ')}` : '';
+        const msg = encodeURIComponent(
+          `Olá ${p.name.split(' ')[0]}! Tudo bem?\n\n` +
+          `Seu atendimento ainda nao foi confirmado.\n\n` +
+          `\u2022 ${dataStr}\n` +
+          `\u2022 Sessao nº ${s.num}` +
+          `${procedimentos}${valor}\n\n` +
+          `Assim que possivel, confirme no aplicativo.\n\n` +
+          `*${pr.name || 'Equipe FisioHome'}*\n` +
+          `_${currentUser.sex === 'F' ? 'Obrigada' : 'Obrigado'}_`
+        );
+        const phone = p.phone.replace(/\D/g, '');
+        window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
+        setTimeout(() => openSignScreen(s, p), 600);
+      }
 
-    // ── ASSINATURA ──
-    function openSignScreen(session, patient) {
-      document.getElementById('btn-confirm-sign').disabled = false;
-      document.getElementById('btn-confirm-sign').textContent = 'Confirmar Atendimento';
-      const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-      const d = new Date(session.date + 'T12:00:00');
-      const pr = session.professional || {};
-      const valor = session.value ? `R$ ${session.value.toFixed(2).replace('.', ',')}` : null;
-      document.getElementById('sign-card').innerHTML = `
+      // ── ASSINATURA ──
+      function openSignScreen(session, patient) {
+        document.getElementById('btn-confirm-sign').disabled = false;
+        document.getElementById('btn-confirm-sign').textContent = 'Confirmar Atendimento';
+        const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+        const d = new Date(session.date + 'T12:00:00');
+        const pr = session.professional || {};
+        const valor = session.value ? `R$ ${session.value.toFixed(2).replace('.', ',')}` : null;
+        document.getElementById('sign-card').innerHTML = `
     <div class="sign-card-row"><span class="sign-card-key">Paciente</span><span class="sign-card-val">${patient.name}</span></div>
     <div class="sign-card-row"><span class="sign-card-key">Data</span><span class="sign-card-val">${d.getDate()} de ${months[d.getMonth()]} de ${d.getFullYear()}</span></div>
     <div class="sign-card-row"><span class="sign-card-key">Sessão nº</span><span class="sign-card-val">${session.num}</span></div>
     <div class="sign-card-row"><span class="sign-card-key">Procedimentos</span><span class="sign-card-val">${session.procs.join(', ') || 'Fisioterapia geral'}</span></div>
     <div class="sign-card-row"><span class="sign-card-key">Dor (EVA)</span><span class="sign-card-val">${session.pain}/10</span></div>
     ${valor ? `<div class="sign-card-row"><span class="sign-card-key">Valor</span><span class="sign-card-val" style="color:var(--green-mid)">${valor}</span></div>` : ''}`;
-      document.getElementById('stamp-box').innerHTML = `
+        document.getElementById('stamp-box').innerHTML = `
     <div class="stamp-box-title">🔏 Responsável pelo atendimento</div>
     <div class="stamp-text"><strong>${pr.name || '—'}</strong><br>Fisioterapeuta${pr.spec ? ' – ' + pr.spec : ''}<br>${pr.crp || ''}${pr.cpf ? '<br>CPF: ' + pr.cpf : ''}<br>${pr.tel || ''}<br>${pr.addr || ''}</div>`;
-      document.getElementById('sign-body').style.display = 'flex';
-      document.getElementById('sign-ok').style.display = 'none';
-      showScreen('sign');
-    }
-    function confirmSign() {
-      if (!savedSession) return;
-      const btn = document.getElementById('btn-confirm-sign');
-      btn.disabled = true; btn.textContent = '⏳ Confirmando...';
-      const { session: s, patient: p } = savedSession;
-      if (s && !s.signed) {
-        s.signed = true;
-        s.signedAt = new Date().toISOString();
-        s.signedBy = p.name;
-        s.userAgent = navigator.userAgent;
-        saveDB();
-        syncSessionToSupabase(s);
-        if (p.phone) {
-          const pr = s.professional || {};
-          const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
-          const d = new Date(s.date + 'T12:00:00');
-          const dataStr = `${d.getDate()} de ${months[d.getMonth()]}`;
-      const valor = '';
-          const procedimentos = s.procs.length ? `\n\u2022 ${s.procs.join(', ')}` : '';
-          const msg = encodeURIComponent(
-            `Olá, ${p.name.split(' ')[0]}, seu atendimento foi confirmado.\n\n` +
-            `\u2022 ${dataStr}\n` +
-            `\u2022 Sessão Nº ${s.num}` +
-            `${procedimentos}${valor}\n\n` +
-            `*${pr.name || 'Equipe FisioHome'}*\n` +
-            `_${currentUser.sex === 'F' ? 'Obrigada' : 'Obrigado'}!_`
-          );
-          const phone = p.phone.replace(/\D/g, '');
-          window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
+        document.getElementById('sign-body').style.display = 'flex';
+        document.getElementById('sign-ok').style.display = 'none';
+        showScreen('sign');
+      }
+      function confirmSign() {
+        if (!savedSession) return;
+        const btn = document.getElementById('btn-confirm-sign');
+        btn.disabled = true; btn.textContent = '⏳ Confirmando...';
+        const { session: s, patient: p } = savedSession;
+        if (s && !s.signed) {
+          s.signed = true;
+          s.signedAt = new Date().toISOString();
+          s.signedBy = p.name;
+          s.userAgent = navigator.userAgent;
+          saveDB();
+          syncSessionToSupabase(s);
+          if (p.phone) {
+            const pr = s.professional || {};
+            const months = ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'];
+            const d = new Date(s.date + 'T12:00:00');
+            const dataStr = `${d.getDate()} de ${months[d.getMonth()]}`;
+            const valor = '';
+            const procedimentos = s.procs.length ? `\n\u2022 ${s.procs.join(', ')}` : '';
+            const msg = encodeURIComponent(
+              `Olá, ${p.name.split(' ')[0]}, seu atendimento foi confirmado.\n\n` +
+              `\u2022 ${dataStr}\n` +
+              `\u2022 Sessão Nº ${s.num}` +
+              `${procedimentos}${valor}\n\n` +
+              `*${pr.name || 'Equipe FisioHome'}*\n` +
+              `_${currentUser.sex === 'F' ? 'Obrigada' : 'Obrigado'}!_`
+            );
+            const phone = p.phone.replace(/\D/g, '');
+            window.open(`https://wa.me/55${phone}?text=${msg}`, '_blank');
+          }
+        }
+        document.getElementById('sign-body').style.display = 'none';
+        document.getElementById('sign-ok').style.display = 'flex';
+      }
+
+      // ── CRIAR USUÁRIO (admin) ──
+      function openCreateUserModal() {
+        ['cu-name', 'cu-email', 'cu-phone', 'cu-cpf'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('cu-result').style.display = 'none';
+        document.getElementById('cu-btn').disabled = false;
+        document.getElementById('cu-btn').textContent = 'Criar Usuário';
+        document.getElementById('modal-create-user').classList.add('open');
+      }
+      async function createUserManual() {
+        const name = document.getElementById('cu-name').value.trim();
+        const email = document.getElementById('cu-email').value.trim().toLowerCase();
+        if (!name || !email) { showToast('Preencha nome e e-mail.', 'error'); return; }
+
+        const btn = document.getElementById('cu-btn');
+        btn.disabled = true; btn.textContent = '⏳ Criando...';
+        const resultEl = document.getElementById('cu-result');
+        const resultText = document.getElementById('cu-result-text');
+
+        try {
+          const session = await supabaseClient.auth.getSession();
+          const token = session?.data?.session?.access_token;
+          if (!token) { throw new Error('Você precisa estar logado.'); }
+
+          const r = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-user`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
+            body: JSON.stringify({
+              name,
+              email,
+              phone: document.getElementById('cu-phone').value.replace(/\D/g, ''),
+              cpf: document.getElementById('cu-cpf').value.replace(/\D/g, ''),
+            }),
+          });
+
+          const data = await r.json();
+          if (!r.ok) { throw new Error(data.error || 'Erro ao criar usuário'); }
+
+          resultEl.style.display = 'block';
+          resultEl.style.background = '#dcf5e8';
+          resultEl.style.borderColor = '#1a7a4a';
+          resultText.style.color = '#1a7a4a';
+          resultText.innerHTML = `✅ Usuário <strong>${email}</strong> criado com sucesso!<br>Senha temporária: <code style="background:#fff;padding:2px 6px;border-radius:4px;font-size:.9rem">${data.password}</code>`;
+          showToast(`Usuário ${email} criado!`, 'success');
+        } catch (err) {
+          resultEl.style.display = 'block';
+          resultText.innerHTML = `❌ ${err.message}`;
+          resultEl.style.background = '#fde8e8';
+          resultEl.style.borderColor = '#c0392b';
+          resultText.style.color = '#9b1c1c';
+          showToast(err.message, 'error');
+        } finally {
+          btn.disabled = false;
+          btn.textContent = 'Criar Usuário';
         }
       }
-      document.getElementById('sign-body').style.display = 'none';
-      document.getElementById('sign-ok').style.display = 'flex';
-    }
 
-    // ── CRIAR USUÁRIO (admin) ──
-    function openCreateUserModal() {
-      ['cu-name', 'cu-email', 'cu-phone', 'cu-cpf'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('cu-result').style.display = 'none';
-      document.getElementById('cu-btn').disabled = false;
-      document.getElementById('cu-btn').textContent = 'Criar Usuário';
-      document.getElementById('modal-create-user').classList.add('open');
-    }
-    async function createUserManual() {
-      const name = document.getElementById('cu-name').value.trim();
-      const email = document.getElementById('cu-email').value.trim().toLowerCase();
-      if (!name || !email) { showToast('Preencha nome e e-mail.', 'error'); return; }
+      // ── MODALS ──
+      function openNewPatient() { document.getElementById('modal-new').classList.add('open'); }
 
-      const btn = document.getElementById('cu-btn');
-      btn.disabled = true; btn.textContent = '⏳ Criando...';
-      const resultEl = document.getElementById('cu-result');
-      const resultText = document.getElementById('cu-result-text');
-
-      try {
-        const session = await supabaseClient.auth.getSession();
-        const token = session?.data?.session?.access_token;
-        if (!token) { throw new Error('Você precisa estar logado.'); }
-
-        const r = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-user`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
-          body: JSON.stringify({
-            name,
-            email,
-            phone: document.getElementById('cu-phone').value.replace(/\D/g, ''),
-            cpf: document.getElementById('cu-cpf').value.replace(/\D/g, ''),
-          }),
-        });
-
-        const data = await r.json();
-        if (!r.ok) { throw new Error(data.error || 'Erro ao criar usuário'); }
-
-        resultEl.style.display = 'block';
-        resultEl.style.background = '#dcf5e8';
-        resultEl.style.borderColor = '#1a7a4a';
-        resultText.style.color = '#1a7a4a';
-        resultText.innerHTML = `✅ Usuário <strong>${email}</strong> criado com sucesso!<br>Senha temporária: <code style="background:#fff;padding:2px 6px;border-radius:4px;font-size:.9rem">${data.password}</code>`;
-        showToast(`Usuário ${email} criado!`, 'success');
-      } catch (err) {
-        resultEl.style.display = 'block';
-        resultText.innerHTML = `❌ ${err.message}`;
-        resultEl.style.background = '#fde8e8';
-        resultEl.style.borderColor = '#c0392b';
-        resultText.style.color = '#9b1c1c';
-        showToast(err.message, 'error');
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Criar Usuário';
+      // ── SELECIONAR PACIENTE PARA ATENDIMENTO ──
+      function openSelectPatient() {
+        document.getElementById('sp-search').value = '';
+        renderSelectList(myPatients());
+        document.getElementById('modal-select').classList.add('open');
       }
-    }
-
-    // ── MODALS ──
-    function openNewPatient() { document.getElementById('modal-new').classList.add('open'); }
-
-    // ── SELECIONAR PACIENTE PARA ATENDIMENTO ──
-    function openSelectPatient() {
-      document.getElementById('sp-search').value = '';
-      renderSelectList(myPatients());
-      document.getElementById('modal-select').classList.add('open');
-    }
-    function filterSelectList() {
-      const q = document.getElementById('sp-search').value.toLowerCase();
-      renderSelectList(myPatients().filter(p => p.name.toLowerCase().includes(q) || p.diag.toLowerCase().includes(q)));
-    }
-    function renderSelectList(list) {
-      const el = document.getElementById('sp-list');
-      if (!list.length) {
-        el.innerHTML = '<div class="sp-empty">Nenhum paciente encontrado.<br>Cadastre um paciente primeiro.</div>';
-        return;
+      function filterSelectList() {
+        const q = document.getElementById('sp-search').value.toLowerCase();
+        renderSelectList(myPatients().filter(p => p.name.toLowerCase().includes(q) || p.diag.toLowerCase().includes(q)));
       }
-      el.innerHTML = list.map(p => `
+      function renderSelectList(list) {
+        const el = document.getElementById('sp-list');
+        if (!list.length) {
+          el.innerHTML = '<div class="sp-empty">Nenhum paciente encontrado.<br>Cadastre um paciente primeiro.</div>';
+          return;
+        }
+        el.innerHTML = list.map(p => `
     <div class="select-patient-item" onclick="selectPatientForAtend(${p.id})">
       <div class="sp-avatar">${p.name[0]}</div>
       <div class="sp-info">
@@ -3325,302 +3328,302 @@
       </div>
       <span class="sp-arrow">›</span>
     </div>`).join('');
-    }
-    function selectPatientForAtend(id) {
-      closeModal('modal-select');
-      currentPatientId = id;
-      openFormAtend();
-    }
-    function closeModal(id) { document.getElementById(id).classList.remove('open'); }
-    function closeMO(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
-    function saveNewPatient() {
-      const name = document.getElementById('np-name').value.trim();
-      const diag = document.getElementById('np-diag').value.trim();
-      if (!name || !diag) { alert('Preencha nome e diagnóstico.'); return; }
-      const birth = document.getElementById('np-birth').value;
-      const cep = document.getElementById('np-cep').value;
-      const city = document.getElementById('np-city').value;
-      const p = { id: Date.now(), name, birth: birth || null, age: birth ? calcAgeFromBirth('np-birth', 'np-age', true) : null, sex: document.getElementById('np-sex').value || null, diag, cpf: document.getElementById('np-cpf').value || null, phone: document.getElementById('np-phone').value.replace(/\D/g, ''), cep, addr: document.getElementById('np-addr').value, city, obs: document.getElementById('np-obs').value, usuario_id: userId(), professional_name: professionalName(), crefito: currentUser?.crp || '', createdAt: new Date().toISOString() };
-      db.patients.push(p); saveDB();
-      syncPatientToSupabase(p);
-      ['np-name', 'np-age', 'np-diag', 'np-cpf', 'np-phone', 'np-addr', 'np-obs', 'np-birth', 'np-cep', 'np-city'].forEach(id => document.getElementById(id).value = '');
-      document.getElementById('np-sex').value = '';
-      closeModal('modal-new');
-      renderPatients(); renderTable(); updateStats();
-    }
-    function openEditPatient() { openEditPatientById(currentPatientId); }
-    function openEditPatientById(id) {
-      editingPatientId = id;
-      const p = db.patients.find(x => x.id === id);
-      if (!p) return;
-      document.getElementById('ep-name').value = p.name || '';
-      document.getElementById('ep-birth').value = p.birth || '';
-      if (p.birth) calcAgeFromBirth('ep-birth', 'ep-age');
-      document.getElementById('ep-sex').value = p.sex || '';
-      document.getElementById('ep-diag').value = p.diag || '';
-      document.getElementById('ep-cpf').value = p.cpf || '';
-      document.getElementById('ep-phone').value = p.phone || '';
-      document.getElementById('ep-cep').value = p.cep || '';
-      document.getElementById('ep-city').value = p.city || '';
-      document.getElementById('ep-addr').value = p.addr || '';
-      document.getElementById('ep-obs').value = p.obs || '';
-      document.getElementById('modal-edit').classList.add('open');
-    }
-    function saveEditPatient() {
-      const name = document.getElementById('ep-name').value.trim();
-      const diag = document.getElementById('ep-diag').value.trim();
-      if (!name || !diag) { alert('Preencha nome e diagnóstico.'); return; }
-      const p = db.patients.find(x => x.id === editingPatientId);
-      if (!p) return;
-      p.name = name; p.birth = document.getElementById('ep-birth').value || null;
-      p.age = p.birth ? calcAgeFromBirth('ep-birth', 'ep-age', true) : null;
-      p.sex = document.getElementById('ep-sex').value || null;
-      p.diag = diag; p.cpf = document.getElementById('ep-cpf').value || null;
-      p.phone = document.getElementById('ep-phone').value.replace(/\D/g, '');
-      p.cep = document.getElementById('ep-cep').value || '';
-      p.city = document.getElementById('ep-city').value || '';
-      p.addr = document.getElementById('ep-addr').value;
-      p.obs = document.getElementById('ep-obs').value;
-      p.updatedAt = new Date().toISOString();
-      saveDB(); syncPatientToSupabase(p); closeModal('modal-edit');
-      renderPatients(); renderTable();
-      if (currentPatientId === editingPatientId) openPatient(editingPatientId);
-    }
-    function maskCEP(el) {
-      let v = el.value.replace(/\D/g, '').slice(0, 8);
-      if (v.length > 5) v = v.replace(/(\d{5})(\d{1,3})/, '$1-$2');
-      el.value = v;
-    }
-    function calcAgeFromBirth(birthId, ageId, returnNum) {
-      const birth = document.getElementById(birthId).value;
-      const ageEl = document.getElementById(ageId);
-      if (!birth) { if (ageEl) ageEl.value = ''; return returnNum ? null : undefined; }
-      const b = new Date(birth + 'T12:00:00');
-      const t = new Date(); let age = t.getFullYear() - b.getFullYear();
-      const m = t.getMonth() - b.getMonth();
-      if (m < 0 || (m === 0 && t.getDate() < b.getDate())) age--;
-      if (returnNum) return age >= 0 ? age : null;
-      ageEl.value = age >= 0 ? age + ' anos' : '—';
-    }
-    let cepTimer = null;
-    function buscaCEP(cepEl, addrId, cityId) {
-      clearTimeout(cepTimer);
-      const cep = cepEl.value.replace(/\D/g, '');
-      if (cep.length !== 8) return;
-      cepTimer = setTimeout(async () => {
+      }
+      function selectPatientForAtend(id) {
+        closeModal('modal-select');
+        currentPatientId = id;
+        openFormAtend();
+      }
+      function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+      function closeMO(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+      function saveNewPatient() {
+        const name = document.getElementById('np-name').value.trim();
+        const diag = document.getElementById('np-diag').value.trim();
+        if (!name || !diag) { alert('Preencha nome e diagnóstico.'); return; }
+        const birth = document.getElementById('np-birth').value;
+        const cep = document.getElementById('np-cep').value;
+        const city = document.getElementById('np-city').value;
+        const p = { id: Date.now(), name, birth: birth || null, age: birth ? calcAgeFromBirth('np-birth', 'np-age', true) : null, sex: document.getElementById('np-sex').value || null, diag, cpf: document.getElementById('np-cpf').value || null, phone: document.getElementById('np-phone').value.replace(/\D/g, ''), cep, addr: document.getElementById('np-addr').value, city, obs: document.getElementById('np-obs').value, usuario_id: userId(), professional_name: professionalName(), crefito: currentUser?.crp || '', createdAt: new Date().toISOString() };
+        db.patients.push(p); saveDB();
+        syncPatientToSupabase(p);
+        ['np-name', 'np-age', 'np-diag', 'np-cpf', 'np-phone', 'np-addr', 'np-obs', 'np-birth', 'np-cep', 'np-city'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('np-sex').value = '';
+        closeModal('modal-new');
+        renderPatients(); renderTable(); updateStats();
+      }
+      function openEditPatient() { openEditPatientById(currentPatientId); }
+      function openEditPatientById(id) {
+        editingPatientId = id;
+        const p = db.patients.find(x => x.id === id);
+        if (!p) return;
+        document.getElementById('ep-name').value = p.name || '';
+        document.getElementById('ep-birth').value = p.birth || '';
+        if (p.birth) calcAgeFromBirth('ep-birth', 'ep-age');
+        document.getElementById('ep-sex').value = p.sex || '';
+        document.getElementById('ep-diag').value = p.diag || '';
+        document.getElementById('ep-cpf').value = p.cpf || '';
+        document.getElementById('ep-phone').value = p.phone || '';
+        document.getElementById('ep-cep').value = p.cep || '';
+        document.getElementById('ep-city').value = p.city || '';
+        document.getElementById('ep-addr').value = p.addr || '';
+        document.getElementById('ep-obs').value = p.obs || '';
+        document.getElementById('modal-edit').classList.add('open');
+      }
+      function saveEditPatient() {
+        const name = document.getElementById('ep-name').value.trim();
+        const diag = document.getElementById('ep-diag').value.trim();
+        if (!name || !diag) { alert('Preencha nome e diagnóstico.'); return; }
+        const p = db.patients.find(x => x.id === editingPatientId);
+        if (!p) return;
+        p.name = name; p.birth = document.getElementById('ep-birth').value || null;
+        p.age = p.birth ? calcAgeFromBirth('ep-birth', 'ep-age', true) : null;
+        p.sex = document.getElementById('ep-sex').value || null;
+        p.diag = diag; p.cpf = document.getElementById('ep-cpf').value || null;
+        p.phone = document.getElementById('ep-phone').value.replace(/\D/g, '');
+        p.cep = document.getElementById('ep-cep').value || '';
+        p.city = document.getElementById('ep-city').value || '';
+        p.addr = document.getElementById('ep-addr').value;
+        p.obs = document.getElementById('ep-obs').value;
+        p.updatedAt = new Date().toISOString();
+        saveDB(); syncPatientToSupabase(p); closeModal('modal-edit');
+        renderPatients(); renderTable();
+        if (currentPatientId === editingPatientId) openPatient(editingPatientId);
+      }
+      function maskCEP(el) {
+        let v = el.value.replace(/\D/g, '').slice(0, 8);
+        if (v.length > 5) v = v.replace(/(\d{5})(\d{1,3})/, '$1-$2');
+        el.value = v;
+      }
+      function calcAgeFromBirth(birthId, ageId, returnNum) {
+        const birth = document.getElementById(birthId).value;
+        const ageEl = document.getElementById(ageId);
+        if (!birth) { if (ageEl) ageEl.value = ''; return returnNum ? null : undefined; }
+        const b = new Date(birth + 'T12:00:00');
+        const t = new Date(); let age = t.getFullYear() - b.getFullYear();
+        const m = t.getMonth() - b.getMonth();
+        if (m < 0 || (m === 0 && t.getDate() < b.getDate())) age--;
+        if (returnNum) return age >= 0 ? age : null;
+        ageEl.value = age >= 0 ? age + ' anos' : '—';
+      }
+      let cepTimer = null;
+      function buscaCEP(cepEl, addrId, cityId) {
+        clearTimeout(cepTimer);
+        const cep = cepEl.value.replace(/\D/g, '');
+        if (cep.length !== 8) return;
+        cepTimer = setTimeout(async () => {
+          try {
+            const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
+            const d = await r.json();
+            if (d.erro) return;
+            const addrEl = document.getElementById(addrId);
+            const cityEl = document.getElementById(cityId);
+            if (addrEl && !addrEl.value) addrEl.value = `${d.logradouro || ''}, ${d.bairro || ''}`.replace(/^,\s*/, '').replace(/,\s*$/, '');
+            if (cityEl && !cityEl.value) cityEl.value = `${d.localidade || ''} / ${d.uf || ''}`;
+          } catch (e) { console.warn("Falha ao buscar CEP:", e); }
+        }, 400);
+      }
+      function maskCPF(el) {
+        let v = el.value.replace(/\D/g, '').slice(0, 11);
+        if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
+        else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+        else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+        el.value = v;
+      }
+
+      // ── SUPABASE SYNC ──
+      function canSync() { return supabaseClient && currentUser?.supabaseId; }
+
+      let _syncQueue = [];
+      let _syncing = false;
+      function updateSyncDot(state) {
+        const dot = document.getElementById('sync-dot');
+        if (!dot) return;
+        dot.className = 'sync-dot' + (state === 'ok' ? '' : ' ' + state);
+        dot.title = state === 'ok' ? 'Sincronizado' : state === 'pending' ? 'Sincronizando...' : 'Erro de sincronização';
+      }
+      async function _processSyncQueue() {
+        if (_syncing || !_syncQueue.length) return;
+        _syncing = true;
+        updateSyncDot('pending');
+        const item = _syncQueue.shift();
         try {
-          const r = await fetch(`https://viacep.com.br/ws/${cep}/json/`);
-          const d = await r.json();
-          if (d.erro) return;
-          const addrEl = document.getElementById(addrId);
-          const cityEl = document.getElementById(cityId);
-          if (addrEl && !addrEl.value) addrEl.value = `${d.logradouro || ''}, ${d.bairro || ''}`.replace(/^,\s*/, '').replace(/,\s*$/, '');
-          if (cityEl && !cityEl.value) cityEl.value = `${d.localidade || ''} / ${d.uf || ''}`;
-        } catch (e) { console.warn("Falha ao buscar CEP:", e); }
-      }, 400);
-    }
-    function maskCPF(el) {
-      let v = el.value.replace(/\D/g, '').slice(0, 11);
-      if (v.length > 9) v = v.replace(/(\d{3})(\d{3})(\d{3})(\d{1,2})/, '$1.$2.$3-$4');
-      else if (v.length > 6) v = v.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
-      else if (v.length > 3) v = v.replace(/(\d{3})(\d{1,3})/, '$1.$2');
-      el.value = v;
-    }
-
-    // ── SUPABASE SYNC ──
-    function canSync() { return supabaseClient && currentUser?.supabaseId; }
-
-    let _syncQueue = [];
-    let _syncing = false;
-    function updateSyncDot(state) {
-      const dot = document.getElementById('sync-dot');
-      if (!dot) return;
-      dot.className = 'sync-dot' + (state === 'ok' ? '' : ' ' + state);
-      dot.title = state === 'ok' ? 'Sincronizado' : state === 'pending' ? 'Sincronizando...' : 'Erro de sincronização';
-    }
-    async function _processSyncQueue() {
-      if (_syncing || !_syncQueue.length) return;
-      _syncing = true;
-      updateSyncDot('pending');
-      const item = _syncQueue.shift();
-      try {
-        await item.fn();
-        updateSyncDot(_syncQueue.length ? 'pending' : 'ok');
-      } catch (e) {
-        updateSyncDot('error');
-        if (item.retries < 5) {
-          setTimeout(() => { _syncQueue.push({ ...item, retries: item.retries + 1 }); _processSyncQueue(); }, 30000);
-        } else {
-          showToast('Não foi possível sincronizar: ' + (e?.message || 'erro de conexão'), 'error');
-        }
-      }
-      _syncing = false;
-      if (_syncQueue.length) _processSyncQueue();
-    }
-    function enqueueSync(label, fn) {
-      _syncQueue.push({ label, fn, retries: 0 });
-      _processSyncQueue();
-    }
-
-    async function syncPatientToSupabase(p) {
-      if (!canSync()) return;
-      try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) return;
-        const profName = p.professional_name || professionalName();
-        const { error } = await supabaseClient.from('patients').upsert({
-          id: p.id, name: p.name, birth: p.birth, age: p.age,
-          sex: p.sex, diag: p.diag, cpf: p.cpf, phone: p.phone,
-          cep: p.cep, addr: p.addr, city: p.city, obs: p.obs,
-          professional_name: profName, crefito: p.crefito || currentUser?.crp || '', usuario_id: userId(),
-          "createdAt": p.createdAt || new Date().toISOString(),
-          "updatedAt": new Date().toISOString(),
-        }, { onConflict: 'id' });
-        if (error) { console.warn('Sync patient error:', error); showToast('Erro ao sincronizar paciente: ' + __authErr(error.message), 'error'); }
-      } catch (e) { console.warn('Sync patient failed:', e); showToast('Erro de conexão ao sincronizar paciente.', 'error'); }
-    }
-
-    function syncSessionToSupabase(s) {
-      if (!canSync()) return;
-      enqueueSync('session', () => pushSessionToSupabase(s));
-    }
-
-    async function pushSessionToSupabase(s) {
-      try {
-        const { data: { session } } = await supabaseClient.auth.getSession();
-        if (!session) throw new Error('Sessão expirada');
-        const p = db.patients.find(x => x.id === s.patientId);
-        if (p) {
-          const { data: existing } = await supabaseClient.from('patients').select('id').eq('id', p.id).maybeSingle();
-          if (!existing) {
-            const { error: perr } = await supabaseClient.from('patients').upsert({
-              id: p.id, name: p.name, birth: p.birth, age: p.age,
-              sex: p.sex, diag: p.diag, cpf: p.cpf, phone: p.phone,
-              cep: p.cep, addr: p.addr, city: p.city, obs: p.obs,
-              professional_name: p.professional_name || professionalName(),
-              crefito: p.crefito || currentUser?.crp || '',
-              usuario_id: userId(),
-              "createdAt": p.createdAt || new Date().toISOString(),
-              "updatedAt": new Date().toISOString(),
-            }, { onConflict: 'id' });
-            if (perr) throw perr;
+          await item.fn();
+          updateSyncDot(_syncQueue.length ? 'pending' : 'ok');
+        } catch (e) {
+          updateSyncDot('error');
+          if (item.retries < 5) {
+            setTimeout(() => { _syncQueue.push({ ...item, retries: item.retries + 1 }); _processSyncQueue(); }, 30000);
+          } else {
+            showToast('Não foi possível sincronizar: ' + (e?.message || 'erro de conexão'), 'error');
           }
         }
-        const payload = {
-          id: s.id, patient_id: s.patientId, date: s.date, num: s.num,
-          evolucao: s.evolucao, pa: s.pa, spo2: s.spo2, fc: s.fc,
-          pain: s.pain, procs: s.procs || [], obs: s.obs || '',
-          signed: s.signed || false, signed_at: s.signedAt || null,
-          paid: s.paid || false,
-          professional_name: s.professional_name || null,
-          crefito: s.crefito || null,
-          professional: s.professional || null,
-        };
-        if (parseFloat(s.value) > 0) payload.value = parseFloat(s.value);
-        if (s.signedBy) payload.signed_by = s.signedBy;
-        if (s.userAgent) payload.user_agent = s.userAgent;
-        if (s.token) payload.token = s.token;
-        const { error } = await supabaseClient.from('sessions').upsert(payload, { onConflict: 'id' });
-
-        if (error) throw error;
-      } catch (e) {
-        console.warn('Sync session error:', e);
-        throw e;
+        _syncing = false;
+        if (_syncQueue.length) _processSyncQueue();
       }
-    }
-
-    async function pullFromSupabase() {
-      if (!canSync()) return;
-      try {
-        const uid = currentUser.supabaseId;
-        const email = currentUser.email;
-        const { data: rp, error: pe } = await supabaseClient
-          .from('patients')
-          .select('*')
-          .or(`usuario_id.eq.${uid},usuario_id.eq.${email}`);
-        if (!pe && rp && rp.length) {
-          for (const r of rp) {
-            const old = db.patients.find(p => p.id === r.id);
-            if (old) Object.assign(old, { name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, professional_name: r.professional_name || null, crefito: r.crefito || null, createdAt: r.createdAt, updatedAt: r.updatedAt });
-            else db.patients.push({ id: r.id, name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, professional_name: r.professional_name || null, crefito: r.crefito || null, createdAt: r.createdAt, updatedAt: r.updatedAt });
-          }
-          saveDB();
-          const { data: rs, error: se } = await supabaseClient
-            .from('sessions')
-            .select('*')
-            .in('patient_id', rp.map(p => p.id));
-          if (!se && rs && rs.length) {
-            for (const r of rs) {
-              const old = db.sessions.find(s => s.id === r.id);
-              if (old) Object.assign(old, { patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, paid: r.paid || false, signedAt: r.signed_at, signedBy: r.signed_by || null, userAgent: r.user_agent || null, token: r.token || null, professional_name: r.professional_name || null, crefito: r.crefito || null, professional: r.professional || null });
-              else db.sessions.push({ id: r.id, patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, paid: r.paid || false, signedAt: r.signed_at, signedBy: r.signed_by || null, userAgent: r.user_agent || null, token: r.token || null, professional_name: r.professional_name || null, crefito: r.crefito || null, professional: r.professional || null });
-            }
-            saveDB();
-          }
-        }
-      } catch (e) { console.warn('Pull from Supabase failed:', e); }
-    }
-
-    // ── INIT ──
-    (async function init() {
-      const params = new URLSearchParams(location.search);
-      const token = params.get('token');
-      if (token) {
-        const s = db.sessions.find(x => x.token === token);
-        if (s && !s.signed) { const p = db.patients.find(x => x.id === s.patientId); if (p) { savedSession = { session: s, patient: p }; openSignScreen(s, p, true); return; } }
+      function enqueueSync(label, fn) {
+        _syncQueue.push({ label, fn, retries: 0 });
+        _processSyncQueue();
       }
 
-      // Password recovery flow: user clicked recovery link from email
-      if (supabaseClient && (__initialUrl.includes('type=recovery') || __recoveryFlow)) {
-        // Wait for Supabase to finish token exchange and set session
-        if (!__recoveryFlow) {
-          for (let i = 0; i < 30; i++) {
-            if (__recoveryFlow) break;
-            await new Promise(r => setTimeout(r, 50));
-          }
-        }
-        document.getElementById('recover-err').style.display = 'none';
-        showScreen('recover-setpass');
-        return;
-      }
-
-      // If we have a Supabase session, fetch profile from profiles table
-      if (supabaseClient) {
+      async function syncPatientToSupabase(p) {
+        if (!canSync()) return;
         try {
           const { data: { session } } = await supabaseClient.auth.getSession();
-          if (session?.user) {
-            const { data: prof } = await supabaseClient
-              .from('profiles')
-              .select('*')
-              .eq('id', session.user.id)
-              .single();
-            if (prof) {
-              const local = JSON.parse(localStorage.getItem('fh_user') || '{}');
-              currentUser = {
-                email: prof.email,
-                name: prof.name,
-                supabaseId: session.user.id,
-                sex: prof.sex || local.sex || '',
-                crp: prof.crp || local.crp || '',
-                spec: prof.spec || local.spec || '',
-                tel: prof.phone || local.tel || '',
-                addr: prof.addr || local.addr || '',
-                cpf: prof.cpf || local.cpf || '',
-                role: prof.role || local.role || 'user',
-              };
-              localStorage.setItem('fh_user', JSON.stringify(currentUser));
-              migrateLocalUserId(currentUser.email, session.user.id);
-              bootDash();
-              return;
-            }
-          }
-        } catch (_) { /* no session or no profiles table */ }
+          if (!session) return;
+          const profName = p.professional_name || professionalName();
+          const { error } = await supabaseClient.from('patients').upsert({
+            id: p.id, name: p.name, birth: p.birth, age: p.age,
+            sex: p.sex, diag: p.diag, cpf: p.cpf, phone: p.phone,
+            cep: p.cep, addr: p.addr, city: p.city, obs: p.obs,
+            professional_name: profName, crefito: p.crefito || currentUser?.crp || '', usuario_id: userId(),
+            "createdAt": p.createdAt || new Date().toISOString(),
+            "updatedAt": new Date().toISOString(),
+          }, { onConflict: 'id' });
+          if (error) { console.warn('Sync patient error:', error); showToast('Erro ao sincronizar paciente: ' + __authErr(error.message), 'error'); }
+        } catch (e) { console.warn('Sync patient failed:', e); showToast('Erro de conexão ao sincronizar paciente.', 'error'); }
       }
 
-      if (currentUser && db.users[currentUser.email]) bootDash();
-      else showScreen('login');
-    })();
-  </script>
+      function syncSessionToSupabase(s) {
+        if (!canSync()) return;
+        enqueueSync('session', () => pushSessionToSupabase(s));
+      }
+
+      async function pushSessionToSupabase(s) {
+        try {
+          const { data: { session } } = await supabaseClient.auth.getSession();
+          if (!session) throw new Error('Sessão expirada');
+          const p = db.patients.find(x => x.id === s.patientId);
+          if (p) {
+            const { data: existing } = await supabaseClient.from('patients').select('id').eq('id', p.id).maybeSingle();
+            if (!existing) {
+              const { error: perr } = await supabaseClient.from('patients').upsert({
+                id: p.id, name: p.name, birth: p.birth, age: p.age,
+                sex: p.sex, diag: p.diag, cpf: p.cpf, phone: p.phone,
+                cep: p.cep, addr: p.addr, city: p.city, obs: p.obs,
+                professional_name: p.professional_name || professionalName(),
+                crefito: p.crefito || currentUser?.crp || '',
+                usuario_id: userId(),
+                "createdAt": p.createdAt || new Date().toISOString(),
+                "updatedAt": new Date().toISOString(),
+              }, { onConflict: 'id' });
+              if (perr) throw perr;
+            }
+          }
+          const payload = {
+            id: s.id, patient_id: s.patientId, date: s.date, num: s.num,
+            evolucao: s.evolucao, pa: s.pa, spo2: s.spo2, fc: s.fc,
+            pain: s.pain, procs: s.procs || [], obs: s.obs || '',
+            signed: s.signed || false, signed_at: s.signedAt || null,
+            paid: s.paid || false,
+            professional_name: s.professional_name || null,
+            crefito: s.crefito || null,
+            professional: s.professional || null,
+          };
+          if (parseFloat(s.value) > 0) payload.value = parseFloat(s.value);
+          if (s.signedBy) payload.signed_by = s.signedBy;
+          if (s.userAgent) payload.user_agent = s.userAgent;
+          if (s.token) payload.token = s.token;
+          const { error } = await supabaseClient.from('sessions').upsert(payload, { onConflict: 'id' });
+
+          if (error) throw error;
+        } catch (e) {
+          console.warn('Sync session error:', e);
+          throw e;
+        }
+      }
+
+      async function pullFromSupabase() {
+        if (!canSync()) return;
+        try {
+          const uid = currentUser.supabaseId;
+          const email = currentUser.email;
+          const { data: rp, error: pe } = await supabaseClient
+            .from('patients')
+            .select('*')
+            .or(`usuario_id.eq.${uid},usuario_id.eq.${email}`);
+          if (!pe && rp && rp.length) {
+            for (const r of rp) {
+              const old = db.patients.find(p => p.id === r.id);
+              if (old) Object.assign(old, { name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, professional_name: r.professional_name || null, crefito: r.crefito || null, createdAt: r.createdAt, updatedAt: r.updatedAt });
+              else db.patients.push({ id: r.id, name: r.name, birth: r.birth, age: r.age, sex: r.sex, diag: r.diag, cpf: r.cpf, phone: r.phone, cep: r.cep, addr: r.addr, city: r.city, obs: r.obs, usuario_id: r.usuario_id, professional_name: r.professional_name || null, crefito: r.crefito || null, createdAt: r.createdAt, updatedAt: r.updatedAt });
+            }
+            saveDB();
+            const { data: rs, error: se } = await supabaseClient
+              .from('sessions')
+              .select('*')
+              .in('patient_id', rp.map(p => p.id));
+            if (!se && rs && rs.length) {
+              for (const r of rs) {
+                const old = db.sessions.find(s => s.id === r.id);
+                if (old) Object.assign(old, { patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, paid: r.paid || false, signedAt: r.signed_at, signedBy: r.signed_by || null, userAgent: r.user_agent || null, token: r.token || null, professional_name: r.professional_name || null, crefito: r.crefito || null, professional: r.professional || null });
+                else db.sessions.push({ id: r.id, patientId: r.patient_id, date: r.date, num: r.num, evolucao: r.evolucao, pa: r.pa, spo2: r.spo2, fc: r.fc, pain: r.pain, procs: r.procs || [], obs: r.obs || '', value: parseFloat(r.value) || 0, signed: r.signed || false, paid: r.paid || false, signedAt: r.signed_at, signedBy: r.signed_by || null, userAgent: r.user_agent || null, token: r.token || null, professional_name: r.professional_name || null, crefito: r.crefito || null, professional: r.professional || null });
+              }
+              saveDB();
+            }
+          }
+        } catch (e) { console.warn('Pull from Supabase failed:', e); }
+      }
+
+      // ── INIT ──
+      (async function init() {
+        const params = new URLSearchParams(location.search);
+        const token = params.get('token');
+        if (token) {
+          const s = db.sessions.find(x => x.token === token);
+          if (s && !s.signed) { const p = db.patients.find(x => x.id === s.patientId); if (p) { savedSession = { session: s, patient: p }; openSignScreen(s, p, true); return; } }
+        }
+
+        // Password recovery flow: user clicked recovery link from email
+        if (supabaseClient && (__initialUrl.includes('type=recovery') || __recoveryFlow)) {
+          // Wait for Supabase to finish token exchange and set session
+          if (!__recoveryFlow) {
+            for (let i = 0; i < 30; i++) {
+              if (__recoveryFlow) break;
+              await new Promise(r => setTimeout(r, 50));
+            }
+          }
+          document.getElementById('recover-err').style.display = 'none';
+          showScreen('recover-setpass');
+          return;
+        }
+
+        // If we have a Supabase session, fetch profile from profiles table
+        if (supabaseClient) {
+          try {
+            const { data: { session } } = await supabaseClient.auth.getSession();
+            if (session?.user) {
+              const { data: prof } = await supabaseClient
+                .from('profiles')
+                .select('*')
+                .eq('id', session.user.id)
+                .single();
+              if (prof) {
+                const local = JSON.parse(localStorage.getItem('fh_user') || '{}');
+                currentUser = {
+                  email: prof.email,
+                  name: prof.name,
+                  supabaseId: session.user.id,
+                  sex: prof.sex || local.sex || '',
+                  crp: prof.crp || local.crp || '',
+                  spec: prof.spec || local.spec || '',
+                  tel: prof.phone || local.tel || '',
+                  addr: prof.addr || local.addr || '',
+                  cpf: prof.cpf || local.cpf || '',
+                  role: prof.role || local.role || 'user',
+                };
+                localStorage.setItem('fh_user', JSON.stringify(currentUser));
+                migrateLocalUserId(currentUser.email, session.user.id);
+                bootDash();
+                return;
+              }
+            }
+          } catch (_) { /* no session or no profiles table */ }
+        }
+
+        if (currentUser && db.users[currentUser.email]) bootDash();
+        else showScreen('login');
+      })();
+    </script>
 </body>
 
 </html>
