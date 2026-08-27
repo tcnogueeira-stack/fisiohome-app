@@ -2766,7 +2766,7 @@
       }
       function updateStats() {
         const now = new Date();
-        const today = now.toISOString().split('T')[0];
+        const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
         const month = today.slice(0, 7);
         let list = myPatients();
         if (patientDateFilter === 'today') list = list.filter(p => sessionsOf(p.id).some(s => s.date === today));
@@ -2795,7 +2795,7 @@
 
       function updateProfileStats() {
         const now = new Date();
-        const month = now.toISOString().slice(0, 7);
+        const month = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
         let sessions = sessionsOf(currentPatientId);
         if (profileFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); sessions = sessions.filter(s => new Date(s.date) >= w); }
         else if (profileFilter === 'month') sessions = sessions.filter(s => s.date.startsWith(month));
@@ -2823,7 +2823,7 @@
 
       function renderPatients() {
         const now = new Date();
-        const today = now.toISOString().split('T')[0];
+        const today = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
         const month = today.slice(0, 7);
         let list = myPatients();
         if (patientDateFilter === 'today') { const t = today; list = list.filter(p => sessionsOf(p.id).some(s => s.date === t)); }
@@ -3055,7 +3055,7 @@
 
       function renderSessions() {
         const now = new Date();
-        const month = now.toISOString().slice(0, 7);
+        const month = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
         let list = sessionsOf(currentPatientId);
         if (profileFilter === 'week') { const w = new Date(now); w.setDate(now.getDate() - 7); list = list.filter(s => new Date(s.date) >= w); }
         else if (profileFilter === 'month') list = list.filter(s => s.date.startsWith(month));
