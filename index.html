@@ -3098,7 +3098,8 @@
         const p = db.patients.find(x => x.id === currentPatientId);
         const nextNum = sessionsOf(p.id).length + 1;
         document.getElementById('form-patient-name').textContent = p.name;
-        document.getElementById('f-date').value = new Date().toISOString().split('T')[0];
+        const hoje = new Date();
+        document.getElementById('f-date').value = `${hoje.getFullYear()}-${String(hoje.getMonth()+1).padStart(2,'0')}-${String(hoje.getDate()).padStart(2,'0')}`;
         document.getElementById('f-num-display').textContent = nextNum;
         document.getElementById('f-num-display').dataset.num = nextNum;
         ['f-evolucao', 'f-pa', 'f-spo2', 'f-fc', 'f-obs', 'f-value'].forEach(id => document.getElementById(id).value = '');
